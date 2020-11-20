@@ -10,7 +10,7 @@ std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
 int main() {
     std::shared_ptr<pht::UnorderedTree<char>> tree = createTestTree();
-    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro::decompose<char>(tree, 5);
+    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(tree, 5);
     std::cout << "Original tree:\n" << *tree << "\n\n";
     std::cout << "Component trees:\n";
     for(int i = 0; i < componentSubtrees.size(); i++) {
@@ -41,6 +41,11 @@ int main() {
         }
     } while(xml->read());
     std::cout << "\n\nXML tree:\n" << xmlTree->toNewickString();
+    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> componentSubtrees2 = pht::FarzanMunro<std::string>::decompose(xmlTree, 5);
+    std::cout << "\n\nComponent trees:\n";
+    for(int i = 0; i < componentSubtrees2.size(); i++) {
+        std::cout << (i==0?"":"\n") << *componentSubtrees2.at(i);
+    }
     return 0;
 }
 

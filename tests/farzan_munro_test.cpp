@@ -74,9 +74,9 @@ protected:
 };
 
 TEST_F(FarzanMunroTest, DecomposeTest) {
-    EXPECT_DEATH({ pht::FarzanMunro::decompose((std::shared_ptr<pht::UnorderedTree<char>>)nullptr, 5); }, "Invalid tree");
-    EXPECT_DEATH({ pht::FarzanMunro::decompose(example, 0); }, "l cannot be 0");
-    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro::decompose(example, 5);
+    EXPECT_DEATH({ pht::FarzanMunro<char>::decompose((std::shared_ptr<pht::UnorderedTree<char>>)nullptr, 5); }, "Invalid tree");
+    EXPECT_DEATH({ pht::FarzanMunro<char>::decompose(example, 0); }, "l cannot be 0");
+    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(example, 5);
     std::vector<std::string> componentSubtreeStrings;
     for(std::shared_ptr<pht::UnorderedTree<char>> componentSubtree : componentSubtrees) {
         componentSubtreeStrings.push_back(componentSubtree->toString());
