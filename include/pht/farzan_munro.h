@@ -1,9 +1,10 @@
 #ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_FARZANMUNRO_H_
 #define PROJECTGROUP_HYPERSUCCINCT_TREES_FARZANMUNRO_H_
 
-#include "unordered_tree.h"
-
 #include <iostream>
+
+#include "unordered_tree.h"
+#include "list_utils.h"
 
 namespace pht {
     /**
@@ -72,8 +73,7 @@ namespace pht {
             if(newComponents.size() == 1 && newComponents.at(0)->getSize() < idealSize) {
                 return newComponents;
             } else {
-                //TODO Extract into Utils
-                permanentComponents.insert(permanentComponents.end(), newComponents.begin(), newComponents.end());
+                ListUtils::addAll(permanentComponents, newComponents);
                 return std::vector<std::shared_ptr<pht::UnorderedTree<T>>>();
             }
         }
@@ -96,19 +96,13 @@ namespace pht {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
             } else {
                 for(std::shared_ptr<pht::Node<T>> child : tree->getDirectDescendants(currentNode)) {
-                    //TODO Extract into Utils
-                    std::vector<std::shared_ptr<pht::UnorderedTree<T>>> childComponents = decompose(tree, child, idealSize);
-                    temporaryComponents.insert(temporaryComponents.end(), childComponents.begin(), childComponents.end());
+                    ListUtils::addAll(temporaryComponents, decompose(tree, child, idealSize));
                 }
             }
             
-            //TODO Extract into Utils or UnorderedTree
-            std::vector<std::shared_ptr<pht::Node<T>>> heavyChildren = tree->getDirectDescendants(currentNode);
-            heavyChildren.erase(std::remove_if(heavyChildren.begin(), heavyChildren.end(), [tree, idealSize](std::shared_ptr<pht::Node<T>> child){ return !tree->isHeavy(child, idealSize); }), heavyChildren.end());
+            std::vector<std::shared_ptr<pht::Node<T>>> heavyChildren = tree->getHeavyDirectDescendants(currentNode, idealSize);
             
             if(heavyChildren.size() <= 1) {
-                //TODO Extract into Utils
-                //auto heavyComponentPosition = std::find_if(temporaryComponents.begin(), temporaryComponents.end(), [tree, heavyChildren](std::shared_ptr<pht::UnorderedTree<T>> component){ return component->getRoot() == heavyChildren.at(0); });
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
             } else {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> group;
