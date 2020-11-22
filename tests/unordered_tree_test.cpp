@@ -75,7 +75,6 @@ protected:
 
 TEST_F(UnorderedTreeTest, ConstructorTest) {
     EXPECT_EQ(empty->getRoot(), nullptr);
-    EXPECT_FALSE(empty->isPermanent());
 }
 
 TEST_F(UnorderedTreeTest, LeftShiftOperatorTest) {
@@ -258,13 +257,13 @@ TEST_F(UnorderedTreeTest, RemoveTest) {
     empty->add(c, b);
     empty->remove(b);
     EXPECT_STREQ(empty->toString().c_str(), "a{}");
-    /*EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
     example->remove(b, true);
     EXPECT_STREQ(example->toString().c_str(), "a{c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{},g{l{}},h{},i{m{}},j{}}");
     example->remove(A);
     EXPECT_STREQ(example->toString().c_str(), "a{c{},d{k{n{},o{q{s{},t{},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{},g{l{}},h{},i{m{}},j{}}");
     example->remove(q);
-    EXPECT_STREQ(example->toString().c_str(), "a{c{},d{k{n{},o{r{x{B{}},y{},z{}}},p{}}},e{},f{},g{l{}},h{},i{m{}},j{}}");*/
+    EXPECT_STREQ(example->toString().c_str(), "a{c{},d{k{n{},o{r{x{B{}},y{},z{}}},p{}}},e{},f{},g{l{}},h{},i{m{}},j{}}");
 }
 
 TEST_F(UnorderedTreeTest, GetSizeTest) {
@@ -320,35 +319,6 @@ TEST_F(UnorderedTreeTest, GetHeightTest1) {
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
     EXPECT_EQ(example->getHeight(), 6);
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-}
-
-TEST_F(UnorderedTreeTest, GetSetPermanentTest) {
-	EXPECT_STREQ(empty->toString().c_str(), "");
-    EXPECT_FALSE(empty->isPermanent());
-    EXPECT_STREQ(empty->toString().c_str(), "");
-    empty->add(a);
-    EXPECT_STREQ(empty->toString().c_str(), "a{}");
-    EXPECT_FALSE(empty->isPermanent());
-    EXPECT_STREQ(empty->toString().c_str(), "a{}");
-    empty->add(b, a);
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    EXPECT_FALSE(empty->isPermanent());
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-    EXPECT_FALSE(empty->isPermanent());
-    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-	EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    empty->setPermanent(true);
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-	EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    EXPECT_TRUE(empty->isPermanent());
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-	EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    empty->setPermanent(false);
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-	EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
-    EXPECT_FALSE(empty->isPermanent());
-    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
 }
 
 TEST_F(UnorderedTreeTest, ContainsTest) {
@@ -483,7 +453,7 @@ TEST_F(UnorderedTreeTest, IsHeavyTest) {
 	EXPECT_DEATH({ empty->isHeavy(nullptr, 5); }, "Invalid node");
     EXPECT_DEATH({ empty->isHeavy(a, 5); }, "Node not found");
     empty->add(a);
-    EXPECT_DEATH({ empty->isHeavy(a, 0); }, "l cannot be 0");
+    EXPECT_DEATH({ empty->isHeavy(a, 0); }, "Size cannot be 0");
     EXPECT_STREQ(empty->toString().c_str(), "a{}");
     EXPECT_FALSE(empty->isHeavy(a, 5));
     EXPECT_STREQ(empty->toString().c_str(), "a{}");
@@ -509,6 +479,37 @@ TEST_F(UnorderedTreeTest, IsHeavyTest) {
     EXPECT_FALSE(example->isHeavy(j, 5));
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
     EXPECT_FALSE(example->isHeavy(A, 5));
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+}
+
+TEST_F(UnorderedTreeTest, GetHeavyDirectDescendantsTest) {
+	EXPECT_DEATH({ empty->getHeavyDirectDescendants(nullptr, 5); }, "Invalid node");
+    EXPECT_DEATH({ empty->getHeavyDirectDescendants(a, 5); }, "Node not found");
+    empty->add(a);
+    EXPECT_DEATH({ empty->getHeavyDirectDescendants(a, 0); }, "Size cannot be 0");
+    EXPECT_STREQ(empty->toString().c_str(), "a{}");
+    EXPECT_THAT(empty->getHeavyDirectDescendants(a, 5), ::testing::UnorderedElementsAre());
+    EXPECT_STREQ(empty->toString().c_str(), "a{}");
+    EXPECT_THAT(empty->getHeavyDirectDescendants(a, 1), ::testing::UnorderedElementsAre());
+    EXPECT_STREQ(empty->toString().c_str(), "a{}");
+    empty->add(b, a);
+    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
+    EXPECT_THAT(empty->getHeavyDirectDescendants(a, 5), ::testing::UnorderedElementsAre());
+    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
+    EXPECT_THAT(empty->getHeavyDirectDescendants(a, 1), ::testing::UnorderedElementsAre(b));
+    EXPECT_STREQ(empty->toString().c_str(), "a{b{}}");
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(a, 5), ::testing::UnorderedElementsAre(b,d));
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(a, 1), ::testing::UnorderedElementsAre(b,c,d,e,f));
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(a, 100), ::testing::UnorderedElementsAre());
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(o, 5), ::testing::UnorderedElementsAre(q,r));
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(o, 1), ::testing::UnorderedElementsAre(q,r));
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_THAT(example->getHeavyDirectDescendants(o, 100), ::testing::UnorderedElementsAre());
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
 }
 

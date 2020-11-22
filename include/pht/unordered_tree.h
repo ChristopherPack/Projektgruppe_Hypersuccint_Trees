@@ -120,6 +120,23 @@ namespace pht {
         }
 
         /**
+         * Returns all direct descendants of the given node. 
+         * 
+         * @param[in] node A pointer to the ancestor node. Cannot be nullptr. 
+         * @param[in] size The size as of a node is considered heavy. 
+         * @return A list which contains pointers to all direct heavy descendants of the given node. 
+         */
+        std::vector<std::shared_ptr<pht::Node<T>>> getHeavyDirectDescendants(const std::shared_ptr<pht::Node<T>> node, const uint32_t size) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+            ASSERT(size >= 1, "Size cannot be 0");
+
+            std::vector<std::shared_ptr<pht::Node<T>>> children = getDirectDescendants(node);
+            children.erase(std::remove_if(children.begin(), children.end(), [this, size](std::shared_ptr<pht::Node<T>> child){ return !isHeavy(child, size); }), children.end());
+            return children;
+        }
+
+        /**
          * Returns all descendants of the given node. 
          * 
          * This method recursively collects all descendants of the given node. 
@@ -225,8 +242,8 @@ namespace pht {
                 descendants.clear();
                 root = nullptr;
             } else {
-                for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                    remove(desc);
+                while(!descendants.at(node).empty()) {
+                    remove(descendants.at(node).at(0));
                 }
                 descendants.erase(node);
                 descendants.at(ancestors.at(node)).erase(std::remove(descendants.at(ancestors.at(node)).begin(), descendants.at(ancestors.at(node)).end(), node), descendants.at(ancestors.at(node)).end());
@@ -264,24 +281,6 @@ namespace pht {
             if(root == nullptr)
                 return -1;
             return getHeight(root);
-        }
-
-        /**
-         * Returns true if this tree was marked as permanent. 
-         * 
-         * @return True when the tree is permanent. 
-         */
-        virtual bool isPermanent() const {
-            return permanent;
-        };
-
-        /**
-         * Marks this tree as (not) permanent. 
-         * 
-         * @param[in] permanent The new permanence status.  
-         */
-        virtual void setPermanent(const bool permanent) {
-            this->permanent = permanent;
         }
 
         /**
@@ -381,18 +380,18 @@ namespace pht {
          * Checks if the given node is heavy as defined by the farzan-munro-algorithm. 
          * 
          * This method calculates the size of the subtree defined by the given node and returns 
-         * true if the size is bigger than the given parameter l.
+         * true if the size is bigger than the given parameter.
          * 
          * @param[in] node A pointer to the node. Cannot be nullptr. Has to be in the tree. 
-         * @param[in] l The count of descendants (inclusive node) by which a heavy node is defined. 
-         * @return True if the node has greater or equal to l-1 descendants. 
+         * @param[in] size The count of descendants (inclusive node) by which a heavy node is defined. 
+         * @return True if the node has greater or equal to size-1 descendants. 
          */
-        bool isHeavy(const std::shared_ptr<pht::Node<T>> node, const uint32_t l) const {
+        bool isHeavy(const std::shared_ptr<pht::Node<T>> node, const uint32_t size) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
-            ASSERT(l >= 1, "l cannot be 0");
+            ASSERT(size >= 1, "Size cannot be 0");
 
-            return getSize(node) >= l;
+            return getSize(node) >= size;
         }
 
         /**
@@ -423,7 +422,6 @@ namespace pht {
 
     protected:
         std::shared_ptr<pht::Node<T>> root; ///The root od the tree
-        bool permanent; ///Allows the tree to be marked as permanent for the farzan-munro-algorithm
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup. 

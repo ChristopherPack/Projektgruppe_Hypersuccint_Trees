@@ -10,7 +10,7 @@ namespace pht {
      * An implementation of the farzan-munro-algorithm. 
      * 
      * This class implements the algorithm of Farzan and Munro to decompose a tree 
-     * into multiple smaller subtrees with a size between a parameter l and 2l.
+     * into multiple smaller subtrees with a size between a parameter L and 2L.
      */
     template<class T> class FarzanMunro {
     public:
@@ -18,38 +18,40 @@ namespace pht {
          * Decomposes a tree. 
          * 
          * This method will decompose the given tree into multiple new and smaller subtrees with a size 
-         * between l and 2 l.
+         * between idealSize and 2*idealSize.
          * 
          * @param[in] tree A pointer to the tree to decompose. 
-         * @param[in] l The size of the new subtrees. Subtrees will never be larger than 2l and mostly bigger than l. 
+         * @param[in] idealSize The size of the new subtrees. Subtrees will never be larger than 2*idealSize and mostly bigger than idealSize. 
          * @tparam T The type of data stored in the nodes of the tree. 
+         * @return A list with pointers to the components of the decomposed tree. 
          */
-        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t l) {
+        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
             assert(tree != nullptr && "Invalid tree");
-            assert(l >= 1 && "l cannot be 0");
+            assert(idealSize >= 1 && "IdealSize cannot be 0");
 
-            if(tree->isEmpty() || tree->getSize() <= l) {
+            if(tree->isEmpty() || tree->getSize() <= idealSize) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result;
                 result.push_back(std::shared_ptr<pht::UnorderedTree<T>>(tree));
                 return result;
             } else {
                 permanentComponents.clear();
-                decompose(tree, tree->getRoot(), l);
+                decompose(tree, tree->getRoot(), idealSize);
                 return permanentComponents;
             }
         }
 
     private:
-        inline static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> permanentComponents;
+        inline static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> permanentComponents; ///The permanent components of the tree which is currently decomposed. 
 
         /**
-         * Greedily packs the components and node v into new components with l < getSize() < 2l. 
+         * Greedily packs the components and node v into new components with idealSize < getSize() < 2*idealSize. 
          * 
          * @param[in] tree A pointer to the original tree to decompose. 
-         * @param[in] v A pointer to the node which child-components are getting packed together. 
-         * @param[in] components A list with pointers to the components to pack together. 
-         * @param[in] l The size of the new components. 
+         * @param[in] currentNode A pointer to the node which child-components are getting packed together. 
+         * @param[in] oldComponents A list with pointers to the components to pack together. 
+         * @param[in] idealSize The size of the new components. 
          * @tparam T The type of data stored in the nodes of the tree. 
+         * @return A list with pointers to the new packed components. 
          */
         static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> greedilyPack(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> oldComponents, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> newComponents;
@@ -80,12 +82,13 @@ namespace pht {
          * Decomposes a tree. 
          * 
          * This method will decompose the given (sub-)tree into multiple new and smaller subtrees with a size 
-         * between l and 2 l. 
+         * between idealSize and 2*idealSize. 
          * 
          * @param[in] tree A pointer to the tree to decompose. 
-         * @param[in] v A pointer to the current root node of the subtree to decompose. 
-         * @param[in] l The size of the new subtrees. Subtrees will never be larger than 2l and mostly bigger than l. 
+         * @param[in] currentNode A pointer to the current root node of the subtree to decompose. 
+         * @param[in] idealSize The size of the new subtrees. Subtrees will never be larger than 2*idealSize and mostly bigger than idealSize. 
          * @tparam T The type of data stored in the nodes of the tree. 
+         * @return A list with pointers to the components of the decomposed tree. 
          */
         template<class T> static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> temporaryComponents;
