@@ -7,8 +7,6 @@
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
 
-//TODO Integrate missing order into tests which compare strings
-
 class FarzanMunroTest : public ::testing::Test {
 protected:
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();

@@ -6,8 +6,6 @@
 
 #include "pht/unordered_tree.h"
 
-//TODO Integrate missing order into tests which compare strings
-
 class UnorderedTreeTest : public ::testing::Test {
 protected:
     std::shared_ptr<pht::UnorderedTree<char>> empty = std::make_shared<pht::UnorderedTree<char>>();

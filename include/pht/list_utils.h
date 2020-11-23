@@ -43,7 +43,22 @@ namespace pht {
         }
 
         /**
-         * Filters out all elements int the vector for which the given function is false. 
+         * Sortes the given vector with the given filter function. 
+         * 
+         * @param[in] vector The vector which should be sorted. 
+         * @param[in] predicate The comparator function. 
+         * @tparam T The type of data stored in the vector. 
+         * @tparam F The type of the comparator function. 
+         */
+        template<class T, class F> inline static void sort(std::vector<T>& vector, const F comparator) {
+            if(vector.empty()) {
+                return;
+            }
+            std::sort(vector.begin(), vector.end(), comparator);
+        }
+
+        /**
+         * Filters out all elements in the vector for which the given function is false. 
          * 
          * @param[in] vector The vector which should be filtered. 
          * @param[in] predicate The filter function. 

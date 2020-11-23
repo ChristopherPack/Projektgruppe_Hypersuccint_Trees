@@ -13,7 +13,7 @@ namespace pht {
      * This class stores the information in a tree. It functions as a simple wrapper
      * and is necessary to allow duplicate values in the tree. 
      * 
-     * @tparam T The type of data stored. 
+     * @tparam T The type of data stored. Has to be comparable with < and printable via <<.
      */
     template<class T> class Node {
     public:

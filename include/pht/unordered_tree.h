@@ -397,6 +397,8 @@ namespace pht {
         /**
          * Converts this tree into a string in a human readable debug format. 
          * 
+         * The order of the nodes in the returned string is sorted with value1 < value2 to ensure consistency. 
+         * 
          * @return The string representation of this tree. 
          */
         std::string toString() const {
@@ -420,7 +422,7 @@ namespace pht {
             return toString(root, true)+std::string(";");
         }
 
-    protected:
+    private:
         std::shared_ptr<pht::Node<T>> root; ///The root od the tree
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
@@ -442,7 +444,7 @@ namespace pht {
         }
 
         /**
-         * Helper function to stringify the tree.
+         * Helper function to stringify the tree (in order, relevant for testing). 
          * 
          * Used for recursive calls, stringify a subtree rooted at node. 
          * @param[in] node A pointer to the root node of a subtree to stringify.
@@ -460,6 +462,7 @@ namespace pht {
             }
 
             std::vector<std::shared_ptr<pht::Node<T>>> descs = descendants.at(node);
+            std::sort(descs.begin(), descs.end(), [](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return a->getValue() < b->getValue(); });
             for(int i = 0; i < descs.size(); i++) {
                 if(i != 0) {
                     string << ",";

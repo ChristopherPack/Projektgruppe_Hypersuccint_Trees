@@ -53,6 +53,15 @@ TEST(ListUtilsTest, IndexOfTest) {
     EXPECT_THAT(c, ::testing::ElementsAre());
 }
 
+TEST(ListUtilsTest, SortTest) {
+    std::vector<int> a = {4,1,4,2,2};
+    std::vector<int> b = {};
+    pht::ListUtils::sort(a, [](int a, int b){ return a < b; });
+    EXPECT_THAT(a, ::testing::ElementsAre(1,2,2,4,4));
+    pht::ListUtils::sort(b, [](int a, int b){ return a > b; });
+    EXPECT_THAT(b, ::testing::ElementsAre());
+}
+
 TEST(ListUtilsTest, FilterTest) {
     std::vector<int> a = {0,1,2,3,4};
     std::vector<int> b = {};
