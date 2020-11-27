@@ -1,0 +1,7 @@
+file(GLOB example_service_src CONFIGURE_DEPENDS "*.h" "*.hpp" "*.c" "*.cc" "*.cpp")
+add_executable(example_service ${example_service_src})
+set_target_properties(example_service PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_features(example_service PRIVATE cxx_std_17)
+target_link_libraries(example_service PRIVATE pht_lib irrxml)
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/DBLP.xml" "${CMAKE_CURRENT_BINARY_DIR}/Debug/DBLP.xml")
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/DBLP.xml" "${CMAKE_CURRENT_BINARY_DIR}/Release/DBLP.xml")

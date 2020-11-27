@@ -11,7 +11,7 @@
 
 #include "node.h"
 
-#define ASSERT(condition, msg) assert((condition) && msg);
+#define ASSERT(condition, msg) //assert((condition) && msg);
 
 namespace pht {
     /**
