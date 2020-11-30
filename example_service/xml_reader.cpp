@@ -20,7 +20,6 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
         if(element >= 5963000)
             std::cout << element << " " << xml->getNodeType() << " " << xml->getAttributeCount() << " " << xml->getNodeName() << std::endl;
         if(xml->getNodeType() == irr::io::EXN_ELEMENT) {
-
             std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(xml->getNodeName());
             xmlTree->add(node, current);
             current = node;
