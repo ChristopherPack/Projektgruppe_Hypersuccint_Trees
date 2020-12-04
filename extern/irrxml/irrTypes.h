@@ -80,7 +80,7 @@ typedef unsigned short wchar_t;
 
 //! define a break macro for debugging only in Win32 mode.
 #if defined(WIN32) && defined(_MSC_VER) && defined(_DEBUG)
-#define _IRR_DEBUG_BREAK_IF( _CONDITION_ ) exit(-1);//if (_CONDITION_) {_asm int 3}
+#define _IRR_DEBUG_BREAK_IF( _CONDITION_ ) if (_CONDITION_) throw "irrXML failure";//if (_CONDITION_) {_asm int 3}
 #else 
 #define _IRR_DEBUG_BREAK_IF( _CONDITION_ )
 #endif

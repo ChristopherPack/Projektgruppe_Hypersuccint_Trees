@@ -15,14 +15,11 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     uint32_t element = 0;
     do {
         element++;
-        if(element%1000 == 0)
-            std::cout << element << std::endl;
-        if(element >= 5963000)
-            std::cout << element << " " << xml->getNodeType() << " " << xml->getAttributeCount() << " " << xml->getNodeName() << std::endl;
         if(xml->getNodeType() == irr::io::EXN_ELEMENT) {
             std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(xml->getNodeName());
             xmlTree->add(node, current);
-            current = node;
+            if(!xml->isEmptyElement())
+                current = node;
             for(int i = 0; i < xml->getAttributeCount(); i++) {
                 std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>(std::string(xml->getAttributeName(i)));
                 xmlTree->add(attributeName, current);

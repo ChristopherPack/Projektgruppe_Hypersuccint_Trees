@@ -18,7 +18,7 @@ int main() {
         std::cout << (i==0?"":"\n") << *componentSubtrees.at(i);
     }
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("XMark2.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Programming\\Projects\\Projektgruppe_Hypersuccint_Trees\\build\\example_service\\Debug\\DBLP.xml");
 
     std::cout << "\n\nXML tree:\n"/* << xmlTree->toString()*/;
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> componentSubtrees2 = pht::FarzanMunro<std::string>::decompose(xmlTree, 5);
