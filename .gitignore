@@ -7,3 +7,5 @@ XML/
 build/
 .vscode/
 resources/
+cmake-build-debug/
+cmake-build-release/
