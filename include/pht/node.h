@@ -25,6 +25,9 @@ namespace pht {
         Node(const T value) : value(value) {
         }
 
+        ~Node() {
+        }
+
         /**
          * Changes the value to the new value. 
          * 

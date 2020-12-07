@@ -26,6 +26,12 @@ namespace pht {
     //TODO Caching
     template<class T> class UnorderedTree {
     public:
+        UnorderedTree() {
+        }
+
+        ~UnorderedTree() {
+        }
+        
         /**
          * Adds a node to the tree. 
          * 
@@ -133,6 +139,7 @@ namespace pht {
 
             std::vector<std::shared_ptr<pht::Node<T>>> children = getDirectDescendants(node);
             children.erase(std::remove_if(children.begin(), children.end(), [this, size](std::shared_ptr<pht::Node<T>> child){ return !isHeavy(child, size); }), children.end());
+            children.shrink_to_fit();
             return children;
         }
 
@@ -233,9 +240,11 @@ namespace pht {
                     descendants.at(ancestors.at(node)).push_back(desc);
                 }
                 descendants.at(ancestors.at(node)).erase(std::remove(descendants.at(ancestors.at(node)).begin(), descendants.at(ancestors.at(node)).end(), node), descendants.at(ancestors.at(node)).end());
+                descendants.at(ancestors.at(node)).shrink_to_fit();
                 descendants.erase(node);
                 ancestors.erase(node);
                 nodes.erase(std::remove(nodes.begin(), nodes.end(), node), nodes.end());
+                nodes.shrink_to_fit();
             } else if(node == root) {
                 nodes.clear();
                 ancestors.clear();
@@ -247,8 +256,10 @@ namespace pht {
                 }
                 descendants.erase(node);
                 descendants.at(ancestors.at(node)).erase(std::remove(descendants.at(ancestors.at(node)).begin(), descendants.at(ancestors.at(node)).end(), node), descendants.at(ancestors.at(node)).end());
+                descendants.at(ancestors.at(node)).shrink_to_fit();
                 ancestors.erase(node);
                 nodes.erase(std::remove(nodes.begin(), nodes.end(), node), nodes.end());
+                nodes.shrink_to_fit();
             }
         }
 
@@ -260,7 +271,7 @@ namespace pht {
         uint32_t getSize() const {
             if(root == nullptr)
                 return 0;
-            return getSize(root);
+            return nodes.size();
         }
 
         /**
@@ -422,8 +433,8 @@ namespace pht {
             return toString(root, true)+std::string(";");
         }
 
-    private:
-        std::shared_ptr<pht::Node<T>> root; ///The root od the tree
+    //private:
+        std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup. 

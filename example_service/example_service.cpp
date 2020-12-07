@@ -1,10 +1,11 @@
-#include "pht/unordered_tree.h"
-#include "pht/farzan_munro.h"
-
 #include <iostream>
 #include <string>
 
 #include <irrXML.h>
+
+#include "pht/unordered_tree.h"
+#include "pht/farzan_munro.h"
+#include "xml_reader.h"
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
@@ -16,31 +17,10 @@ int main() {
     for(int i = 0; i < componentSubtrees.size(); i++) {
         std::cout << (i==0?"":"\n") << *componentSubtrees.at(i);
     }
-    
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = std::make_shared<pht::UnorderedTree<std::string>>();
-    std::shared_ptr<pht::Node<std::string>> current = nullptr;
 
-    std::shared_ptr<irr::io::IrrXMLReader> xml = std::shared_ptr<irr::io::IrrXMLReader>(irr::io::createIrrXMLReader("catalog.xml"));
-    if(!xml || !xml->read())
-        throw std::runtime_error("Failed to read xml file");
-    do {
-        if(xml->getNodeType() == irr::io::EXN_ELEMENT) {
-            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(xml->getNodeName());
-            xmlTree->add(node, current);
-            current = node;
-        } else if(xml->getNodeType() == irr::io::EXN_ELEMENT_END) {
-            if(!xmlTree->isRoot(current)) {
-                current = xmlTree->getDirectAncestor(current);
-            }
-        } else if(xml->getNodeType() == irr::io::EXN_TEXT) {
-            std::string text = std::string(xml->getNodeData());
-            if(!std::all_of(text.begin(), text.end(), isspace)) {
-                std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(text);
-                xmlTree->add(node, current);
-            }
-        }
-    } while(xml->read());
-    std::cout << "\n\nXML tree:\n" << xmlTree->toNewickString();
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Programming\\Projects\\Projektgruppe_Hypersuccint_Trees\\build\\example_service\\Debug\\DBLP.xml");
+
+    std::cout << "\n\nXML tree:\n"/* << xmlTree->toString()*/;
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> componentSubtrees2 = pht::FarzanMunro<std::string>::decompose(xmlTree, 5);
     std::cout << "\n\nComponent trees:\n";
     for(int i = 0; i < componentSubtrees2.size(); i++) {
