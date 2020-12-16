@@ -98,7 +98,7 @@ namespace pht {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
             } else {
                 for(std::shared_ptr<pht::Node<T>> child : tree->getDirectDescendants(currentNode)) {
-                    ListUtils::addAll(temporaryComponents, decompose(tree, child, idealSize, depth+1));
+                    ListUtils::addAll(temporaryComponents, decompose(tree, child, idealSize));
                 }
             }
             
