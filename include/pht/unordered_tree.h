@@ -8,6 +8,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <bitset>
 
 #include "node.h"
 
@@ -433,6 +434,15 @@ namespace pht {
             return toString(root, true)+std::string(";");
         }
 
+        std::vector<bool> toBalancedParenthesis() {
+            std::vector<bool> bp;
+            if(root == nullptr) {
+                return bp;
+            }
+            toBP(root,bp);
+            return bp;
+        }
+
     //private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
@@ -490,6 +500,23 @@ namespace pht {
                 string << "}";
             }
             return string.str();
+        }
+
+        /**
+         * Helper function to BPify the tree (in order, relevant for testing).
+         *
+         * Used for recursive calls, BPify a subtree rooted at node.
+         * @param[in] node A pointer to the root node of a subtree to stringify.
+         * @param[in,out] bitset
+         * @param[in] index
+         * @return The subtree as string.
+         */
+        void toBP(std::shared_ptr<pht::Node<T>> node,std::vector<bool>& bp) const {
+            bp.push_back(true);
+            for(std::shared_ptr<pht::Node<T>> child : getDirectDescendants(node)) {
+                toBP(child, bp);
+            }
+            bp.push_back(false);
         }
    };
 

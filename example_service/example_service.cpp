@@ -6,6 +6,8 @@
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
 #include "xml_reader.h"
+#include "pht/hypersuccinct_tree_factory.h"
+#include "pht/hypersuccinct_tree.h"
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
@@ -19,14 +21,16 @@ int main() {
     }
 
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\DBLP.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\1998shortstats.xml");
 
-    std::cout << "\n\nXML tree:\n"/* << xmlTree->toString()*/;
+    /*std::cout << "\n\nXML tree:\n" << xmlTree->toString();
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> componentSubtrees2 = pht::FarzanMunro<std::string>::decompose(xmlTree, 5);
     std::cout << "\n\nComponent trees:\n";
     for(int i = 0; i < componentSubtrees2.size(); i++) {
         std::cout << (i==0?"":"\n") << *componentSubtrees2.at(i);
-    }
+    }*/
+
+    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
     return 0;
 }
 
