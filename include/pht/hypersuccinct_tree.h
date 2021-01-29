@@ -23,12 +23,14 @@ namespace pht {
     struct MiniTree {
         std::vector<MicroTree> microTrees;
         std::vector<bool> interconnections;
-        MiniTree(std::vector<MicroTree> microTrees, std::vector<bool> interconnections) : microTrees(microTrees), interconnections(interconnections) {}
     };
 
     struct MicroTreeData {
         std::vector<bool> bp;
         MicroTreeData(std::vector<bool> bp) : bp(bp) {}
+        bool operator==(const MicroTreeData& mtd) const {
+            return bp == mtd.bp;
+        }
     };
 
 
