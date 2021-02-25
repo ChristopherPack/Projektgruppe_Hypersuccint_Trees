@@ -169,6 +169,20 @@ namespace pht {
             }
             vector.erase(std::remove_if(vector.begin(), vector.end(), [values](T value){ return std::find(values.begin(), values.end(), value) != values.end(); }), vector.end());
         }
+
+        /**
+         *
+         * @tparam T
+         * @param vector
+         * @return
+         */
+        template<class T> inline static std::vector<T> reverse(std::vector<T>& vector) {
+            std::vector<T> res;
+            for(auto i = vector.rbegin(); i != vector.rend(); ++i ) {
+                res.push_back(*i);
+            }
+            return res;
+        }
     };
 }
 

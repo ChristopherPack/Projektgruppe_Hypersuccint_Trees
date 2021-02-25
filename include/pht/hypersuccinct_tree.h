@@ -14,15 +14,17 @@
 #include "hypersuccinct_tree_factory.h"
 
 namespace pht {
-    struct MicroTree {
+    /*struct MicroTree {
         uint32_t size;
         uint32_t index;
         MicroTree(uint32_t size, uint32_t index) : size(size), index(index) {}
-    };
+    };*/
 
     struct MiniTree {
-        std::vector<MicroTree> microTrees;
-        std::vector<bool> interconnections;
+        std::vector<bool> microTrees;
+        std::vector<bool> FIDs;
+        std::vector<bool> typeVector;
+        std::vector<bool> dummys;
     };
 
     struct MicroTreeData {
@@ -48,7 +50,6 @@ namespace pht {
 
         };
         std::vector<MiniTree> miniTrees;
-        std::vector<MicroTree> microTrees;
         std::vector<MicroTreeData> lookupTable;
     };
 }
