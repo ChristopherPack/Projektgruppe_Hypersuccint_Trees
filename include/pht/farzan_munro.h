@@ -33,12 +33,12 @@ namespace pht {
             if(tree->isEmpty() || tree->getSize() <= idealSize) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result;
                 result.push_back(std::shared_ptr<pht::UnorderedTree<T>>(tree));
-                ListUtils::sort(result, [](std::shared_ptr<pht::UnorderedTree<T>> a, std::shared_ptr<pht::UnorderedTree<T>> b){ return a->getRoot()->getValue() < b->getRoot()->getValue(); });
+                //ListUtils::sort(result, [](std::shared_ptr<pht::UnorderedTree<T>> a, std::shared_ptr<pht::UnorderedTree<T>> b){ return a->getRoot()->getValue() < b->getRoot()->getValue(); });
                 return result;
             } else {
                 permanentComponents.clear();
                 decompose(tree, tree->getRoot(), idealSize);
-                ListUtils::sort(permanentComponents, [](std::shared_ptr<pht::UnorderedTree<T>> a, std::shared_ptr<pht::UnorderedTree<T>> b){ return a->getRoot()->getValue() < b->getRoot()->getValue(); });
+                //ListUtils::sort(permanentComponents, [](std::shared_ptr<pht::UnorderedTree<T>> a, std::shared_ptr<pht::UnorderedTree<T>> b){ return a->getRoot()->getValue() < b->getRoot()->getValue(); });
                 return permanentComponents;
             }
         }
