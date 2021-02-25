@@ -5,18 +5,20 @@
 
 namespace pht {
     class Bitvector {
-    private:
+    public://private:
         uint8_t* data;
         size_t size;
     public:
         Bitvector(const size_t size = 8) : size(size) {
             size_t byteSize = ceil(size/8.0f);
             data = new uint8_t[byteSize];
+            memset(data, 0x0, byteSize);
         }
 
         void resize(const size_t size) {
             size_t byteSize = ceil(size/8.0f);
             uint8_t* newData = new uint8_t[byteSize];
+            memset(newData, 0x0, byteSize);
             memcpy(newData, data, byteSize);
             delete[] data;
             data = newData;
@@ -35,7 +37,7 @@ namespace pht {
             data[(size_t)floor(idx/8.0f)] &= 0x0<<(idx%8);
         }
 
-        const bool inline at(const size_t idx) const { 
+        bool inline at(const size_t idx) const { 
             return (data[(size_t)floor(idx/8.0f)]>>(idx%8))&0x1;
         }
 
