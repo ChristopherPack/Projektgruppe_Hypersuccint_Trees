@@ -10,9 +10,9 @@
 #include <set>
 
 #include "hypersuccinct_tree.h"
+#include "bitvector_utils.h"
 
 namespace pht {
-    typedef std::vector<bool> Bitvector;
     class HypersuccinctTreeFactory2 {
     public:
         template<class T> static HypersuccinctTree<T> create(const std::shared_ptr<UnorderedTree<T>> tree) {
@@ -21,51 +21,43 @@ namespace pht {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(tree, size));
             size = ceil((log2(tree->getSize()))/8.0);
             //nur einen MiniTree auswählen
-            //for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
-                std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(fmMiniTree, size));
-                MiniTree miniTree = MiniTree();
-                for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                    std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
-                    MicroTreeData microTreeData(bp);
-                    if(!ListUtils::contains(hypersuccinctTree.lookupTable, microTreeData)) {
-                        hypersuccinctTree.lookupTable.push_back(microTreeData);
-                    }
-                }
-                //BITVECTOR FUNCTION
-                miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
-                hypersuccinctTree.miniTrees.push_back(miniTree);
-            //}
+            for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
+
+                hypersuccinctTree.miniTrees.push_back(createMiniTree(fmMiniTree,size,hypersuccinctTree));
+            }
+            //todo: create Interconnections MicroTrees
+
+            //todo: create Interconnections MiniTrees
             return hypersuccinctTree;
         }
 
-        template<class T> static Bitvector createBitVectorforMicroTrees(std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees) {
-            //determine size of Bitvector
-            Bitvector res;
+        template<class T> static MiniTree createMiniTree(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree,uint32_t size,HypersuccinctTree<T> hypersuccinctTree) {
+            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(fmMiniTree, size));
+            MiniTree miniTree = MiniTree();
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                createBitVectorForMicroTree(fmMicroTree);
+                std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
+                MicroTreeData microTreeData(bp);
+                if(!ListUtils::contains(hypersuccinctTree.lookupTable, microTreeData)) {
+                    hypersuccinctTree.lookupTable.push_back(microTreeData);
+                }
             }
-            return res;
+            //BITVECTOR FUNCTION
+            miniTree.microTrees = Bitvector_Utils::createBitVectorforMicroTrees(fmMicroTrees);
         }
 
-        template<class T> static Bitvector createBitVectorForMicroTree(Bitvector& res,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
-            int32_t size = microTree->getSize();
-            int32_t logSize = floor((log2(size)));
-            //elias gamma code SIZE
-            createEliasGamma<T>(res,size);
-            //BP FORM in bitform
-            Bitvector bp = microTree->toBalancedParenthesis();
-            pht::ListUtils::addAll(res,bp);
+        /*template<class T> static ?? createInterconnections() {
+
         }
 
-        template<class T> static Bitvector createEliasGamma(Bitvector& res, const int32_t size) {
-            int32_t logSize = floor((log2(size)));
-            for(int i=0; i<logSize;i++) {
-                res.push_back(false);
-            }
-            for(int i =0; i<logSize+1;i++) {
-                res.push_back((size>>(logSize-i))%2==1);
-            }
+        template<class T> static Bitvector createType3Interconnections() {
+
         }
+
+        template<class T> static Bitvector createType12Interconnections() {
+
+        }*/
+
+
     };
 }
 

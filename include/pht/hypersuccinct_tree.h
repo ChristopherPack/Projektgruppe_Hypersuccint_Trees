@@ -23,6 +23,7 @@ namespace pht {
     struct MiniTree {
         std::vector<bool> microTrees;
         std::vector<bool> FIDs;
+        std::vector<bool> typeVector;
         std::vector<bool> dummys;
     };
 
