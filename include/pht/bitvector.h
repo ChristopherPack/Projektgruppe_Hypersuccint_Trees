@@ -1,22 +1,24 @@
-#ifndef PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
-#define PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
+#ifndef PROJEKTSUCCINCTTREES_BITVECTOR_H
+#define PROJEKTSUCCINCTTREES_BITVECTOR_H
 
 #include <iostream>
 
 namespace pht {
-    class Bitvector {
+    class BitvectorOld {
     private:
         uint8_t* data;
         size_t size;
     public:
-        Bitvector(const size_t size = 8) : size(size) {
+        BitvectorOld(const size_t size = 8) : size(size) {
             size_t byteSize = ceil(size/8.0f);
             data = new uint8_t[byteSize];
+            memset(data, 0 ,byteSize);
         }
 
         void resize(const size_t size) {
             size_t byteSize = ceil(size/8.0f);
             uint8_t* newData = new uint8_t[byteSize];
+            memset(newData, 0 ,byteSize);
             memcpy(newData, data, byteSize);
             delete[] data;
             data = newData;
@@ -24,25 +26,29 @@ namespace pht {
         }
 
         void inline set(const size_t idx) { 
-            data[(size_t)floor(idx/8.0f)] |= 0x1<<(idx%8);
+            data[(size_t)floor(idx/8.0f)] |= 0x1<<(7-idx%8);
         }
 
         void inline toggle(const size_t idx) { 
-            data[(size_t)floor(idx/8.0f)] ^= 0x1<<(idx%8);
+            data[(size_t)floor(idx/8.0f)] ^= 0x1<<(7-idx%8);
         }
 
         void inline reset(const size_t idx) { 
-            data[(size_t)floor(idx/8.0f)] &= 0x0<<(idx%8);
+            data[(size_t)floor(idx/8.0f)] &= 0x0<<(7-idx%8);
         }
 
         const bool inline at(const size_t idx) const { 
-            return (data[(size_t)floor(idx/8.0f)]>>(idx%8))&0x1;
+            return (data[(size_t)floor(idx/8.0f)]>>(7-idx%8))&0x1;
         }
 
-        ~Bitvector() {
+        size_t getSize() const {
+            return size;
+        }
+
+        ~BitvectorOld() {
             delete[] data;
         }
     };
 }
 
-#endif//PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
+#endif//PROJEKTSUCCINCTTREES_BITVECTOR_H

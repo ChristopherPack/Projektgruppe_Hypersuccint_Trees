@@ -12,6 +12,7 @@
 #include "hypersuccinct_tree.h"
 
 namespace pht {
+    typedef std::vector<bool> Bitvector;
     class HypersuccinctTreeFactory2 {
     public:
         template<class T> static HypersuccinctTree<T> create(const std::shared_ptr<UnorderedTree<T>> tree) {
@@ -29,14 +30,41 @@ namespace pht {
                     if(!ListUtils::contains(hypersuccinctTree.lookupTable, microTreeData)) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
-                    //todo: BITVECTOR FUNCTION
-                    /*MicroTree microTree = MicroTree(fmMicroTree->getSize(), ListUtils::indexOf(hypersuccinctTree.lookupTable, microTreeData));
-                    hypersuccinctTree.microTrees.push_back(microTree);
-                    miniTree.microTrees.push_back(microTree);*/
                 }
+                //BITVECTOR FUNCTION
+                miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
             //}
             return hypersuccinctTree;
+        }
+
+        template<class T> static Bitvector createBitVectorforMicroTrees(std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees) {
+            //determine size of Bitvector
+            Bitvector res;
+            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
+                createBitVectorForMicroTree(fmMicroTree);
+            }
+            return res;
+        }
+
+        template<class T> static Bitvector createBitVectorForMicroTree(Bitvector& res,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
+            int32_t size = microTree->getSize();
+            int32_t logSize = floor((log2(size)));
+            //elias gamma code SIZE
+            createEliasGamma<T>(res,size);
+            //BP FORM in bitform
+            Bitvector bp = microTree->toBalancedParenthesis();
+            pht::ListUtils::addAll(res,bp);
+        }
+
+        template<class T> static Bitvector createEliasGamma(Bitvector& res, const int32_t size) {
+            int32_t logSize = floor((log2(size)));
+            for(int i=0; i<logSize;i++) {
+                res.push_back(false);
+            }
+            for(int i =0; i<logSize+1;i++) {
+                res.push_back((size>>(logSize-i))%2==1);
+            }
         }
     };
 }
