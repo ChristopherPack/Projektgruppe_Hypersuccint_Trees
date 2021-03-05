@@ -79,6 +79,12 @@ namespace pht{
                 vector.push_back((size>>(logSize-i))%2==1);
             }
         }
+
+        template<class T> static Bitvector createInterconnections() { //todo: which parameters do we need?
+            Bitvector res;
+            //todo
+            return res;
+        }
     };
 }
 

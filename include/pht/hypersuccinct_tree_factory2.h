@@ -40,6 +40,7 @@ namespace pht {
 
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
 
+                //todo: We might need this for Interconnections
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(fmMiniTree, size));
                 MiniTree miniTree = MiniTree();
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
@@ -49,7 +50,6 @@ namespace pht {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
                 }
-                //BITVECTOR FUNCTION
                 miniTree.microTrees = Bitvector_Utils::createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
 
