@@ -4,6 +4,10 @@
 #include <iostream>
 
 namespace pht {
+    /**
+     * This Class implements a simple Bitvector, with optimised space usage (1 bit per bit)
+     * todo: This class is currently outdated since std::vector<bool> is already space-optimal
+     */
     class BitvectorOld {
     private:
         uint8_t* data;
