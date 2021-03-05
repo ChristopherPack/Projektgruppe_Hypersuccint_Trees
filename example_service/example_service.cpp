@@ -8,6 +8,7 @@
 #include "xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 #include "pht/hypersuccinct_tree.h"
+#include "pht/bitvector_utils.h"
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
@@ -15,7 +16,9 @@ int main() {
     std::shared_ptr<pht::UnorderedTree<char>> tree = createTestTree();
     std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(tree, 5);
     componentSubtrees = pht::ListUtils::reverse(componentSubtrees);
-    std::vector<bool> microTrees = pht::HypersuccinctTreeFactory::createBitVectorforMicroTrees(componentSubtrees);
+    std::vector<bool> microTrees = pht::Bitvector_Utils::createBitVectorforMicroTrees(componentSubtrees);
+    pht::MiniTree miniTree;
+    pht::Bitvector_Utils::createInterconnections(tree,componentSubtrees,5,miniTree);
     std::cout << "Original tree:\n" << *tree << "\n\n";
     std::cout << "Component trees:\n";
     for(int i = 0; i < componentSubtrees.size(); i++) {
@@ -25,6 +28,19 @@ int main() {
     for(bool bit: microTrees) {
         std::cout << bit;
     }
+    std::cout << std::endl;
+    for(bool bit: miniTree.FIDs) {
+        std::cout << bit;
+    }
+    std::cout << std::endl;
+    for(bool bit: miniTree.typeVectors) {
+        std::cout << bit;
+    }
+    std::cout << std::endl;
+    for(bool bit: miniTree.dummys) {
+        std::cout << bit;
+    }
+    std::cout << std::endl;
 
 
     //std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\1998shortstats.xml");

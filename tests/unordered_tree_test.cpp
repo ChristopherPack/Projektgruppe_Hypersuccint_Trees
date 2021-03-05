@@ -524,3 +524,21 @@ TEST_F(UnorderedTreeTest, ToBalancedParenthesisTest) {
     EXPECT_THAT(example->toBalancedParenthesis(), ::testing::UnorderedElementsAre(true, true, true, true, false, false, true, false, true, true, false, false, true, false, false, true, false, true, true, true, false, true, true, true, false, true, true, false, false, true, false, true, false, true, false, false, true, true, true, false, false, true, false, true, false, false, false, true, false, false, false, true, false, true, false, false));
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
 }
+
+TEST_F(UnorderedTreeTest, EnumerateTest) {
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(f), 1);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(a), 0);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(r), 7);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(w), 13);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    std::shared_ptr<pht::UnorderedTree<char>> addTree = std::make_shared<pht::UnorderedTree<char>>();
+    addTree->add(d);
+    addTree->add(k, d);
+    addTree->add(n, k);
+    addTree->add(q, k);
+    addTree->add(o, k);
+}

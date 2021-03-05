@@ -137,3 +137,10 @@ TEST(ListUtilsTest, ReverseTest) {
     std::vector<int> b = pht::ListUtils::reverse(a);
     EXPECT_THAT(b, ::testing::ElementsAre(4,3,2,1,0));
 }
+
+TEST(ListUtilsTest, DistinctTest) {
+    std::vector<int> a = {0,0,2,3,3};
+    std::vector<int> b;
+    pht::ListUtils::distinct(a,b);
+    EXPECT_THAT(b, ::testing::ElementsAre(0,2,3));
+}

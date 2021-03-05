@@ -10,9 +10,9 @@ namespace pht {
      */
     class BitvectorOld {
     private:
+    public:
         uint8_t* data;
         size_t size;
-    public:
         BitvectorOld(const size_t size = 8) : size(size) {
             size_t byteSize = ceil(size/8.0f);
             data = new uint8_t[byteSize];

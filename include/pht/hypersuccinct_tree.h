@@ -11,7 +11,6 @@
 #include "unordered_tree.h"
 #include "list_utils.h"
 #include "farzan_munro.h"
-#include "hypersuccinct_tree_factory.h"
 
 namespace pht {
     /*struct MicroTree {
@@ -30,7 +29,7 @@ namespace pht {
     struct MiniTree {
         std::vector<bool> microTrees;
         std::vector<bool> FIDs;
-        std::vector<bool> typeVector;
+        std::vector<bool> typeVectors;
         std::vector<bool> dummys;
     };
 

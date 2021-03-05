@@ -28,6 +28,24 @@ namespace pht {
         }
 
         /**
+         * Appends all the values of the second vector to the first vector.
+         *
+         * @param[in] vector The vector to append to.
+         * @param[in] values The vector with the values to append.
+         * @tparam T The type of data stored in the vectors.
+         */
+        template<class T> inline static void distinct(const std::vector<T>& vector1, std::vector<T>& vector2) {
+            if(vector1.empty()) {
+                return;
+            }
+            for(T t : vector1) {
+                if(!ListUtils::contains(vector2,t)) {
+                    vector2.push_back(t);
+                }
+            }
+        }
+
+        /**
          * Returns true if the vector contains the given element. 
          * 
          * @param[in] vector The vector which could contain the element. 

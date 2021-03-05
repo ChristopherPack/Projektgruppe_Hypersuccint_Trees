@@ -12,6 +12,7 @@
 
 #include "unordered_tree.h"
 #include "list_utils.h"
+#include "hypersuccinct_tree.h"
 
 namespace pht{
     typedef std::vector<bool> Bitvector;
@@ -52,7 +53,7 @@ namespace pht{
          * @param microTree The UnorderedTree (MicroTree)
          * @return std::vector<bool>    todo: check return necessity
          */
-        template<class T> static Bitvector createBitVectorForMicroTree(Bitvector& vector,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
+        template<class T> static void createBitVectorForMicroTree(Bitvector& vector,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
             int32_t size = microTree->getSize();
             //elias gamma code SIZE
             createEliasGamma<T>(vector,size);
@@ -70,7 +71,7 @@ namespace pht{
          * @param size The size to encode
          * @return std::vector<bool>    todo: check return necessity
          */
-        template<class T> static Bitvector createEliasGamma(Bitvector& vector, const uint32_t size) {
+        template<class T> static void createEliasGamma(Bitvector& vector, const uint32_t size) {
             int32_t logSize = floor((log2(size)));
             for(int i=0; i<logSize;i++) {
                 vector.push_back(false);
@@ -80,9 +81,84 @@ namespace pht{
             }
         }
 
-        template<class T> static Bitvector createInterconnections() { //todo: which parameters do we need?
+        template<class T> static void createInterconnections(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees, uint32_t size,MiniTree& miniTree) { //todo: which parameters do we need?
+            uint32_t dummySize = floor(log2(2*size+1))+1;
+            assert(fmMiniTree->getRoot() == fmMicroTrees.at(0)->getRoot());
+            std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;
+            ListUtils::map(fmMicroTrees,rootNodes, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
+            std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes;
+            ListUtils::distinct(rootNodes, distinctRootNodes);
+            std::vector<std::shared_ptr<pht::Node<T>>> firstChildren;
+            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = fmMicroTrees;
+            ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
+            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(x->getDirectDescendants(x->getRoot()).size()-1);});
+            //todo: zählung von firstChildren ist front - zählung in neumerate ist reversed
+
+            for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
+                std::vector<std::shared_ptr<pht::Node<T>>> children = ListUtils::reverse(fmMiniTree->getDirectDescendants(rootNode));
+                for(std::shared_ptr<pht::Node<T>> node : children) {
+                    if(ListUtils::contains(rootNodes,node)) {
+                        miniTree.FIDs.push_back(true);
+                        miniTree.typeVectors.push_back(false);
+
+                    }
+                    else if(ListUtils::contains(firstChildren,node))
+                    {
+                        miniTree.FIDs.push_back(true);
+                        miniTree.typeVectors.push_back(true);
+                    }
+                    else
+                    {
+                        miniTree.FIDs.push_back(false);
+                    }
+                }
+
+            }
+            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
+                bool hadDummy = false;
+                for(std::shared_ptr<pht::Node<T>> node : fmMicroTree->getNodes()) {
+                    if(node != fmMicroTree->getRoot()) {
+                        std::vector<std::shared_ptr<pht::Node<T>>> children = fmMiniTree->getDirectDescendants(node);
+                        for(int ind = 0; ind<children.size();ind++) {
+                            if(!ListUtils::contains(fmMicroTree->getNodes(),children.at(ind))) {
+                                std::shared_ptr<pht::Node<T>> dummyNode = std::make_shared<pht::Node<T>>(T());
+                                //todo: Index für Tree order
+                                fmMicroTree->insert(dummyNode,ind, node);
+                                Bitvector num = numberToBitvector(fmMicroTree->enumerate(dummyNode));
+                                for(bool bit: num) {
+                                    std::cout << bit;
+                                }
+                                for (int i = 0; i < dummySize-num.size(); i++) {
+                                    miniTree.dummys.push_back(false);
+                                }
+                                ListUtils::addAll(miniTree.dummys, num);
+                                hadDummy = true;
+                                break;
+                            }
+                        }
+                        if(hadDummy) {
+                            break;
+                        }
+                    }
+                }
+                if(!hadDummy) {
+                    for (int i = 0; i < dummySize; i++) {
+                        miniTree.dummys.push_back(false);
+                    }
+                }
+            }
+        }
+
+        static Bitvector numberToBitvector(uint32_t num) {
             Bitvector res;
-            //todo
+            if (num == 0) {
+                res.push_back(false);
+                return res;
+            }
+            int size = floor(log2(num)) + 1;
+            for(uint32_t i = 0; i<size; i++) {
+                res.push_back((num>>(size-1-i))&1);
+            }
             return res;
         }
     };
