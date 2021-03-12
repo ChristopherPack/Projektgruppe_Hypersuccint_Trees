@@ -31,7 +31,7 @@ namespace pht {
             uint32_t size = ceil(pow(log2(tree->getSize()), 2.0));
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(tree, size));
             size = ceil((log2(tree->getSize()))/8.0);
-
+            Bitvector_Utils::createMiniInterconnections(hypersuccinctTree,fmMiniTrees,size);
 
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
 
@@ -39,7 +39,8 @@ namespace pht {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(fmMiniTree, size));
                 MiniTree miniTree = MiniTree();
 
-                Bitvector_Utils::createInterconnections(fmMiniTree,fmMicroTrees,size);
+                //createMiniDummyTrees
+                Bitvector_Utils::createMicroInterconnections(fmMiniTree,fmMicroTrees,size);
 
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
                     std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();

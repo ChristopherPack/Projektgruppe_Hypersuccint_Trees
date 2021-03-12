@@ -62,11 +62,16 @@ namespace pht {
     template<class T> class HypersuccinctTree {
         friend class HypersuccinctTreeFactory;
     public:
-    private:
+    //private:
         HypersuccinctTree() {
 
         };
+        std::vector<bool> MicroSize;
+        std::vector<bool> MiniSize;
         std::vector<MiniTree> miniTrees;
+        std::vector<bool> FIDs;
+        std::vector<bool> typeVectors;
+        std::vector<bool> dummys;
         std::vector<MicroTreeData> lookupTable;
     };
 }
