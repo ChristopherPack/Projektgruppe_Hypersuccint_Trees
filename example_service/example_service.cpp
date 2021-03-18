@@ -46,6 +46,9 @@ int main() {
     pht::Bitvector_Utils::createMicroInterconnections(tree,componentSubtrees,5,miniTree);
     pht::Bitvector_Utils::createMiniInterconnections(tree,componentMinitrees,10,hypersuccinctTree);
     std::vector<bool> microTrees = pht::Bitvector_Utils::createBitVectorforMicroTrees(componentSubtrees);
+
+
+    //Couts are necessary like this
     std::cout << "Original tree:\n" << *tree << "\n\n";
     std::cout << "Component trees:\n";
     for(int i = 0; i < componentSubtrees.size(); i++) {
@@ -79,6 +82,7 @@ int main() {
     std::cout << std::endl;
 
 
+    //todo: restructure so it can be used for testing
     //std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\1998shortstats.xml");
 
     /*std::cout << "\n\nXML tree:\n" << xmlTree->toString();

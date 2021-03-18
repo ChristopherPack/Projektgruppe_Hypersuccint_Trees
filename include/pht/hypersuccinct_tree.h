@@ -53,7 +53,7 @@ namespace pht {
      * A lookup table for information regarding specific MicroTree structures.
      * It implements:
      * Get Functions Only!! No modifying functions!!!
-     *
+     * todo: All Get functions will need restructuring when MiniTrees become full bitvectors
      *
      * todo: MiniTrees could be condensed into a single Bitvector
      * todo: As a result, it might be possible to represent an entire tree by a SINGLE bitvector, making this class useless
@@ -113,6 +113,16 @@ namespace pht {
             return pht::Bitvector_Utils::findStaticSizeIndex(miniTree.dummys, index, dummySize);
         }
 
+
+        /**
+         * todo: will need full restructuring when MiniTrees become a bitvector
+         * @param index the index as integer
+         * @return MiniTree as MiniTree
+         */
+        MiniTree getMiniTree(uint32_t index ) {
+            return miniTrees.at(index);
+        }
+
         Bitvector getMicroSize() {
             return microSize;
         }
@@ -137,18 +147,21 @@ namespace pht {
             return miniDummys;
         }
 
-    private:
+    //private: /todo: readd private when factory is complete
         HypersuccinctTree() {
 
         };
         //todo: ORDER
+        //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
-        std::vector<MiniTree> miniTrees;
+        //miniTrees
+        std::vector<MiniTree> miniTrees; //todo: restructure into a single bitvector
         std::vector<bool> miniFIDs;
         std::vector<bool> miniTypeVectors;
         std::vector<bool> miniDummys;
-        std::vector<MicroTreeData> lookupTable;
+        //LookupTable
+        std::vector<MicroTreeData> lookupTable; //todo: restructure into a single bitvector
     };
 }
 

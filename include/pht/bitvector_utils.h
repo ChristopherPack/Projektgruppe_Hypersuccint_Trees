@@ -222,7 +222,6 @@ namespace pht{
          * @return the bitvector at given index
          */
         static Bitvector findStaticSizeIndex(Bitvector bitvector,uint32_t index, uint32_t size) {
-
             Bitvector::iterator iterator = bitvector.begin();
             iterator+=(size*index);
             Bitvector dummy;
