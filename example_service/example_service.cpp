@@ -13,8 +13,13 @@
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
 int main() {
+    //todo: Needs complete restructuring
+
     std::shared_ptr<pht::UnorderedTree<char>> tree = createTestTree();
+
     std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(tree, 5);
+
+
     uint32_t size = ceil(pow(log2(tree->getSize()), 2.0));
     std::cout << size << std::endl;
     std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentMinitrees = (pht::FarzanMunro<char>::decompose(tree, size));
