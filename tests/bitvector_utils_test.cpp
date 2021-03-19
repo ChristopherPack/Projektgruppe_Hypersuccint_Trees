@@ -100,29 +100,29 @@ TEST(BitvectorUtilsTest, FindEliasGammaTest) {
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
 }
 
-TEST(BitvectorUtilsTest, getMicroTypeVectorTest) {
+TEST(BitvectorUtilsTest, findBitvectorBitIndexTest) {
     std::vector<bool> fids = {0,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0};
     std::vector<bool> bitvector = {1,0,1,0,1,0,0,1,1,1,1,1};
-    std::vector<bool> res = pht::Bitvector_Utils::getMicroTypeVector(bitvector,fids,0);
+    std::vector<bool> res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,0);
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,1,0));
-    res = pht::Bitvector_Utils::getMicroTypeVector(bitvector,fids,1);
+    res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,1);
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = pht::Bitvector_Utils::getMicroTypeVector(bitvector,fids,2);
+    res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,2);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0));
 
 }
 
-TEST(BitvectorUtilsTest, getTypeVectorLengthTest) {
+TEST(BitvectorUtilsTest, findBitvectorLengthTest) {
     std::vector<bool> fids = {0,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0};
-    uint32_t res = pht::Bitvector_Utils::getTypeVectorLength(fids, 0);
+    uint32_t res = pht::Bitvector_Utils::findBitvectorLength(fids, 0);
     EXPECT_EQ(res, 4);
 }
 
 TEST(BitvectorUtilsTest, getMicroDummyTest) {
     std::vector<bool> bitvector = {0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    std::vector<bool> res = pht::Bitvector_Utils::getMicroDummys(bitvector,0,5);
+    std::vector<bool> res = pht::Bitvector_Utils::findStaticSizeIndex(bitvector,0,4);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,0,0));
-    res = pht::Bitvector_Utils::getMicroDummys(bitvector,2,5);
+    res = pht::Bitvector_Utils::findStaticSizeIndex(bitvector,2,4);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,1));
 }
 

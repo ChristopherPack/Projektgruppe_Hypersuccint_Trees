@@ -12,7 +12,6 @@
 
 #include "unordered_tree.h"
 #include "list_utils.h"
-#include "hypersuccinct_tree.h"
 
 namespace pht{
     typedef std::vector<bool> Bitvector;
@@ -31,9 +30,8 @@ namespace pht{
          * It is supposed to use a List of MicroTrees from the Farzan Munro Algorithm
          * Encoding consists of Elias Gamma Code of the size of the MicroTrees and their structure in Balanced Parenthesis form.
          *
-         * @tparam T Class implemented in UnorderedTree Todo: Check usage
+         * @tparam T Class implemented in UnorderedTree
          * @param fmMicroTrees List of UnorderedTrees (MicroTrees)
-         * @return std::vector<bool>
          */
         template<class T> static Bitvector createBitVectorforMicroTrees(std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees) {
             //determine size of Bitvector
@@ -45,13 +43,12 @@ namespace pht{
         }
 
         /**
-         * This Class modifies a Bitvector with a given UnorderedTrees
+         * This Class modifies a Bitvector with a given UnorderedTree
          * It is supposed to use a MicroTree from the Farzan Munro Algorithm
          *
-         * @tparam T Class implemented in UnorderedTree Todo: Check usage
+         * @tparam T Class implemented in UnorderedTree
          * @param vector The Bitvector to be modified
          * @param microTree The UnorderedTree (MicroTree)
-         * @return std::vector<bool>    todo: check return necessity
          */
         template<class T> static void createBitVectorForMicroTree(Bitvector& vector,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
             int32_t size = microTree->getSize();
@@ -66,10 +63,8 @@ namespace pht{
          * This class creates EliasGamma Code for a given Number and adds it to a Bitvector
          * It is supposed to encode the size of a tree from the Farzan Munro Algorithm
          *
-         * @tparam T Class implemented in UnorderedTree Todo: Check usage
          * @param vector The Bitvector to be modified
          * @param size The size to encode
-         * @return std::vector<bool>    todo: check return necessity
          */
         static void createEliasGamma(Bitvector& vector, const uint32_t size) {
             int32_t logSize = floor((log2(size)));
@@ -81,7 +76,15 @@ namespace pht{
             }
         }
 
-        template<class I> static uint32_t decodeEliasGamma(I& iterator) {//iterator) {
+        /**
+         * Decodes Elias Gamma Code into an integer
+         * This function uses an integer an is supposed to return the amount of bits that are important after the Elias Gamma Code in the Bitvector while moving the iterator to the begin of these important bits.
+         *
+         * @tparam I template for Iterator functionality
+         * @param iterator Iterator over a Bitvector with Elias Gamma code, pointing at the start of the Elias Gamma Code
+         * @return Integer of decoded Elias Gamma
+         */
+        template<class I> static uint32_t decodeEliasGamma(I& iterator) {
             if(*iterator == false) {
                 uint32_t size = 0;
                 while(*iterator == false) {
@@ -99,151 +102,12 @@ namespace pht{
             return 1;
         }
 
-        template<class T> static void createMicroInterconnections(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees, uint32_t size,MiniTree& miniTree) {
-            uint32_t dummySize = floor(log2(2*size+1))+1;
-            assert(fmMiniTree->getRoot() == fmMicroTrees.at(0)->getRoot());
-            std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;
-            ListUtils::map(fmMicroTrees,rootNodes, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
-            std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes;
-            ListUtils::distinct(rootNodes, distinctRootNodes);
-            std::vector<std::shared_ptr<pht::Node<T>>> firstChildren;
-            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = fmMicroTrees;
-            ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
-            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(x->getDirectDescendants(x->getRoot()).size()-1);});
-            //todo: zählung von firstChildren ist front - zählung in enumerate ist reversed
-
-            //FIDs und TypeVectors
-            //todo: Elias Gamma Code für FIDs
-            for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
-                std::vector<std::shared_ptr<pht::Node<T>>> children = ListUtils::reverse(fmMiniTree->getDirectDescendants(rootNode));
-                createEliasGamma(miniTree.FIDs, children.size());
-                for(std::shared_ptr<pht::Node<T>> node : children) {
-                    if(ListUtils::contains(rootNodes,node)) {
-                        miniTree.FIDs.push_back(true);
-                        miniTree.typeVectors.push_back(false);
-
-                    }
-                    else if(ListUtils::contains(firstChildren,node))
-                    {
-                        miniTree.FIDs.push_back(true);
-                        miniTree.typeVectors.push_back(true);
-                    }
-                    else
-                    {
-                        miniTree.FIDs.push_back(false);
-                    }
-                }
-
-            }
-
-            //Dummy Nodes
-            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                bool hadDummy = false;
-                for(std::shared_ptr<pht::Node<T>> node : fmMicroTree->getNodes()) {
-                    if(node != fmMicroTree->getRoot()) {
-                        std::vector<std::shared_ptr<pht::Node<T>>> children = fmMiniTree->getDirectDescendants(node);
-                        for(int ind = 0; ind<children.size();ind++) {
-                            if(!ListUtils::contains(fmMicroTree->getNodes(),children.at(ind))) {
-                                std::shared_ptr<pht::Node<T>> dummyNode = std::make_shared<pht::Node<T>>(T());
-                                //Index für Tree order
-                                fmMicroTree->insert(dummyNode,ind, node);
-                                Bitvector bp = fmMicroTree->toBalancedParenthesis();
-                                Bitvector num = numberToBitvector(fmMicroTree->enumerate(dummyNode));
-                                for (int i = 0; i < dummySize-num.size(); i++) {
-                                    miniTree.dummys.push_back(false);
-                                }
-                                ListUtils::addAll(miniTree.dummys, num);
-                                hadDummy = true;
-                                break;
-                            }
-                        }
-                        if(hadDummy) {
-                            break;
-                        }
-                    }
-                }
-                if(!hadDummy) {
-                    for (int i = 0; i < dummySize; i++) {
-                        miniTree.dummys.push_back(false);
-                    }
-                }
-            }
-        }
-
-
-        template<class T> static void createMiniInterconnections(std::shared_ptr<pht::UnorderedTree<T>> tree, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees, uint32_t size,HypersuccinctTree<T>& hypersuccinctTree) {
-            uint32_t dummySize = floor(log2(2*size+1))+1;
-            assert(tree->getRoot() == fmMiniTrees.at(0)->getRoot());
-            std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;
-            ListUtils::map(fmMiniTrees,rootNodes, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
-            std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes;
-            ListUtils::distinct(rootNodes, distinctRootNodes);
-            std::vector<std::shared_ptr<pht::Node<T>>> firstChildren;
-            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = fmMiniTrees;
-            ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
-            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(x->getDirectDescendants(x->getRoot()).size()-1);});
-            //todo: zählung von firstChildren ist front - zählung in enumerate ist reversed
-
-            //FIDs und TypeVectors
-            //todo: Elias Gamma Code für FIDs
-            for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
-                std::vector<std::shared_ptr<pht::Node<T>>> children = ListUtils::reverse(tree->getDirectDescendants(rootNode));
-                createEliasGamma(hypersuccinctTree.FIDs, children.size());
-                for(std::shared_ptr<pht::Node<T>> node : children) {
-                    if(ListUtils::contains(rootNodes,node)) {
-                        hypersuccinctTree.FIDs.push_back(true);
-                        hypersuccinctTree.typeVectors.push_back(false);
-
-                    }
-                    else if(ListUtils::contains(firstChildren,node))
-                    {
-                        hypersuccinctTree.FIDs.push_back(true);
-                        hypersuccinctTree.typeVectors.push_back(true);
-                    }
-                    else
-                    {
-                        hypersuccinctTree.FIDs.push_back(false);
-                    }
-                }
-
-            }
-            /*
-            //Dummy Nodes
-            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                bool hadDummy = false;
-                for(std::shared_ptr<pht::Node<T>> node : fmMicroTree->getNodes()) {
-                    if(node != fmMicroTree->getRoot()) {
-                        std::vector<std::shared_ptr<pht::Node<T>>> children = fmMiniTree->getDirectDescendants(node);
-                        for(int ind = 0; ind<children.size();ind++) {
-                            if(!ListUtils::contains(fmMicroTree->getNodes(),children.at(ind))) {
-                                std::shared_ptr<pht::Node<T>> dummyNode = std::make_shared<pht::Node<T>>(T());
-                                //Index für Tree order
-                                fmMicroTree->insert(dummyNode,ind, node);
-                                Bitvector num = numberToBitvector(fmMicroTree->enumerate(dummyNode));
-                                for(bool bit: num) {
-                                    std::cout << bit;
-                                }
-                                for (int i = 0; i < dummySize-num.size(); i++) {
-                                    miniTree.dummys.push_back(false);
-                                }
-                                ListUtils::addAll(miniTree.dummys, num);
-                                hadDummy = true;
-                                break;
-                            }
-                        }
-                        if(hadDummy) {
-                            break;
-                        }
-                    }
-                }
-                if(!hadDummy) {
-                    for (int i = 0; i < dummySize; i++) {
-                        miniTree.dummys.push_back(false);
-                    }
-                }
-            }*/
-        }
-
+        /**
+         * Converts at number to a bitvector
+         *
+         * @param num the number as integer
+         * @return vector<bool> representing the number
+         */
         static Bitvector numberToBitvector(uint32_t num) {
             Bitvector res;
             if (num == 0) {
@@ -257,6 +121,12 @@ namespace pht{
             return res;
         }
 
+        /**
+         * Converts a bitvector to a Number
+         *
+         * @param bitvector the bitvector to convert
+         * @return the number represented by the bitvector
+         */
         static uint32_t bitvectorToNumber(Bitvector bitvector) {
             uint32_t res = 0;
             for(uint32_t i = 0; i<bitvector.size(); i++) {
@@ -266,14 +136,15 @@ namespace pht{
             return res;
         }
 
-        static Bitvector getMicroTree(Bitvector bitvector,uint32_t index) {
-            return findEliasGammaIndex(bitvector,index,2);
-        }
-
-        static Bitvector getMicroFID(Bitvector bitvector,uint32_t index) {
-            return findEliasGammaIndex(bitvector,index,1);
-        }
-
+        /**
+         * Finds a bitvector from a bitvector indexed by Elias Gamma Code
+         * The Bitvector can use multiplied Elias Gamma codes for indexing
+         *
+         * @param bitvector the indexed bitvector
+         * @param index the index as integer
+         * @param multiplier the index multiplier as integer
+         * @return the bitvector at given index
+         */
         static Bitvector findEliasGammaIndex(Bitvector& bitvector, uint32_t index,uint32_t multiplier) {
             //iterator
             Bitvector::iterator iterator = bitvector.begin();
@@ -296,17 +167,26 @@ namespace pht{
             return micro;
         }
 
-        static Bitvector getMicroTypeVector(Bitvector bitvector,const Bitvector& fids,uint32_t index) {
+        /**
+         * Finds a bitvector from a bitvector indexed by another bitvector
+         * second bitvector must be indexed by Elias Gamma
+         *
+         * @param bitvector the indexed bitvector
+         * @param indexvector the bitvector that indexes the primary bitvector
+         * @param index the index as integer
+         * @return the bitvector at given index
+         */
+        static Bitvector findBitvectorBitIndex(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
             //iterator
             //skip these TypeVectors
             Bitvector::iterator iterator = bitvector.begin();
             for(int i=0; i<index;i++) {
-                uint32_t indexLength = getTypeVectorLength(fids,i);
+                uint32_t indexLength = findBitvectorLength(indexvector, i);
                 iterator+=indexLength;
             }
 
             //return typeVector
-            uint32_t indexLength = getTypeVectorLength(fids,index);
+            uint32_t indexLength = findBitvectorLength(indexvector, index);
             Bitvector typeV;
             for(int j =0;j<indexLength; j++) {
                 typeV.push_back(*iterator);
@@ -315,9 +195,15 @@ namespace pht{
             return typeV;
         }
 
-        static uint32_t getTypeVectorLength(const Bitvector& fids, uint32_t index) {
+        /**
+         *
+         * @param bitvector
+         * @param index
+         * @return
+         */
+        static uint32_t findBitvectorLength(Bitvector& bitvector, uint32_t index) {
             Bitvector fid;
-            fid = getMicroFID(fids, index);
+            fid = findEliasGammaIndex(bitvector,index,1);
             int indexLength = 0;
             for(int j=0; j<fid.size();j++) {
                 if(fid.at(j)) {
@@ -327,12 +213,19 @@ namespace pht{
             return indexLength;
         }
 
-        static Bitvector getMicroDummys(Bitvector bitvector,uint32_t index, uint32_t size) {
-            uint32_t dummySize = floor(log2(2*size+1))+1;
+        /**
+         * Finds a bitvector from a bitvector indexed by a static size
+         *
+         * @param bitvector the indexed bitvector
+         * @param index the index as integer
+         * @param size the size as integer
+         * @return the bitvector at given index
+         */
+        static Bitvector findStaticSizeIndex(Bitvector bitvector,uint32_t index, uint32_t size) {
             Bitvector::iterator iterator = bitvector.begin();
-            iterator+=(dummySize*index);
+            iterator+=(size*index);
             Bitvector dummy;
-            for(int j =0;j<dummySize; j++) {
+            for(int j =0;j<size; j++) {
                 dummy.push_back(*iterator);
                 iterator++;
             }
