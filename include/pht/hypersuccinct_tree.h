@@ -61,6 +61,7 @@ namespace pht {
      *
      *
      * todo: IDEA: When Hypersuccinct Tree is complete, you only need to use this class to navigate the tree (move get functions here)
+     * todo: Does this include queries or are those in a different class?
      */
     template<class T> class HypersuccinctTree {
         friend class HypersuccinctTreeFactory;
