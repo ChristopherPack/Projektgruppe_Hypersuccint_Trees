@@ -13,67 +13,18 @@
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 
 int main() {
+    //todo: Needs complete restructuring
+
     std::shared_ptr<pht::UnorderedTree<char>> tree = createTestTree();
-    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(tree, 5);
-    uint32_t size = ceil(pow(log2(tree->getSize()), 2.0));
-    std::cout << size << std::endl;
-    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentMinitrees = (pht::FarzanMunro<char>::decompose(tree, size));
-    componentMinitrees = pht::ListUtils::reverse(componentMinitrees);
-    size = ceil((log2(tree->getSize()))/8.0);
-    std::cout << size << std::endl;
-    std::cout << std::endl << std::endl;
-    for(int i = 0; i < componentMinitrees.size(); i++) {
-        std::cout << (i==0?"":"\n") << *componentMinitrees.at(i);
-    }
-    for(std::shared_ptr<pht::UnorderedTree<char>> miniTree : componentMinitrees) {
-        std::vector<std::shared_ptr<pht::UnorderedTree<char>>> fmMicroTrees = pht::FarzanMunro<char>::decompose(miniTree,size);
-        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
-        std::cout << std::endl << std::endl;
-        for(int i = 0; i < fmMicroTrees.size(); i++) {
-            std::cout << (i==0?"":"\n") << *fmMicroTrees.at(i);
-        }
-    }
-    std::cout << std::endl;
-    componentSubtrees = pht::ListUtils::reverse(componentSubtrees);
-    componentMinitrees = pht::ListUtils::reverse(componentMinitrees);
-    pht::MiniTree miniTree;
-    pht::HypersuccinctTree<char> hypersuccinctTree;
-    pht::Bitvector_Utils::createMicroInterconnections(tree,componentSubtrees,5,miniTree);
-    pht::Bitvector_Utils::createMiniInterconnections(tree,componentMinitrees,10,hypersuccinctTree);
-    std::vector<bool> microTrees = pht::Bitvector_Utils::createBitVectorforMicroTrees(componentSubtrees);
+
+
+
+    //Couts are necessary like this
     std::cout << "Original tree:\n" << *tree << "\n\n";
-    std::cout << "Component trees:\n";
-    for(int i = 0; i < componentSubtrees.size(); i++) {
-        std::cout << (i==0?"":"\n") << *componentSubtrees.at(i);
-    }
-    std::cout << "\nBitvector:\n";
-    for(bool bit: microTrees) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
-    for(bool bit: miniTree.FIDs) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
-    for(bool bit: miniTree.typeVectors) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
-    for(bool bit: miniTree.dummys) {
-        std::cout << bit;
-    }
-    std::cout << std::endl << std::endl;
-    for(bool bit: hypersuccinctTree.FIDs) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
-    for(bool bit: hypersuccinctTree.typeVectors) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
     std::cout << std::endl;
 
 
+    //todo: restructure so it can be used for testing
     //std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\1998shortstats.xml");
 
     /*std::cout << "\n\nXML tree:\n" << xmlTree->toString();
@@ -85,6 +36,13 @@ int main() {
 
     //pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
     return 0;
+}
+
+void printBitvector(std::vector<bool>& bitvector) {
+    for(bool bit: bitvector) {
+        std::cout << bit;
+    }
+    std::cout << std::endl;
 }
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree() {
