@@ -267,23 +267,16 @@ namespace pht{
         }
 
         static Bitvector getMicroTree(Bitvector bitvector,uint32_t index) {
-            return findEliasGammaIndex(bitvector,index,2);
+            return getBitvectorAtIndex(bitvector, index, 2);
         }
 
         static Bitvector getMicroFID(Bitvector bitvector,uint32_t index) {
-            return findEliasGammaIndex(bitvector,index,1);
+            return getBitvectorAtIndex(bitvector, index, 1);
         }
 
-        static Bitvector findEliasGammaIndex(Bitvector& bitvector, uint32_t index,uint32_t multiplier) {
+        static Bitvector getBitvectorAtIndex(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
             //iterator
-            Bitvector::iterator iterator = bitvector.begin();
-            //for index:
-            for(int i=0;i<index;i++) {
-                //decode Elias Gamma
-                int length = decodeEliasGamma(iterator)*multiplier;
-                //Count until Elias Gamma is done / skip this FID
-                iterator+=length;
-            }
+            auto iterator = findEliasGammaIndex(bitvector, index, multiplier);
             //when index is found:
             //decode Elias Gamma
             int length = decodeEliasGamma(iterator)*multiplier;
@@ -296,10 +289,22 @@ namespace pht{
             return micro;
         }
 
+        static Bitvector::iterator findEliasGammaIndex(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
+            auto iterator = bitvector.begin();
+            for(int i=0;i<index;i++) {
+                //decode Elias Gamma
+                int length = decodeEliasGamma(iterator)*multiplier;
+                //Count until Elias Gamma is done / skip this FID
+                iterator+=length;
+            }
+            return iterator;
+        }
+
+
         static Bitvector getMicroTypeVector(Bitvector bitvector,const Bitvector& fids,uint32_t index) {
             //iterator
             //skip these TypeVectors
-            Bitvector::iterator iterator = bitvector.begin();
+            auto iterator = bitvector.begin();
             for(int i=0; i<index;i++) {
                 uint32_t indexLength = getTypeVectorLength(fids,i);
                 iterator+=indexLength;
@@ -319,8 +324,8 @@ namespace pht{
             Bitvector fid;
             fid = getMicroFID(fids, index);
             int indexLength = 0;
-            for(int j=0; j<fid.size();j++) {
-                if(fid.at(j)) {
+            for(auto && j : fid) {
+                if(j) {
                     indexLength++;
                 }
             }
@@ -329,7 +334,7 @@ namespace pht{
 
         static Bitvector getMicroDummys(Bitvector bitvector,uint32_t index, uint32_t size) {
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            Bitvector::iterator iterator = bitvector.begin();
+            auto iterator = bitvector.begin();
             iterator+=(dummySize*index);
             Bitvector dummy;
             for(int j =0;j<dummySize; j++) {

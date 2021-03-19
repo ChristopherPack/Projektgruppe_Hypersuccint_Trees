@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <functional>
+#include <utility>
 
 #include "unordered_tree.h"
 #include "list_utils.h"
@@ -41,7 +42,7 @@ namespace pht {
      */
     struct MicroTreeData {
         std::vector<bool> bp;
-        MicroTreeData(std::vector<bool> bp) : bp(bp) {}
+        explicit MicroTreeData(std::vector<bool> bp) : bp(std::move(bp)) {}
         bool operator==(const MicroTreeData& mtd) const {
             return bp == mtd.bp;
         }
@@ -63,9 +64,7 @@ namespace pht {
         friend class HypersuccinctTreeFactory;
     public:
     //private:
-        HypersuccinctTree() {
-
-        };
+        HypersuccinctTree() = default;
         std::vector<bool> MicroSize;
         std::vector<bool> MiniSize;
         std::vector<MiniTree> miniTrees;
