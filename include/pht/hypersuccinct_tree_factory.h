@@ -27,12 +27,16 @@ namespace pht {
         template<class T> static HypersuccinctTree<T> create(const std::shared_ptr<UnorderedTree<T>> tree) {
             HypersuccinctTree<T> hypersuccinctTree;
 
+            #ifdef PHT_TEST
+            uint32_t sizeMini = 10;
+            uint32_t sizeMicro = 5;
+            #else
             uint32_t sizeMini = ceil(pow(log2(tree->getSize()), 2.0));
-
+            uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
+            #endif
             hypersuccinctTree.miniSize = pht::Bitvector_Utils::numberToBitvector(sizeMini);
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(tree, sizeMini));
 
-            uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
 
             hypersuccinctTree.microSize = pht::Bitvector_Utils::numberToBitvector(sizeMicro);
             std::tuple<Bitvector,Bitvector> miniIntercon = create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
