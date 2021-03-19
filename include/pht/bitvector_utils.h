@@ -145,7 +145,7 @@ namespace pht{
          * @param multiplier the index multiplier as integer
          * @return the bitvector at given index
          */
-        static Bitvector findEliasGammaIndex(Bitvector& bitvector, uint32_t index,uint32_t multiplier) {
+        static Bitvector getBitvectorAtIndexEG(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
             //iterator
             auto iterator = findEliasGammaIndex(bitvector, index, multiplier);
             //when index is found:
@@ -171,8 +171,6 @@ namespace pht{
             return iterator;
         }
 
-
-        static Bitvector getMicroTypeVector(Bitvector bitvector,const Bitvector& fids,uint32_t index) {
         /**
          * Finds a bitvector from a bitvector indexed by another bitvector
          * second bitvector must be indexed by Elias Gamma
@@ -182,7 +180,7 @@ namespace pht{
          * @param index the index as integer
          * @return the bitvector at given index
          */
-        static Bitvector findBitvectorBitIndex(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
+        static Bitvector getBitvectorAtIndexvector(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
             //iterator
             //skip these TypeVectors
             auto iterator = bitvector.begin();
@@ -209,7 +207,7 @@ namespace pht{
          */
         static uint32_t findBitvectorLength(Bitvector& bitvector, uint32_t index) {
             Bitvector fid;
-            fid = findEliasGammaIndex(bitvector,index,1);
+            fid = getBitvectorAtIndexEG(bitvector, index, 1);
             int indexLength = 0;
             for(auto && j : fid) {
                 if(j) {
@@ -227,7 +225,7 @@ namespace pht{
          * @param size the size as integer
          * @return the bitvector at given index
          */
-        static Bitvector findStaticSizeIndex(Bitvector bitvector,uint32_t index, uint32_t size) {
+        static Bitvector getBitvectorAtIndexStaticSize(Bitvector bitvector, uint32_t index, uint32_t size) {
             auto iterator = bitvector.begin();
             iterator+=(size*index);
             Bitvector dummy;

@@ -103,11 +103,11 @@ TEST(BitvectorUtilsTest, FindEliasGammaTest) {
 TEST(BitvectorUtilsTest, findBitvectorBitIndexTest) {
     std::vector<bool> fids = {0,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0};
     std::vector<bool> bitvector = {1,0,1,0,1,0,0,1,1,1,1,1};
-    std::vector<bool> res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,0);
+    std::vector<bool> res = pht::Bitvector_Utils::getBitvectorAtIndexvector(bitvector, fids, 0);
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,1,0));
-    res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,1);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexvector(bitvector, fids, 1);
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = pht::Bitvector_Utils::findBitvectorBitIndex(bitvector,fids,2);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexvector(bitvector, fids, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0));
 
 }
@@ -120,9 +120,9 @@ TEST(BitvectorUtilsTest, findBitvectorLengthTest) {
 
 TEST(BitvectorUtilsTest, getMicroDummyTest) {
     std::vector<bool> bitvector = {0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    std::vector<bool> res = pht::Bitvector_Utils::findStaticSizeIndex(bitvector,0,4);
+    std::vector<bool> res = pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(bitvector, 0, 4);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,0,0));
-    res = pht::Bitvector_Utils::findStaticSizeIndex(bitvector,2,4);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(bitvector, 2, 4);
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,1));
 }
 
