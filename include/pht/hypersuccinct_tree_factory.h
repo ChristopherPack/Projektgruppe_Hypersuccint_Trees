@@ -34,11 +34,10 @@ namespace pht {
 
             uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
 
-            std::tuple<Bitvector,Bitvector> miniIntercon = hypersuccinctTree.microSize = pht::Bitvector_Utils::numberToBitvector(sizeMicro);
+            hypersuccinctTree.microSize = pht::Bitvector_Utils::numberToBitvector(sizeMicro);
+            std::tuple<Bitvector,Bitvector> miniIntercon = create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
             hypersuccinctTree.miniFIDs = std::get<0>(miniIntercon);
             hypersuccinctTree.miniTypeVectors = std::get<1>(miniIntercon);
-
-            create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
             Bitvector miniDummys = createDummyInterconnections(tree,fmMiniTrees,sizeMini);
             hypersuccinctTree.miniDummys = miniDummys;
 
