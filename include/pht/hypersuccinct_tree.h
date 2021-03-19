@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <functional>
+#include <utility>
 
 #include "unordered_tree.h"
 #include "list_utils.h"
@@ -38,7 +39,7 @@ namespace pht {
      */
     struct MicroTreeData {
         Bitvector bp;
-        MicroTreeData(Bitvector bp) : bp(bp) {}
+        explicit MicroTreeData(Bitvector bp) : bp(std::move(bp)) {}
         bool operator==(const MicroTreeData& mtd) const {
             return bp == mtd.bp;
         }
@@ -75,7 +76,7 @@ namespace pht {
          * @return the MicroTree in Balanced Parenthesis form as bitvector
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::findEliasGammaIndex(miniTree.microTrees,index,2);
+            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.microTrees, index, 2);
         }
 
         /**
@@ -86,7 +87,7 @@ namespace pht {
          * @return the FID as bitvector
          */
         Bitvector getMicroFID(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::findEliasGammaIndex(miniTree.FIDs,index,1);
+            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.FIDs, index, 1);
         }
 
         /**
@@ -98,7 +99,7 @@ namespace pht {
          * @return the Typevector as bitvector
          */
         Bitvector getMicroTypeVector(MiniTree& miniTree , uint32_t index) {
-            return pht::Bitvector_Utils::findBitvectorBitIndex(miniTree.typeVectors, miniTree.FIDs, index);
+            return pht::Bitvector_Utils::getBitvectorAtIndexvector(miniTree.typeVectors, miniTree.FIDs, index);
         }
 
         /**
@@ -111,7 +112,7 @@ namespace pht {
         Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index) {
             uint32_t size = pht::Bitvector_Utils::bitvectorToNumber(microSize);
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            return pht::Bitvector_Utils::findStaticSizeIndex(miniTree.dummys, index, dummySize);
+            return pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(miniTree.dummys, index, dummySize);
         }
 
 
@@ -149,9 +150,7 @@ namespace pht {
         }
 
     //private: /todo: readd private when factory is complete
-        HypersuccinctTree() {
-
-        };
+        HypersuccinctTree() = default;
         //todo: ORDER
         //sizes
         std::vector<bool> microSize;

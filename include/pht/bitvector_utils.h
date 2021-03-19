@@ -145,16 +145,9 @@ namespace pht{
          * @param multiplier the index multiplier as integer
          * @return the bitvector at given index
          */
-        static Bitvector findEliasGammaIndex(Bitvector& bitvector, uint32_t index,uint32_t multiplier) {
+        static Bitvector getBitvectorAtIndexEG(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
             //iterator
-            Bitvector::iterator iterator = bitvector.begin();
-            //for index:
-            for(int i=0;i<index;i++) {
-                //decode Elias Gamma
-                int length = decodeEliasGamma(iterator)*multiplier;
-                //Count until Elias Gamma is done / skip this FID
-                iterator+=length;
-            }
+            auto iterator = findEliasGammaIndex(bitvector, index, multiplier);
             //when index is found:
             //decode Elias Gamma
             int length = decodeEliasGamma(iterator)*multiplier;
@@ -167,6 +160,17 @@ namespace pht{
             return micro;
         }
 
+        static Bitvector::iterator findEliasGammaIndex(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
+            auto iterator = bitvector.begin();
+            for(int i=0;i<index;i++) {
+                //decode Elias Gamma
+                int length = decodeEliasGamma(iterator)*multiplier;
+                //Count until Elias Gamma is done / skip this FID
+                iterator+=length;
+            }
+            return iterator;
+        }
+
         /**
          * Finds a bitvector from a bitvector indexed by another bitvector
          * second bitvector must be indexed by Elias Gamma
@@ -176,10 +180,10 @@ namespace pht{
          * @param index the index as integer
          * @return the bitvector at given index
          */
-        static Bitvector findBitvectorBitIndex(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
+        static Bitvector getBitvectorAtIndexvector(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
             //iterator
             //skip these TypeVectors
-            Bitvector::iterator iterator = bitvector.begin();
+            auto iterator = bitvector.begin();
             for(int i=0; i<index;i++) {
                 uint32_t indexLength = findBitvectorLength(indexvector, i);
                 iterator+=indexLength;
@@ -203,10 +207,10 @@ namespace pht{
          */
         static uint32_t findBitvectorLength(Bitvector& bitvector, uint32_t index) {
             Bitvector fid;
-            fid = findEliasGammaIndex(bitvector,index,1);
+            fid = getBitvectorAtIndexEG(bitvector, index, 1);
             int indexLength = 0;
-            for(int j=0; j<fid.size();j++) {
-                if(fid.at(j)) {
+            for(auto && j : fid) {
+                if(j) {
                     indexLength++;
                 }
             }
@@ -221,8 +225,8 @@ namespace pht{
          * @param size the size as integer
          * @return the bitvector at given index
          */
-        static Bitvector findStaticSizeIndex(Bitvector bitvector,uint32_t index, uint32_t size) {
-            Bitvector::iterator iterator = bitvector.begin();
+        static Bitvector getBitvectorAtIndexStaticSize(Bitvector bitvector, uint32_t index, uint32_t size) {
+            auto iterator = bitvector.begin();
             iterator+=(size*index);
             Bitvector dummy;
             for(int j =0;j<size; j++) {
