@@ -133,11 +133,11 @@ namespace pht {
             return miniSize;
         }
 
-        std::vector<MiniTree> getMiniTree() {
+        std::vector<MiniTree> getMiniTrees() {
             return miniTrees;
         }
 
-        Bitvector getFIDs() {
+        Bitvector getMiniFIDs() {
             return miniFIDs;
         }
 
