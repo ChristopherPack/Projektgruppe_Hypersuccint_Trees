@@ -1,9 +1,15 @@
 include(GoogleTest)
-file(GLOB test_src CONFIGURE_DEPENDS "*.c" "*.cc" "*.cpp")
-add_executable(pht_test ${test_src} bitvector_utils_test.cpp hypersuccinct_tree_test.cpp)
-target_include_directories(pht_test PUBLIC "${CMAKE_SOURCE_DIR}/include")
-set_target_properties(pht_test PROPERTIES LINKER_LANGUAGE CXX)
-target_compile_features(pht_test PRIVATE cxx_std_17)
-target_link_libraries(pht_test PRIVATE pht_lib gtest gmock gtest_main gmock_main irrxml)
+set(PHT_TEST_SOURCES
+   bitvector_utils_test.cpp
+   farzan_munro_test.cpp
+   hypersuccinct_tree_test.cpp
+   hypersuccinct_tree_factory_test.cpp
+   list_utils_test.cpp
+   node_test.cpp
+   unordered_tree_test.cpp
+)
+list(TRANSFORM PHT_TEST_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
+add_executable(pht_test)
+target_sources(pht_test PRIVATE ${PHT_TEST_SOURCES})
+target_link_libraries(pht_test PRIVATE pht_lib gtest gmock gtest_main gmock_main)
 gtest_discover_tests(pht_test)
-#add_custom_command(TARGET pht_test COMMENT "Run tests" POST_BUILD COMMAND pht_test)

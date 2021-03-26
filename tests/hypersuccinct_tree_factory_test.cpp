@@ -8,7 +8,7 @@
 #include "pht/hypersuccinct_tree.h"
 #include "pht/hypersuccinct_tree_factory.h"
 
-class HypersuccinctTreeTest : public ::testing::Test {
+class HypersuccinctTreeFactoryTest : public ::testing::Test {
 protected:
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();
     std::shared_ptr<pht::Node<char>> a = std::make_shared<pht::Node<char>>('a');

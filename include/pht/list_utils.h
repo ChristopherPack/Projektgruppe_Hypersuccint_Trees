@@ -1,6 +1,8 @@
-#ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS_H_
-#define PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS_H_
+#ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS
+#define PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS
 
+#include <algorithm>
+#include <functional>
 #include <vector>
 
 namespace pht {
@@ -9,7 +11,6 @@ namespace pht {
      * 
      * This class provides commonly used functionality for the std::vector class, 
      * which is not implemented or very verbose in the standard library. 
-     * 
      */
     class ListUtils {
     public:
@@ -20,7 +21,7 @@ namespace pht {
          * @param[in] values The vector with the values to append. 
          * @tparam T The type of data stored in the vectors. 
          */
-        template<class T> inline static void addAll(std::vector<T>& vector, const std::vector<T>& values) {
+        template<class T> static void combine(std::vector<T>& vector, const std::vector<T>& values) {
             if(values.empty()) {
                 return;
             }
@@ -28,47 +29,216 @@ namespace pht {
         }
 
         /**
-         * Appends all the values of the second vector to the first vector.
-         *
-         * @param[in] vector The vector to append to.
-         * @param[in] values The vector with the values to append.
-         * @tparam T The type of data stored in the vectors.
+         * Appends all the values of the second vector to the first vector. 
+         * 
+         * @param[in] vector The vector to append to. 
+         * @param[in] values The vector with the values to append. 
+         * @tparam T The type of data stored in the vectors. 
+         * @overload
          */
-        template<class T> inline static void distinct(const std::vector<T>& vector1, std::vector<T>& vector2) {
-            if(vector1.empty()) {
+        template<class T> static void combine(std::vector<T>& vector, const std::initializer_list<T> values) {
+            if(values.size() == 0) {
                 return;
             }
-            for(T t : vector1) {
-                if(!ListUtils::contains(vector2,t)) {
-                    vector2.push_back(t);
+            vector.insert(vector.end(), values.begin(), values.end());
+        }
+        
+        /**
+         * Combines the two vectors into a new one. 
+         * 
+         * @param[in] vector One vector to combine. 
+         * @param[in] values The second vector to combine. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return The combined values. 
+         */
+        template<class T> static std::vector<T> combined(const std::vector<T>& vectorA, const std::vector<T>& vectorB) {
+            if(vectorB.empty()) {
+                return std::vector<T>(vectorA);
+            }
+            std::vector<T> result = vectorA;
+            result.insert(result.end(), vectorB.begin(), vectorB.end());
+            return result;
+        }
+        
+        /**
+         * Combines the two vectors into a new one. 
+         * 
+         * @param[in] vector One vector to combine. 
+         * @param[in] values The second vector to combine. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return The combined values. 
+         * @overload
+         */
+        template<class T> static std::vector<T> combined(const std::vector<T>& vectorA, const std::initializer_list<T> vectorB) {
+            if(vectorB.size() == 0) {
+                return std::vector<T>();
+            }
+            std::vector<T> result = vectorA;
+            result.insert(vectorA.end(), vectorB.begin(), vectorB.end());
+            return result;
+        }
+
+        /**
+         * Returns a list with the values which are only once in the given vector. 
+         *
+         * @param[in] vector The vector to get the distinct values from. 
+         * @tparam T The type of data stored in the vectors.
+         * @return The distinct values. 
+         */
+        template<class T> static std::vector<T> distincted(const std::vector<T>& vector) {
+            if(vector.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector<T> result;
+            for(T value : vector) {
+                if(std::find(result.begin(), result.end(), value) == result.end()) {
+                    result.push_back(value);
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Removes all duplicates in the given vector. 
+         *
+         * @param[in] vector The vector to keep only the distinct values in. 
+         * @tparam T The type of data stored in the vectors. 
+         */
+        template<class T> static void distinct(std::vector<T>& vector) {
+            if(vector.empty()) {
+                return;
+            }
+            typename std::vector<T>::iterator iterator = vector.begin();
+            while(iterator != vector.end()) {
+                if(std::find(vector.begin(), iterator, *iterator) != iterator) { 
+                    iterator = vector.erase(iterator);
+                } else {
+                    iterator++;
                 }
             }
         }
 
         /**
-         * Returns true if the vector contains the given element. 
+         * Returns true if the vector contains any of the given elements. 
          * 
          * @param[in] vector The vector which could contain the element. 
-         * @param[in] value The searched element. 
+         * @param[in] values The searched elements. 
          * @tparam T The type of data stored in the vector. 
-         * @return True if the vector contains the value.
+         * @return True if the vector contains any of the values or values is empty. 
+         * @overload
          */
-        template<class T> inline static bool contains(const std::vector<T>& vector, const T value) {
+        template<class T> static bool containsAny(const std::vector<T>& vector, const std::vector<T>& values) {
+            if(values.empty()) {
+                return true;
+            }
             if(vector.empty()) {
                 return false;
             }
-            return std::find(vector.begin(), vector.end(), value) != vector.end();
+            for(T value : values) {
+                if(std::find(vector.begin(), vector.end(), value) != vector.end()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns true if the vector contains all the given elements. 
+         * 
+         * @param[in] vector The vector which could contain the element. 
+         * @param[in] values The searched elements. 
+         * @tparam T The type of data stored in the vector. 
+         * @return True if the vector contains all the values or values is empty. 
+         * @overload
+         */
+        template<class T> static bool containsAll(const std::vector<T>& vector, const std::vector<T>& values) {
+            if(values.empty()) {
+                return true;
+            }
+            if(vector.empty()) {
+                return false;
+            }
+            for(T value : values) {
+                if(std::find(vector.begin(), vector.end(), value) == vector.end()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Returns true if the vector contains any of the given elements. 
+         * 
+         * @param[in] vector The vector which could contain the element. 
+         * @param[in] values The searched elements. 
+         * @tparam T The type of data stored in the vector. 
+         * @return True if the vector contains any of the values or values is empty. 
+         * @overload
+         */
+        template<class T> static bool containsAny(const std::vector<T>& vector, const std::initializer_list<T> values) {
+            if(values.size() == 0) {
+                return true;
+            }
+            if(vector.empty()) {
+                return false;
+            }
+            for(T value : values) {
+                if(std::find(vector.begin(), vector.end(), value) != vector.end()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns true if the vector contains all of the given elements. 
+         * 
+         * @param[in] vector The vector which could contain the element. 
+         * @param[in] values The searched elements. 
+         * @tparam T The type of data stored in the vector. 
+         * @return True if the vector contains all the values or values is empty. 
+         * @overload
+         */
+        template<class T> static bool containsAll(const std::vector<T>& vector, const std::initializer_list<T> values) {
+            if(values.size() == 0) {
+                return true;
+            }
+            if(vector.empty()) {
+                return false;
+            }
+            for(T value : values) {
+                if(std::find(vector.begin(), vector.end(), value) == vector.end()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Sortes a copy of the given vector with the given filter function. 
+         * 
+         * @param[in] vector The vector which should be sorted. 
+         * @param[in] comparator The comparator function. 
+         * @tparam T The type of data stored in the vector. 
+         * @return a sorted version of the vector. 
+         */
+        template<class T> static std::vector<T> sorted(const std::vector<T>& vector, std::function<bool(T,T)> comparator) {
+            if(vector.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector<T> result = vector;
+            std::sort(result.begin(), result.end(), comparator);
+            return result;
         }
 
         /**
          * Sortes the given vector with the given filter function. 
          * 
          * @param[in] vector The vector which should be sorted. 
-         * @param[in] predicate The comparator function. 
+         * @param[in] comparator The comparator function. 
          * @tparam T The type of data stored in the vector. 
-         * @tparam F The type of the comparator function. 
          */
-        template<class T, class F> inline static void sort(std::vector<T>& vector, const F comparator) {
+        template<class T> static void sort(std::vector<T>& vector, std::function<bool(T,T)> comparator) {
             if(vector.empty()) {
                 return;
             }
@@ -81,9 +251,8 @@ namespace pht {
          * @param[in] vector The vector which should be filtered. 
          * @param[in] predicate The filter function. 
          * @tparam T The type of data stored in the vector. 
-         * @tparam F The type of the filter function. 
          */
-        template<class T, class F> inline static void filter(std::vector<T>& vector, const F predicate) {
+        template<class T> static void filter(std::vector<T>& vector, std::function<bool(T)> predicate) {
             if(vector.empty()) {
                 return;
             }
@@ -91,38 +260,72 @@ namespace pht {
         }
 
         /**
+         * Filters out all elements from a copy of the vector for which the given function is false. 
+         * 
+         * @param[in] vector The vector which should be filtered. 
+         * @param[in] predicate The filter function. 
+         * @tparam T The type of data stored in the vector. 
+         * @return A filtered copy of the vector. 
+         */
+        template<class T> static std::vector<T> filtered(const std::vector<T>& vector, std::function<bool(T)> predicate) {
+            if(vector.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector<T> result = vector;
+            result.erase(std::remove_if(result.begin(), result.end(), [predicate](T x){ return !predicate(x); }), result.end());
+            return result;
+        }
+
+        /**
          * Maps all elements in vector1 into vector2 with the help of the given function. 
          * 
-         * @param[in] vector1 The vector which should be mapped. 
-         * @param[in] vector2 The vector to m ap into. 
+         * @param[in] vector The vector which should be mapped. 
          * @param[in] mapper The mapping function which converts an element from T1 into T2. 
          * @tparam T1 The type of data stored in the vector. 
          * @tparam T2 The new type of the data after mapping. 
-         * @tparam F The type of the mapping function. 
          * @return A new vector with the mapped values. 
          */
-        template<class T1, class T2, class F> inline static void map(const std::vector<T1>& vector1, std::vector<T2>& vector2, const F mapper) {
-            if(vector1.empty()) {
+        template<class T1, class T2> static std::vector<T2> mapped(const std::vector<T1>& vector, std::function<T2(T1)> mapper) {
+            if(vector.empty()) {
+                return std::vector<T2>();
+            }
+            std::vector<T2> result;
+            result.reserve(vector.size());
+            std::transform(vector.begin(), vector.end(), std::back_inserter(result), mapper);
+            return result;
+        }
+
+        /**
+         * Maps all elements in vector1 into vector2 with the help of the given function. 
+         * 
+         * @param[in] vector The vector which should be mapped. 
+         * @param[out] vector The vector to map into. 
+         * @param[in] mapper The mapping function which converts an element from T1 into T2. 
+         * @tparam T1 The type of data stored in the vector. 
+         * @tparam T2 The new type of the data after mapping. 
+         */
+        template<class T1, class T2> static void map(const std::vector<T1>& vector, std::vector<T2>& output, std::function<T2(T1)> mapper) {
+            if(vector.empty()) {
                 return;
             }
-            vector2.reserve(vector1.size());
-            std::transform(vector1.begin(), vector1.end(), std::back_inserter(vector2), mapper);
+            std::for_each(vector.begin(), vector.end(), [&output,mapper](T1 x){output.push_back(mapper(x));});
         }
 
         /**
          * Combines all elements in the vector the help of the given function and the given initialization value. 
          * 
          * @param[in] vector The vector which should be mapped. 
+         * @param[in] value The start value. 
          * @param[in] folder The fold function which combines the accumulated value with a new one. 
-         * @tparam T The type of data stored in the vector. 
-         * @tparam F The type of the fold function. 
+         * @tparam T1 The type of data stored in the vector. 
+         * @tparam T2 The type of the accumulated data. 
          */
-        template<class T, class F> inline static T fold(const std::vector<T>& vector, const T value, const F folder) {
+        template<class T1, class T2> static T2 fold(const std::vector<T1>& vector, const T2 value, std::function<T2(T2,T1)> folder) {
             if(vector.empty()) {
                 return value;
             }
-            T result = value;
-            std::for_each(vector.begin(), vector.end(), [&result, folder](T x) mutable { result = folder(result, x); });
+            T2 result = value;
+            std::for_each(vector.begin(), vector.end(), [&result, folder](T1 x) mutable { result = folder(result, x); });
             return result;
         }
 
@@ -131,10 +334,9 @@ namespace pht {
          * 
          * @param[in] vector The vector which should be mapped. 
          * @param[in] function The function to execute. 
-         * @tparam T The type of data stored in the vectors. 
-         * @tparam F The type of the function. 
+         * @tparam T The type of data stored in the vectors.
          */
-        template<class T, class F> inline static void forEach(const std::vector<T>& vector, const F function) {
+        template<class T> static void foreach(const std::vector<T>& vector, std::function<void(T)> function) {
             if(vector.empty()) {
                 return;
             }
@@ -149,7 +351,7 @@ namespace pht {
          * @tparam T The type of data stored in the vectors. 
          * @return The index of the element or -1. 
          */
-        template<class T> inline static int32_t indexOf(const std::vector<T>& vector, const T value) {
+        template<class T> static int32_t indexOf(const std::vector<T>& vector, const T value) {
             if(vector.empty()) {
                 return -1;
             }
@@ -161,17 +363,36 @@ namespace pht {
         }
 
         /**
-         * Removes the given value from the given vector.
+         * Removes all the values of the second vector from the first vector.
          * 
          * @param[in] vector The vector to remove from. 
-         * @param[in] value The vector with the values to remove. 
+         * @param[in] values The vector with the values to remove. 
          * @tparam T The type of data stored in the vectors. 
+         * @overload
          */
-        template<class T> inline static void erase(std::vector<T>& vector, const T value) {
-            if(vector.empty()) {
+        template<class T> static void erase(std::vector<T>& vector, const std::vector<T>& values) {
+            if(vector.empty() || values.empty()) {
                 return;
             }
-            vector.erase(std::remove(vector.begin(), vector.end(), value), vector.end());
+            vector.erase(std::remove_if(vector.begin(), vector.end(), [values](T value){ return std::find(values.begin(), values.end(), value) != values.end(); }), vector.end());
+        }
+
+        /**
+         * Removes all the values of the second vector from a copy of the first vector.
+         * 
+         * @param[in] vector The vector to remove from. 
+         * @param[in] values The vector with the values to remove. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return A copy without the values to erase. 
+         * @overload
+         */
+        template<class T> static std::vector<T> erased(const std::vector<T>& vector, const std::vector<T>& values) {
+            if(vector.empty() || values.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector result = vector;
+            result.erase(std::remove_if(result.begin(), result.end(), [values](T value){ return std::find(values.begin(), values.end(), value) != values.end(); }), result.end());
+            return result;
         }
 
         /**
@@ -180,28 +401,99 @@ namespace pht {
          * @param[in] vector The vector to remove from. 
          * @param[in] values The vector with the values to remove. 
          * @tparam T The type of data stored in the vectors. 
+         * @overload
          */
-        template<class T> inline static void eraseAll(std::vector<T>& vector, const std::vector<T>& values) {
-            if(vector.empty() || values.empty()) {
+        template<class T> static void erase(std::vector<T>& vector, const std::initializer_list<T> values) {
+            if(vector.empty() || (values.size() == 0)) {
                 return;
             }
             vector.erase(std::remove_if(vector.begin(), vector.end(), [values](T value){ return std::find(values.begin(), values.end(), value) != values.end(); }), vector.end());
         }
 
         /**
-         *
-         * @tparam T
-         * @param vector
-         * @return
+         * Removes all the values of the second vector from a copy of the first vector.
+         * 
+         * @param[in] vector The vector to remove from. 
+         * @param[in] values The vector with the values to remove. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return A copy without the values to erase. 
+         * @overload
          */
-        template<class T> inline static std::vector<T> reversed(std::vector<T>& vector) {
-            std::vector<T> res;
-            for(auto i = vector.rbegin(); i != vector.rend(); ++i ) {
-                res.push_back(*i);
+        template<class T> static std::vector<T> erased(const std::vector<T>& vector, const std::initializer_list<T> values) {
+            if(vector.empty() || (values.size() == 0)) {
+                return std::vector<T>(vector);
             }
-            return res;
+            std::vector result = vector;
+            result.erase(std::remove_if(result.begin(), result.end(), [values](T value){ return std::find(values.begin(), values.end(), value) != values.end(); }), result.end());
+            return result;
+        }
+
+        /**
+         * Reverses the given list. 
+         * 
+         * @param vector The to reverse. 
+         * @tparam T The type of data stored in the vectors. 
+         */
+        template<class T> static void reverse(std::vector<T>& vector) {
+            if(vector.empty()) {
+                return;
+            }
+            for(uint32_t i = 0; i < vector.size()/2; i++) {
+                T tmp = vector.at(vector.size()-1-i);
+                vector.at(vector.size()-1-i) = vector.at(i);
+                vector.at(i) = tmp;
+            }
+        }
+
+        /**
+         * Reverses the given list into a new list. 
+         * 
+         * @param vector The to reverse. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return The reversed list. 
+         */
+        template<class T> static std::vector<T> reversed(const std::vector<T>& vector) {
+            if(vector.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector<T> result;
+            std::for_each(vector.begin(), vector.end(), [&result](T value){result.insert(result.begin(), value);});
+            return result;
+        }
+
+        /**
+         * Replaces the given value in the given vector. 
+         * 
+         * @param vector The to replace the value in. 
+         * @param value The value to replace. 
+         * @param replacement The replacement. 
+         * @tparam T The type of data stored in the vectors. 
+         */
+        template<class T> static void replace(std::vector<T>& vector, const T value, const T replacement) {
+            if(vector.empty()) {
+                return;
+            }
+            std::replace(vector.begin(), vector.end(), value, replacement);
+        }
+
+        /**
+         * Replaces the given value in the given vector. 
+         * 
+         * @param vector The to replace the value in. 
+         * @param value The value to replace. 
+         * @param replacement The replacement. 
+         * @tparam T The type of data stored in the vectors. 
+         * @return A copy with the replaced value. 
+         */
+        template<class T> static std::vector<T> replaced(const std::vector<T>& vector, const T value, const T replacement) {
+            if(vector.empty()) {
+                return std::vector<T>(vector);
+            }
+            std::vector<T> result = vector;
+            std::replace(result.begin(), result.end(), value, replacement);
+            return result;
         }
     };
 }
 
-#endif//PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS_H_
+#endif//PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS

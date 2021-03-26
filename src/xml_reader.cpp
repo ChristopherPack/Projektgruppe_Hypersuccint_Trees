@@ -11,36 +11,36 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = std::make_shared<pht::UnorderedTree<std::string>>();
     std::shared_ptr<pht::Node<std::string>> current = nullptr;
 
-    std::shared_ptr<irr::io::IrrXMLReader> xml = std::shared_ptr<irr::io::IrrXMLReader>(irr::io::createIrrXMLReader(path.c_str()));
-    if(!xml || !xml->read())
+    std::unique_ptr<irr::io::IrrXMLReader> reader = std::unique_ptr<irr::io::IrrXMLReader>(irr::io::createIrrXMLReader(path.c_str()));
+    if(!reader || !reader->read())
         throw std::runtime_error("Failed to read xml file");
 
     uint32_t element = 0;
     do {
         element++;
-        if(xml->getNodeType() == irr::io::EXN_ELEMENT) {
-            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(xml->getNodeName());
+        if(reader->getNodeType() == irr::io::EXN_ELEMENT) {
+            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(reader->getNodeName());
             xmlTree->add(node, current);
-            if(!xml->isEmptyElement())
+            if(!reader->isEmptyElement())
                 current = node;
-            for(int i = 0; i < xml->getAttributeCount(); i++) {
-                std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>(std::string(xml->getAttributeName(i)));
+            for(int i = 0; i < reader->getAttributeCount(); i++) {
+                std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeName(i)));
                 xmlTree->add(attributeName, current);
-                std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>(std::string(xml->getAttributeValue(i)));
+                std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeValue(i)));
                 xmlTree->add(attributeValue, attributeName);
             }
-        } else if(xml->getNodeType() == irr::io::EXN_ELEMENT_END) {
+        } else if(reader->getNodeType() == irr::io::EXN_ELEMENT_END) {
             if(!xmlTree->isRoot(current)) {
                 current = xmlTree->getDirectAncestor(current);
             }
-        } else if(xml->getNodeType() == irr::io::EXN_TEXT) {
-            std::string text = std::string(xml->getNodeData());
+        } else if(reader->getNodeType() == irr::io::EXN_TEXT) {
+            std::string text = std::string(reader->getNodeData());
             if(!std::all_of(text.begin(), text.end(), isspace)) {
                 std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(text);
                 xmlTree->add(node, current);
             }
         }
-    } while(xml->read());
+    } while(reader->read());
 
     return xmlTree;
 }
