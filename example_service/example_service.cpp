@@ -25,7 +25,7 @@ void printBitvector(std::vector<bool> bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("testNath.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = createExampleTree();
 
 
 
@@ -38,7 +38,7 @@ int main() {
     uint32_t sizeMicro = 4;
 
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
-    fmMiniTrees = pht::ListUtils::reverse(fmMiniTrees);
+    //fmMiniTrees = pht::ListUtils::reverse(fmMiniTrees);
 
     std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
@@ -63,7 +63,7 @@ int main() {
 
 
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("testNath.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = createExampleTree();//pht::XMLReader::read("testNath.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
     pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 

@@ -36,7 +36,7 @@ namespace pht {
             #endif
 
             hypersuccinctTree.miniSize = pht::Bitvector_Utils::numberToBitvector(sizeMini);
-            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(tree, sizeMini));
+            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::FarzanMunro<T>::decompose(tree, sizeMini);
 
             /*for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
 
@@ -57,7 +57,7 @@ namespace pht {
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
 
                 //todo: We might need this for Interconnections
-                std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro));
+                std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
 
                 //todo: Create Mini Dummy Nodes possible Position
@@ -101,11 +101,11 @@ namespace pht {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = subtrees;
             ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
             ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(x->getDirectDescendants(x->getRoot()).size()-1);});
-            //zählung von firstChildren ist front - zählung in enumerate ist reversed
+            //zählung von firstChildren ist front - zählung in enumerate
 
             //FIDs und TypeVectors
             for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
-                std::vector<std::shared_ptr<pht::Node<T>>> children = ListUtils::reverse(baseTree->getDirectDescendants(rootNode));
+                std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(rootNode);
                 pht::Bitvector_Utils::createEliasGamma(FIDs, children.size());
                 for(std::shared_ptr<pht::Node<T>> node : children) {
                     if(ListUtils::contains(rootNodes,node)) {

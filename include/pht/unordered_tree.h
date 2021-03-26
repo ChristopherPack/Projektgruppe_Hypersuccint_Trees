@@ -303,20 +303,18 @@ namespace pht {
             if(node==root) {
                 return 0;
             }
-            uint32_t i = 0;
-            return enumerateHelper(node,root,i);
-        }
-
-        uint32_t enumerateHelper(const std::shared_ptr<pht::Node<T>> searchNode,const std::shared_ptr<pht::Node<T>> currentNode, uint32_t& currentIndex) {
-            if(currentNode==searchNode) {
-                return currentIndex;
-            }
-            for(const std::shared_ptr<pht::Node<T>> node : ListUtils::reverse(descendants.at(currentNode))) {
-                uint32_t res = enumerateHelper(searchNode,node,++currentIndex);
-                if(res) {
-                    return res;
+            uint32_t i = 1;
+            std::vector<std::shared_ptr<pht::Node<T>>> nodes = getDirectDescendants(root);
+            while(!nodes.empty()) {
+                std::shared_ptr<pht::Node<T>> current = nodes.front();
+                nodes.erase(nodes.begin());
+                ListUtils::addAll(nodes, getDirectDescendants(current));
+                if(current == node) {
+                    return i;
                 }
+                i++;
             }
+            ASSERT(false, "Node not found");
             return 0;
         }
 

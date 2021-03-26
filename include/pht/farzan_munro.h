@@ -16,6 +16,26 @@ namespace pht {
     template<class T> class FarzanMunro {
     public:
         /**
+         * Decomposes a tree and sorts it
+         *
+         * This method will decompose the given tree into multiple new and smaller subtrees with a size
+         * between idealSize and 2*idealSize.
+         *
+         * @param[in] tree A pointer to the tree to decompose.
+         * @param[in] idealSize The size of the new subtrees. Subtrees will never be larger than 2*idealSize and mostly bigger than idealSize.
+         * @tparam T The type of data stored in the nodes of the tree.
+         * @return A list with pointers to the components of the decomposed tree.
+         */
+        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
+            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result = decomposeRaw(tree, idealSize);
+            std::vector<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>> enumResult;
+            ListUtils::map(result, enumResult, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){return std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>(tree->enumerate(tree1->getRoot()),tree1);});
+            ListUtils::sort(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeB){return treeA.first<treeB.first;});
+            result.clear();
+            ListUtils::map(enumResult, result, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
+            return result;
+        }
+        /**
          * Decomposes a tree. 
          * 
          * This method will decompose the given tree into multiple new and smaller subtrees with a size 
@@ -26,7 +46,7 @@ namespace pht {
          * @tparam T The type of data stored in the nodes of the tree. 
          * @return A list with pointers to the components of the decomposed tree. 
          */
-        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
+        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decomposeRaw(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
             assert(tree != nullptr && "Invalid tree");
             assert(idealSize >= 1 && "IdealSize cannot be 0");
 
