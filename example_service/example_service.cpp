@@ -25,7 +25,7 @@ void printBitvector(std::vector<bool> bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("testAlex.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("testNath.xml");
 
 
 
@@ -63,7 +63,7 @@ int main() {
 
 
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("testAlex.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("testNath.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
     pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
@@ -87,7 +87,7 @@ int main() {
     printBitvector(hst.getMiniDummys());
 
     pht::MiniTree miniTree = hst.getMiniTree(0);
-    for(int index = 0 ; index < 9; index++) {
+    for(int index = 0 ; index < hst.getMiniTrees().size(); index++) {
         std::cout << "MicroTreesinMiniTree" << index << ":  ";
         printBitvector(hst.getMiniTree(index).microTrees);
         std::cout << "MicroTreeFIDs:  ";
