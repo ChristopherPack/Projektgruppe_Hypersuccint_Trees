@@ -72,6 +72,7 @@ namespace pht {
                 newComponents.push_back(newComponent);
             } while(!oldComponents.empty());
 
+            //todo: gehört in die DO Schleife?
             if(newComponents.size() == 1 && newComponents.at(0)->getSize() < idealSize) {
                 return newComponents;
             } else {
@@ -101,8 +102,20 @@ namespace pht {
                     ListUtils::addAll(temporaryComponents, decompose(tree, child, idealSize));
                 }
             }
-            
+
             std::vector<std::shared_ptr<pht::Node<T>>> heavyChildren = tree->getHeavyDirectDescendants(currentNode, idealSize);
+
+            /*std::cout << currentNode->getValue() << std::endl;
+            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : temporaryComponents) {
+                std::cout << tree1->toNewickString() << std::endl;
+            }
+            std::cout << "PERMANENT: " << std::endl;
+            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : permanentComponents) {
+                std::cout << tree1->toNewickString() << std::endl;
+            }
+            for(std::shared_ptr<pht::Node<T>> node : heavyChildren) {
+                std::cout << node->getValue() << std::endl;
+            }*/
             
             if(heavyChildren.size() <= 1) {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
@@ -118,9 +131,20 @@ namespace pht {
                         permanentComponents.push_back(temporaryComponents.at(0));
                         temporaryComponents.erase(temporaryComponents.begin()); //Skip heavy component
                     }
-                    std::vector<std::shared_ptr<pht::UnorderedTree<T>>> packedComponents = greedilyPack(tree, currentNode, group, idealSize);
-                    permanentComponents.insert(permanentComponents.end(), packedComponents.begin(), packedComponents.end());
+                    if(!group.empty()) {
+                        std::vector<std::shared_ptr<pht::UnorderedTree<T>>> packedComponents = greedilyPack(tree,
+                                                                                                            currentNode,
+                                                                                                            group,
+                                                                                                            idealSize);
+                        permanentComponents.insert(permanentComponents.end(), packedComponents.begin(),
+                                                   packedComponents.end());
+                    }
                 } while(!temporaryComponents.empty());
+                if(heavyChildren.size() == tree->getDirectDescendants(currentNode).size()) {
+                    std::shared_ptr<pht::UnorderedTree<T>> component = std::make_shared<pht::UnorderedTree<T>>();
+                    component->add(currentNode);
+                    permanentComponents.push_back(component);
+                }
                 return std::vector<std::shared_ptr<pht::UnorderedTree<T>>>();
             }
         }

@@ -28,8 +28,8 @@ namespace pht {
             HypersuccinctTree<T> hypersuccinctTree;
 
             #ifdef PHT_TEST
-            uint32_t sizeMini = 10;
-            uint32_t sizeMicro = 5;
+            uint32_t sizeMini = 12;
+            uint32_t sizeMicro = 4;
             #else
             uint32_t sizeMini = ceil(pow(log2(tree->getSize()), 2.0));
             uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
@@ -37,6 +37,13 @@ namespace pht {
 
             hypersuccinctTree.miniSize = pht::Bitvector_Utils::numberToBitvector(sizeMini);
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::ListUtils::reverse(pht::FarzanMunro<T>::decompose(tree, sizeMini));
+
+            /*for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
+
+                std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
+                std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
+                std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
+            }*/
 
             hypersuccinctTree.microSize = pht::Bitvector_Utils::numberToBitvector(sizeMicro);
 
@@ -86,7 +93,6 @@ namespace pht {
             Bitvector FIDs;
             Bitvector typeVectors;
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            //assert(baseTree->getRoot() == subtrees.at(0)->getRoot());
             std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;
             ListUtils::map(subtrees, rootNodes, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
             std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes;
