@@ -82,7 +82,7 @@ namespace pht {
             ASSERT(ancestor || !root, "Invalid ancestor");
             ASSERT(!root || std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
-            ASSERT(ancestor == nullptr || index < descendants.at(ancestor).size() , "Invalid index");
+            ASSERT(ancestor == nullptr || index <= descendants.at(ancestor).size() , "Invalid index");
 
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
