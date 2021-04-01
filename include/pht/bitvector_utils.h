@@ -235,6 +235,16 @@ namespace pht{
             }
             return dummy;
         }
+
+        static Bitvector convertToBitvector(std::string input){
+            Bitvector result;
+
+            for(char i : input){
+                result.push_back(i=='1');
+            }
+
+            return result;
+        }
     };
 }
 
