@@ -4,7 +4,7 @@
 
 #include "xml_reader.h"
 
-std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std::string path) {
+std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std::string& path) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = std::make_shared<pht::UnorderedTree<std::string>>();
     std::shared_ptr<pht::Node<std::string>> current = nullptr;
 

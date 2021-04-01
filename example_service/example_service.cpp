@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include <irrXML.h>
 #define PHT_TEST
@@ -7,9 +8,12 @@
 #include "pht/farzan_munro.h"
 #include "xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#include <direct.h>
 #include "pht/hypersuccinct_tree.h"
 #include "pht/bitvector_utils.h"
 #include "pht/list_utils.h"
+
+using namespace std::filesystem;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
@@ -25,7 +29,15 @@ void printBitvector(std::vector<bool> bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = createExampleTree();
+    char temp[256];
+    _getcwd( temp, 256); //der Programmpfad ist jetzt in 'temp' gespeichert
+    path myRoot(temp);
+    path directory = myRoot.parent_path().parent_path() /= "example_service\\treeNath.xml"; // \\Projektgruppe_Hypersuccint_Trees\\example_service\\treeNath.xml
+
+    //std::shared_ptr<pht::UnorderedTree<std::string>> tree = createExampleTree();
+    std::cout << "Reading File... \n";
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::read( directory.string());
+    std::cout << "File Read. \n\n";
 
 
 
@@ -40,36 +52,36 @@ int main() {
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
     //fmMiniTrees = pht::ListUtils::reverse(fmMiniTrees);
 
-    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
+//    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
+//
+//    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
+//
+//        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
+//        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
+//        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
+//
+//        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
+//        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
+//
+//        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
+//
+//        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
+//            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
+//            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
+//            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
+//        }
+//        std::cout << std::endl;
+//    }
 
-    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
-
-        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
-        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
-        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
-
-        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
-        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
-
-        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
-
-        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
-            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
-            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
-            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
-        }
-        std::cout << std::endl;
-    }
 
 
+    //std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = createExampleTree();//pht::XMLReader::read("testAlex.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = createExampleTree();//pht::XMLReader::read("testNath.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
-
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
 
     std::cout << "Original Tree data:" << std::endl;
-    std::cout << xmlTree->getSize() << std::endl;
-    std::cout << xmlTree->toNewickString() << std::endl;
+    std::cout << tree->getSize() << std::endl;
+    std::cout << tree->toNewickString() << std::endl;
 
     std::cout << "Hypersuccinct Tree:" << std::endl;
     std::cout << "MiniSize:  ";
