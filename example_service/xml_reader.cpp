@@ -1,8 +1,11 @@
 #include <iostream>
+#include <filesystem>
+#include <direct.h>
 
 #include <irrXML.h>
 
 #include "xml_reader.h"
+using namespace std::filesystem;
 
 std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std::string& path) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = std::make_shared<pht::UnorderedTree<std::string>>();
@@ -40,4 +43,27 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     } while(xml->read());
 
     return xmlTree;
+}
+
+/**
+ * Reads the specified file located in Projektgruppe_Hypersuccint_Trees/example_service
+ *
+ * @param name
+ * @return unorderedTree from xml
+ */
+std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(const std::string &name) {
+
+    char temp[256];
+    _getcwd( temp, 256); //der Programmpfad ist jetzt in 'temp' gespeichert
+    path myRoot(temp);
+    path directory = myRoot;
+
+    while (directory.stem() != "Projektgruppe_Hypersuccint_Trees"){
+        directory = directory.parent_path();
+    }
+
+    directory /= "example_service\\";
+
+    return read(directory.string() + name);
+
 }

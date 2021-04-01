@@ -83,12 +83,7 @@ protected:
         example->add(A, t);
         example->add(B, x);
 
-        char temp[256];
-        _getcwd( temp, 256); //der Programmpfad ist jetzt in 'temp' gespeichert
-        path myRoot(temp);
-        path directory = myRoot.parent_path().parent_path() /= "example_service\\treeNath.xml"; // \\Projektgruppe_Hypersuccint_Trees\\example_service\\treeNath.xml
-
-        treeNath  = pht::XMLReader::read(directory.string());
+        treeNath  = pht::XMLReader::readByName("treeNath.xml");
         hyperNath = pht::HypersuccinctTreeFactory::create(treeNath);
 
     }

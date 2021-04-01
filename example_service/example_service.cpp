@@ -19,7 +19,7 @@ std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
-void printBitvector(std::vector<bool> bitvector) {
+void printBitvector(const std::vector<bool>& bitvector) {
     for(bool bit: bitvector) {
         std::cout << bit;
     }
@@ -29,17 +29,9 @@ void printBitvector(std::vector<bool> bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    char temp[256];
-    _getcwd( temp, 256); //der Programmpfad ist jetzt in 'temp' gespeichert
-    path myRoot(temp);
-    path directory = myRoot.parent_path().parent_path() /= "example_service\\treeNath.xml"; // \\Projektgruppe_Hypersuccint_Trees\\example_service\\treeNath.xml
-
-    //std::shared_ptr<pht::UnorderedTree<std::string>> tree = createExampleTree();
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::read( directory.string());
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath.xml");
     std::cout << "File Read. \n\n";
-
-
 
     //Couts are necessary like this
     std::cout << "Original tree:\n" << *tree << "\n\n";

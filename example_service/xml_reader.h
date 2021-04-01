@@ -13,6 +13,8 @@ namespace pht {
          * 
          */
         static std::shared_ptr<UnorderedTree<std::string>> read(const std::string& path);
+
+        static std::shared_ptr<UnorderedTree<std::string>> readByName(const std::string& name);
     };
 }
 
