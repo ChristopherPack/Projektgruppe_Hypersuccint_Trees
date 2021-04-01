@@ -44,26 +44,26 @@ int main() {
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
     //fmMiniTrees = pht::ListUtils::reverse(fmMiniTrees);
 
-//    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
-//
-//    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
-//
-//        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
-//        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
-//        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
-//
-//        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
-//        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
-//
-//        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
-//
-//        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
-//            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
-//            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
-//            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
-//        }
-//        std::cout << std::endl;
-//    }
+    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
+
+    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
+
+        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
+        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
+        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
+
+        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
+        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
+
+        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
+
+        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
+            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
+            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
+            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
+        }
+        std::cout << std::endl;
+    }
 
 
 
