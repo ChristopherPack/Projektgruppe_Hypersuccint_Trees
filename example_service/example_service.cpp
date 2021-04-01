@@ -30,7 +30,7 @@ int main() {
     //todo: Needs complete restructuring
 
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath");
     std::cout << "File Read. \n\n";
 
     //Couts are necessary like this
