@@ -58,11 +58,17 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(cons
     path myRoot(temp);
     path directory = myRoot;
 
-    while (directory.stem() != "Projektgruppe_Hypersuccint_Trees"){
+    while (directory.stem() != "Projektgruppe_Hypersuccint_Trees" && directory.root_path() != directory.parent_path()){
         directory = directory.parent_path();
     }
 
     directory /= "example_service\\";
+
+
+    std::string xml = ".xml";
+    if (!std::equal(xml.rbegin(), xml.rend(), name.rbegin())){
+        return read(directory.string() + name + xml);
+    }
 
     return read(directory.string() + name);
 
