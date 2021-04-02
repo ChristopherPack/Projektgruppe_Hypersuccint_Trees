@@ -101,7 +101,7 @@ TEST_F(HypersuccinctTreeTest, TreeDataTest) {
 }
 
 TEST_F(HypersuccinctTreeTest, MiniTreesTest){
-    pht::Bitvector miniFIDs = convertToBitvector("0111110100101011010111101001001000011");
+    pht::Bitvector miniFIDs = convertToBitvector("0111110101001011010111101010001001001");
     pht::Bitvector miniConnectionTypeVectors = convertToBitvector("001100011111");
     pht::Bitvector miniDummys = convertToBitvector("0000000000000000000000100000000000000000");
     EXPECT_EQ(8, hyperNath.getMiniTrees().size());
@@ -113,13 +113,13 @@ TEST_F(HypersuccinctTreeTest, MiniTreesTest){
 TEST_F(HypersuccinctTreeTest, MicroTreesTest){
     // MiniTree 0
     EXPECT_EQ(hyperNath.getMiniTree(0).microTrees, convertToBitvector("1100011111101001101000"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).FIDs, convertToBitvector("1101001"));
+    EXPECT_EQ(hyperNath.getMiniTree(0).FIDs, convertToBitvector("1101010"));
     EXPECT_EQ(hyperNath.getMiniTree(0).typeVectors, convertToBitvector("01"));
     EXPECT_EQ(hyperNath.getMiniTree(0).dummys, convertToBitvector("00000000"));
 
     // MiniTree 1
     EXPECT_EQ(hyperNath.getMiniTree(1).microTrees, convertToBitvector("1100111110000101100001001110100000110111010011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).FIDs, convertToBitvector("0101111010111101001"));
+    EXPECT_EQ(hyperNath.getMiniTree(1).FIDs, convertToBitvector("0101111010111101010"));
     EXPECT_EQ(hyperNath.getMiniTree(1).typeVectors, convertToBitvector("0010111"));
     EXPECT_EQ(hyperNath.getMiniTree(1).dummys, convertToBitvector("00000010000000000000"));
 
@@ -137,20 +137,20 @@ TEST_F(HypersuccinctTreeTest, MicroTreesTest){
 
     // MiniTree 4
     EXPECT_EQ(hyperNath.getMiniTree(4).microTrees, convertToBitvector("1100010111101001000010011010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).FIDs, convertToBitvector("11011101011001"));
+    EXPECT_EQ(hyperNath.getMiniTree(4).FIDs, convertToBitvector("11011110011100"));
     EXPECT_EQ(hyperNath.getMiniTree(4).typeVectors, convertToBitvector("0011"));
     EXPECT_EQ(hyperNath.getMiniTree(4).dummys, convertToBitvector("000000000000"));
 
     // MiniTree 5
     EXPECT_EQ(hyperNath.getMiniTree(5).microTrees, convertToBitvector("1100111110000010011101000001011101010100001011110011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).FIDs, convertToBitvector("01011110101100100000101001"));
+    EXPECT_EQ(hyperNath.getMiniTree(5).FIDs, convertToBitvector("01011110101100100100001010"));
     EXPECT_EQ(hyperNath.getMiniTree(5).typeVectors, convertToBitvector("0010111"));
     EXPECT_EQ(hyperNath.getMiniTree(5).dummys, convertToBitvector("00000010000000000000"));
 
     // MiniTree 6
     EXPECT_EQ(hyperNath.getMiniTree(6).microTrees, convertToBitvector("0010011101000001001110100000100110110000010011010100001011101010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).FIDs, convertToBitvector("01111101011011011011001001000001"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).typeVectors, convertToBitvector("010010111"));
+    EXPECT_EQ(hyperNath.getMiniTree(6).FIDs, convertToBitvector("01111101011011110011100001001000"));
+    EXPECT_EQ(hyperNath.getMiniTree(6).typeVectors, convertToBitvector("010011011"));
     EXPECT_EQ(hyperNath.getMiniTree(6).dummys, convertToBitvector("00000000000000000000"));
 
     // MiniTree 7
