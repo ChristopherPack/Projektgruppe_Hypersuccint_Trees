@@ -4,8 +4,8 @@
 
 #include <irrXML.h>
 
-#include "xml_reader.h"
 using namespace std::filesystem;
+#include "pht/xml_reader.h"
 
 std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std::string& path) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = std::make_shared<pht::UnorderedTree<std::string>>();
@@ -58,7 +58,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(cons
     path myRoot(temp);
     path directory = myRoot;
 
-    while (directory.stem() != "Projektgruppe_Hypersuccint_Trees" && directory.root_path() != directory.parent_path()){
+    while ((directory.stem() != "Projektgruppe_Hypersuccint_Trees" && directory.stem() != "ProjektSuccinctTrees") && directory.root_path() != directory.parent_path()){
         directory = directory.parent_path();
     }
 

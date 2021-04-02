@@ -1,6 +1,6 @@
 include(GoogleTest)
 file(GLOB test_src CONFIGURE_DEPENDS "*.c" "*.cc" "*.cpp")
-add_executable(pht_test ${test_src} bitvector_utils_test.cpp hypersuccinct_tree_test.cpp ../example_service/xml_reader.cpp)
+add_executable(pht_test ${test_src} bitvector_utils_test.cpp hypersuccinct_tree_test.cpp)
 target_include_directories(pht_test PUBLIC "${CMAKE_SOURCE_DIR}/include")
 set_target_properties(pht_test PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_features(pht_test PRIVATE cxx_std_17)

@@ -194,7 +194,7 @@ namespace pht {
          * @param vector
          * @return
          */
-        template<class T> inline static std::vector<T> reverse(std::vector<T>& vector) {
+        template<class T> inline static std::vector<T> reversed(std::vector<T>& vector) {
             std::vector<T> res;
             for(auto i = vector.rbegin(); i != vector.rend(); ++i ) {
                 res.push_back(*i);

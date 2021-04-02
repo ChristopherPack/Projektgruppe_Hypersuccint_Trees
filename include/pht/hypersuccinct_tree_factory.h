@@ -100,7 +100,7 @@ namespace pht {
             std::vector<std::shared_ptr<pht::Node<T>>> firstChildren;
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = subtrees;
             ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
-            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(x->getDirectDescendants(x->getRoot()).size()-1);});
+            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(0);});
             //zählung von firstChildren ist front - zählung in enumerate
 
             //FIDs und TypeVectors
@@ -111,7 +111,6 @@ namespace pht {
                     if(ListUtils::contains(rootNodes,node)) {
                         FIDs.push_back(true);
                         typeVectors.push_back(false);
-
                     }
                     else if(ListUtils::contains(firstChildren,node))
                     {
