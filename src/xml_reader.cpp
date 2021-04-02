@@ -4,7 +4,6 @@
 
 #include <irrXML.h>
 
-#include "xml_reader.h"
 using namespace std::filesystem;
 #include "pht/xml_reader.h"
 

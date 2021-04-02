@@ -7,7 +7,6 @@
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree.h"
 #include "pht/hypersuccinct_tree_factory.h"
-#include "../example_service/xml_reader.h"
 #include "pht/bitvector_utils.h"
 
 #define convertToBitvector pht::Bitvector_Utils::convertToBitvector
@@ -45,29 +44,6 @@ protected:
     std::shared_ptr<pht::Node<char>> z = std::make_shared<pht::Node<char>>('z');
     std::shared_ptr<pht::Node<char>> A = std::make_shared<pht::Node<char>>('A');
     std::shared_ptr<pht::Node<char>> B = std::make_shared<pht::Node<char>>('B');
-TEST(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
-
-    EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
-    EXPECT_THAT(hst.getMicroSize(), ::testing::ElementsAre(1,0,0));
-
-    EXPECT_EQ(hst.getMiniTrees().size(), 9);
-    EXPECT_THAT(hst.getMiniFIDs(), ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,1,1,0,1));
-    EXPECT_THAT(hst.getminiTypeVectors(), ::testing::ElementsAre(0,0,1,0,0,1,0,1,1,1,1));
-    EXPECT_THAT(hst.getMiniDummys(), ::testing::ElementsAre(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
-
-    pht::MiniTree miniTree = hst.getMiniTree(0);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
-
-    miniTree = hst.getMiniTree(1);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1,0,1,1,1,0,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,1,1,0,0,0,0,0));
 
     void SetUp() override {
         example->add(a);
@@ -105,17 +81,6 @@ TEST(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     }
 
 };
-    miniTree = hst.getMiniTree(2);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
-
-    miniTree = hst.getMiniTree(3);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,1,1,1,0,1,1,0,1,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,1,0,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,0,0,0));
 
 TEST_F(HypersuccinctTreeTest, TreeDataTest) {
     EXPECT_EQ(77, treeNath->getSize());
@@ -187,6 +152,43 @@ TEST_F(HypersuccinctTreeTest, MicroTreesTest){
     EXPECT_EQ(hyperNath.getMiniTree(7).dummys, convertToBitvector("0000"));
 
 }
+
+TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");
+    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+
+    EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
+    EXPECT_THAT(hst.getMicroSize(), ::testing::ElementsAre(1,0,0));
+
+    EXPECT_EQ(hst.getMiniTrees().size(), 9);
+    EXPECT_THAT(hst.getMiniFIDs(), ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,1,1,0,1));
+    EXPECT_THAT(hst.getminiTypeVectors(), ::testing::ElementsAre(0,0,1,0,0,1,0,1,1,1,1));
+    EXPECT_THAT(hst.getMiniDummys(), ::testing::ElementsAre(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+
+    pht::MiniTree miniTree = hst.getMiniTree(0);
+    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
+    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
+    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
+    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+
+    miniTree = hst.getMiniTree(1);
+    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
+    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1,0,1,1,1,0,0,0,1,1,1,0,0));
+    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1,1));
+    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,1,1,0,0,0,0,0));
+
+    miniTree = hst.getMiniTree(2);
+    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
+    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
+    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
+    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+
+    miniTree = hst.getMiniTree(3);
+    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,1,1,1,0,1,1,0,1,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,1,0,0,0));
+    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,0,0,1,1,1,0,0));
+    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1));
+    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,0,0,0));
+
     miniTree = hst.getMiniTree(4);
     EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
     EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());

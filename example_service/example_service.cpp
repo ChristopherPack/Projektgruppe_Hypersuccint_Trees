@@ -29,9 +29,6 @@ void printBitvector(const std::vector<bool>& bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("treeAlex.xml");
-
-
     std::cout << "Reading File... \n";
     std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath");
     std::cout << "File Read. \n\n";
@@ -65,10 +62,6 @@ int main() {
         }
         std::cout << std::endl;
     }
-
-
-
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
     pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
 
