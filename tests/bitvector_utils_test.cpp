@@ -148,3 +148,9 @@ TEST(BitvectorUtilsTest, createEliasGammaTest) {
     pht::Bitvector_Utils::createEliasGamma(bitvector, size);
     EXPECT_THAT(bitvector, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,true,false,false,true,true,false,true,true,true,true,false,true,true,true));
 }
+
+TEST(BitvectorUtilsTest, convertToBitvector){
+    pht::Bitvector bitvector = {0,1,0,1,1,0};
+    std::string string = "010110";
+    EXPECT_EQ(bitvector, pht::Bitvector_Utils::convertToBitvector(string));
+}

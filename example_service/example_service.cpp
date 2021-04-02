@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include <irrXML.h>
 #define PHT_TEST
@@ -7,15 +8,18 @@
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#include <direct.h>
 #include "pht/hypersuccinct_tree.h"
 #include "pht/bitvector_utils.h"
 #include "pht/list_utils.h"
+
+using namespace std::filesystem;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
-void printBitvector(std::vector<bool> bitvector) {
+void printBitvector(const std::vector<bool>& bitvector) {
     for(bool bit: bitvector) {
         std::cout << bit;
     }
@@ -28,6 +32,9 @@ int main() {
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("treeAlex.xml");
 
 
+    std::cout << "Reading File... \n";
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath");
+    std::cout << "File Read. \n\n";
 
     //Couts are necessary like this
     std::cout << "Original tree:\n" << *tree << "\n\n";
@@ -63,11 +70,11 @@ int main() {
 
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
 
     std::cout << "Original Tree data:" << std::endl;
-    std::cout << xmlTree->getSize() << std::endl;
-    std::cout << xmlTree->toNewickString() << std::endl;
+    std::cout << tree->getSize() << std::endl;
+    std::cout << tree->toNewickString() << std::endl;
 
     std::cout << "Hypersuccinct Tree:" << std::endl;
     std::cout << "MiniSize:  ";
