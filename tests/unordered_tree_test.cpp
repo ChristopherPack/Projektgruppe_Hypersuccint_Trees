@@ -527,18 +527,12 @@ TEST_F(UnorderedTreeTest, ToBalancedParenthesisTest) {
 
 TEST_F(UnorderedTreeTest, EnumerateTest) {
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-    EXPECT_EQ(example->enumerate(f), 1);
+    EXPECT_EQ(example->enumerate(f), 5);
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
     EXPECT_EQ(example->enumerate(a), 0);
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-    EXPECT_EQ(example->enumerate(r), 7);
+    EXPECT_EQ(example->enumerate(r), 17);
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-    EXPECT_EQ(example->enumerate(w), 13);
+    EXPECT_EQ(example->enumerate(w), 22);
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
-    std::shared_ptr<pht::UnorderedTree<char>> addTree = std::make_shared<pht::UnorderedTree<char>>();
-    addTree->add(d);
-    addTree->add(k, d);
-    addTree->add(n, k);
-    addTree->add(q, k);
-    addTree->add(o, k);
 }

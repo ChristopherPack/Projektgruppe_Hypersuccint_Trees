@@ -112,7 +112,7 @@ namespace pht {
          * @tparam T The type of data stored in the nodes of the tree. 
          * @return A list with pointers to the components of the decomposed tree. 
          */
-        template<class T> static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, const uint32_t idealSize) {
+        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> temporaryComponents;
             if(tree->isLeaf(currentNode)) {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);

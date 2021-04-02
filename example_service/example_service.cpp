@@ -5,7 +5,7 @@
 #define PHT_TEST
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
-#include "xml_reader.h"
+#include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 #include "pht/hypersuccinct_tree.h"
 #include "pht/bitvector_utils.h"
@@ -25,7 +25,7 @@ void printBitvector(std::vector<bool> bitvector) {
 int main() {
     //todo: Needs complete restructuring
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = createExampleTree();
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::read("treeAlex.xml");
 
 
 
@@ -38,7 +38,6 @@ int main() {
     uint32_t sizeMicro = 4;
 
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
-    //fmMiniTrees = pht::ListUtils::reverse(fmMiniTrees);
 
     std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
@@ -49,7 +48,6 @@ int main() {
         std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
 
         std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
-        fmMicroTrees = pht::ListUtils::reverse(fmMicroTrees);
 
         std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
 
@@ -63,7 +61,7 @@ int main() {
 
 
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = createExampleTree();//pht::XMLReader::read("testNath.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");//pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\XML\\DBLP.xml");
 
     pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
