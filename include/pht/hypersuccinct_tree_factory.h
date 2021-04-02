@@ -111,7 +111,6 @@ namespace pht {
                     if(ListUtils::contains(rootNodes,node)) {
                         FIDs.push_back(true);
                         typeVectors.push_back(false);
-
                     }
                     else if(ListUtils::contains(firstChildren,node))
                     {

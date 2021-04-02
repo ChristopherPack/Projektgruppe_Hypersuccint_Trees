@@ -1,7 +1,7 @@
 #ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_XML_READER_H_
 #define PROJECTGROUP_HYPERSUCCINCT_TREES_XML_READER_H_
 
-#include "pht/unordered_tree.h"
+#include "unordered_tree.h"
 
 namespace pht {
     /**
