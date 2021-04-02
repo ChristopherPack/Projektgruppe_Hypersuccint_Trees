@@ -1,7 +1,3 @@
-//
-// Created by Christopher Pack on 16.12.2020.
-//
-
 #ifndef PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_H
 #define PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_H
 
@@ -149,7 +145,7 @@ namespace pht {
             return miniDummys;
         }
 
-    //private: /todo: readd private when factory is complete
+        //private: /todo: readd private when factory is complete
         HypersuccinctTree() = default;
         //todo: ORDER
         //sizes

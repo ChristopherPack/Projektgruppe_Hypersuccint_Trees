@@ -1,7 +1,3 @@
-//
-// Created by Christopher Pack on 25.02.2021.
-//
-
 #ifndef PROJEKTSUCCINCTTREES_BITVECTOR_UTILS_H
 #define PROJEKTSUCCINCTTREES_BITVECTOR_UTILS_H
 
@@ -56,7 +52,7 @@ namespace pht{
             createEliasGamma(vector,size);
             //BP FORM in bitform
             Bitvector bp = microTree->toBalancedParenthesis();
-            pht::ListUtils::addAll(vector,bp);
+            pht::ListUtils::combine(vector,bp);
         }
 
         /**

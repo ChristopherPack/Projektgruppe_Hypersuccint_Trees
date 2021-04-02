@@ -29,10 +29,10 @@ namespace pht {
         static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result = decomposeRaw(tree, idealSize);
             std::vector<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>> enumResult;
-            ListUtils::map(result, enumResult, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){return std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>(tree->enumerate(tree1->getRoot()),tree1);});
-            ListUtils::sort(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeB){return treeA.first<treeB.first;});
+            enumResult = ListUtils::mapped<std::shared_ptr<pht::UnorderedTree<T>>, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(result, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){return std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>(tree->enumerate(tree1->getRoot()),tree1);});
+            ListUtils::sort<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeB){return treeA.first<treeB.first;});
             result.clear();
-            ListUtils::map(enumResult, result, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
+            result = ListUtils::mapped<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
         /**
@@ -57,7 +57,7 @@ namespace pht {
             } else {
                 permanentComponents.clear();
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> temporaryComponents = decompose(tree, tree->getRoot(), idealSize);
-                ListUtils::addAll(permanentComponents, temporaryComponents);
+                ListUtils::combine(permanentComponents, temporaryComponents);
                 return permanentComponents;
             }
         }
@@ -95,7 +95,7 @@ namespace pht {
             if(newComponents.size() == 1 && newComponents.at(0)->getSize() < idealSize) {
                 return newComponents;
             } else {
-                ListUtils::addAll(permanentComponents, newComponents);
+                ListUtils::combine(permanentComponents, newComponents);
                 return std::vector<std::shared_ptr<pht::UnorderedTree<T>>>();
             }
         }
@@ -118,7 +118,7 @@ namespace pht {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
             } else {
                 for(std::shared_ptr<pht::Node<T>> child : tree->getDirectDescendants(currentNode)) {
-                    ListUtils::addAll(temporaryComponents, decompose(tree, child, idealSize));
+                    ListUtils::combine(temporaryComponents, decompose(tree, child, idealSize));
                 }
             }
 

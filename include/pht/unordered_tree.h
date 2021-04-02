@@ -308,7 +308,7 @@ namespace pht {
             while(!nodes.empty()) {
                 std::shared_ptr<pht::Node<T>> current = nodes.front();
                 nodes.erase(nodes.begin());
-                ListUtils::addAll(nodes, getDirectDescendants(current));
+                ListUtils::combine(nodes, getDirectDescendants(current));
                 if(current == node) {
                     return i;
                 }

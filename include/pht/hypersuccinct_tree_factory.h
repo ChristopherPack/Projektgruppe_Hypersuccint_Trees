@@ -70,7 +70,7 @@ namespace pht {
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
                     std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
                     MicroTreeData microTreeData(bp);
-                    if(!ListUtils::contains(hypersuccinctTree.lookupTable, microTreeData)) {
+                    if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
                 }
@@ -93,14 +93,11 @@ namespace pht {
             Bitvector FIDs;
             Bitvector typeVectors;
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;
-            ListUtils::map(subtrees, rootNodes, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
-            std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes;
-            ListUtils::distinct(rootNodes, distinctRootNodes);
+            std::vector<std::shared_ptr<pht::Node<T>>> rootNodes = ListUtils::mapped<std::shared_ptr<UnorderedTree<T>>, std::shared_ptr<pht::Node<T>>>(subtrees, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
+            std::vector<std::shared_ptr<pht::Node<T>>> distinctRootNodes = ListUtils::distincted(rootNodes);
             std::vector<std::shared_ptr<pht::Node<T>>> firstChildren;
-            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = subtrees;
-            ListUtils::filter(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
-            ListUtils::map(filteredTrees,firstChildren, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(0);});
+            std::vector<std::shared_ptr<pht::UnorderedTree<T>>> filteredTrees = ListUtils::filtered<std::shared_ptr<UnorderedTree<T>>>(subtrees, [](std::shared_ptr<UnorderedTree<T>> x){return !(x -> isLeaf(x->getRoot()));});
+            firstChildren = ListUtils::mapped<std::shared_ptr<UnorderedTree<T>>, std::shared_ptr<pht::Node<T>>>(filteredTrees, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getDirectDescendants(x->getRoot()).at(0);});
             //zählung von firstChildren ist front - zählung in enumerate
 
             //FIDs und TypeVectors
@@ -108,11 +105,11 @@ namespace pht {
                 std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(rootNode);
                 pht::Bitvector_Utils::createEliasGamma(FIDs, children.size());
                 for(std::shared_ptr<pht::Node<T>> node : children) {
-                    if(ListUtils::contains(rootNodes,node)) {
+                    if(ListUtils::containsAny(rootNodes,{node})) {
                         FIDs.push_back(true);
                         typeVectors.push_back(false);
                     }
-                    else if(ListUtils::contains(firstChildren,node))
+                    else if(ListUtils::containsAny(firstChildren,{node}))
                     {
                         FIDs.push_back(true);
                         typeVectors.push_back(true);
@@ -145,7 +142,7 @@ namespace pht {
                     if(node != fmMicroTree->getRoot()) {
                         std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(node);
                         for(int ind = 0; ind<children.size();ind++) {
-                            if(!ListUtils::contains(fmMicroTree->getNodes(),children.at(ind))) {
+                            if(!ListUtils::containsAny(fmMicroTree->getNodes(),{children.at(ind)})) {
                                 std::shared_ptr<pht::Node<T>> dummyNode = std::make_shared<pht::Node<T>>(T());
                                 //Index für Tree order
                                 fmMicroTree->insert(dummyNode,ind, node);
@@ -154,7 +151,7 @@ namespace pht {
                                 for (int i = 0; i < dummySize-num.size(); i++) {
                                     dummys.push_back(false);
                                 }
-                                ListUtils::addAll(dummys, num);
+                                ListUtils::combine(dummys, num);
                                 hadDummy = true;
                                 break;
                             }
