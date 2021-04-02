@@ -80,23 +80,23 @@ TEST(BitvectorUtilsTest, DecodeEliasGammaTest) {
 
 TEST(BitvectorUtilsTest, FindEliasGammaTest) {
     std::vector<bool> bitvector = {0,1,1,1,1,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,0,1,1,1,0,1,0,0,0,1,1,0,0,0,1,0,1,1,1,1,0,0,1,0,1,0,0,0,1,0,1,1,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,0,1,0,0,0,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,1,1,0,0,0};
-    std::vector<bool> res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector, 0, 2);
+    std::vector<bool> res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector, 0, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,0));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector, 1, 2);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector, 1, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,0));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector, 2, 2);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector, 2, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,0));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector, 3, 2);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector, 3, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector, 4, 2);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector, 4, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,0,1,0,1,0,0));
 
     std::vector<bool> bitvector2 = {0,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0};
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector2, 0, 1);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector2, 0, 1);
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,1,1,1));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector2, 1, 1);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector2, 1, 1);
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = pht::Bitvector_Utils::getBitvectorAtIndex(bitvector2, 2, 1);
+    res = pht::Bitvector_Utils::getBitvectorAtIndexEG(bitvector2, 2, 1);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
 }
 
@@ -147,4 +147,10 @@ TEST(BitvectorUtilsTest, createEliasGammaTest) {
     size = 9975;
     pht::Bitvector_Utils::createEliasGamma(bitvector, size);
     EXPECT_THAT(bitvector, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,true,false,false,true,true,false,true,true,true,true,false,true,true,true));
+}
+
+TEST(BitvectorUtilsTest, convertToBitvector){
+    pht::Bitvector bitvector = {0,1,0,1,1,0};
+    std::string string = "010110";
+    EXPECT_EQ(bitvector, pht::Bitvector_Utils::convertToBitvector(string));
 }

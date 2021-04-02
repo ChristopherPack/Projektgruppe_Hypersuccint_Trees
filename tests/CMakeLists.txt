@@ -4,6 +4,6 @@ add_executable(pht_test ${test_src} bitvector_utils_test.cpp hypersuccinct_tree_
 target_include_directories(pht_test PUBLIC "${CMAKE_SOURCE_DIR}/include")
 set_target_properties(pht_test PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_features(pht_test PRIVATE cxx_std_17)
-target_link_libraries(pht_test PRIVATE pht_lib gtest gmock gtest_main gmock_main)
+target_link_libraries(pht_test PRIVATE pht_lib gtest gmock gtest_main gmock_main irrxml)
 gtest_discover_tests(pht_test)
 #add_custom_command(TARGET pht_test COMMENT "Run tests" POST_BUILD COMMAND pht_test)

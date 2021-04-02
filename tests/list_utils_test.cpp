@@ -134,7 +134,7 @@ TEST(ListUtilsTest, EraseAllTest) {
 
 TEST(ListUtilsTest, ReverseTest) {
     std::vector<int> a = {0,1,2,3,4};
-    std::vector<int> b = pht::ListUtils::reverse(a);
+    std::vector<int> b = pht::ListUtils::reversed(a);
     EXPECT_THAT(b, ::testing::ElementsAre(4,3,2,1,0));
 }
 

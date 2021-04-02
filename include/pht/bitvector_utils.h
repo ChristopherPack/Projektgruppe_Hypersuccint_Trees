@@ -235,6 +235,22 @@ namespace pht{
             }
             return dummy;
         }
+
+        /**
+         * Converts a string of type 0100110 into a bitvector
+         *
+         * @param input
+         * @return bitvector
+         */
+        static Bitvector convertToBitvector(const std::string& input){
+            Bitvector result;
+
+            for(char i : input){
+                result.push_back(i=='1');
+            }
+
+            return result;
+        }
     };
 }
 
