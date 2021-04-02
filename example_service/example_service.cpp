@@ -1,38 +1,74 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include <irrXML.h>
-
+#define PHT_TEST
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
-#include "xml_reader.h"
+#include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#include <direct.h>
 #include "pht/hypersuccinct_tree.h"
+#include "pht/bitvector_utils.h"
+#include "pht/list_utils.h"
+#include "pht/hst_output.h"
+
+using namespace std::filesystem;
+using namespace pht;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
+std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
+
 
 int main() {
-    std::shared_ptr<pht::UnorderedTree<char>> tree = createTestTree();
-    std::vector<std::shared_ptr<pht::UnorderedTree<char>>> componentSubtrees = pht::FarzanMunro<char>::decompose(tree, 5);
+    //todo: Needs complete restructuring
+
+    std::cout << "Reading File... \n";
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath");
+    std::cout << "File Read. \n\n";
+
+    //Couts are necessary like this
     std::cout << "Original tree:\n" << *tree << "\n\n";
-    std::cout << "Component trees:\n";
-    for(int i = 0; i < componentSubtrees.size(); i++) {
-        std::cout << (i==0?"":"\n") << *componentSubtrees.at(i);
+    std::cout << std::endl;
+    std::cout << tree->toNewickString() << std::endl;
+
+    uint32_t sizeMini = 12;
+    uint32_t sizeMicro = 4;
+
+    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
+
+    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
+
+    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
+
+        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
+        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
+        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
+
+        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
+
+        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
+
+        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
+            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
+            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
+            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
+        }
+        std::cout << std::endl;
     }
 
+    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
 
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("D:\\Nutzerdaten\\Dokumente\\Studium_Informatik\\Projektgruppe TheoInf\\ProjektSuccinctTrees\\cmake-build-debug\\example_service\\1998shortstats.xml");
+    std::cout << "Original Tree data:" << std::endl;
+    std::cout << tree->getSize() << std::endl;
+    std::cout << tree->toNewickString() << std::endl;
 
-    /*std::cout << "\n\nXML tree:\n" << xmlTree->toString();
-    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> componentSubtrees2 = pht::FarzanMunro<std::string>::decompose(xmlTree, 5);
-    std::cout << "\n\nComponent trees:\n";
-    for(int i = 0; i < componentSubtrees2.size(); i++) {
-        std::cout << (i==0?"":"\n") << *componentSubtrees2.at(i);
-    }*/
+    HypersuccinctTreeVisualizer::printTree(hst);
 
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
     return 0;
 }
+
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree() {
     std::shared_ptr<pht::UnorderedTree<char>> tree = std::make_shared<pht::UnorderedTree<char>>();
@@ -93,6 +129,137 @@ std::shared_ptr<pht::UnorderedTree<char>> createTestTree() {
     tree->add(z, r);
     tree->add(A, t);
     tree->add(B, x);
+
+    return tree;
+}
+
+std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree() {
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = std::make_shared<pht::UnorderedTree<std::string>>();
+    std::shared_ptr<pht::Node<std::string>> a0 = std::make_shared<pht::Node<std::string>>("0");
+    std::shared_ptr<pht::Node<std::string>> a1 = std::make_shared<pht::Node<std::string>>("1");
+    std::shared_ptr<pht::Node<std::string>> a2 = std::make_shared<pht::Node<std::string>>("2");
+    std::shared_ptr<pht::Node<std::string>> a3 = std::make_shared<pht::Node<std::string>>("3");
+    std::shared_ptr<pht::Node<std::string>> a4 = std::make_shared<pht::Node<std::string>>("4");
+    std::shared_ptr<pht::Node<std::string>> a5 = std::make_shared<pht::Node<std::string>>("5");
+    std::shared_ptr<pht::Node<std::string>> a6 = std::make_shared<pht::Node<std::string>>("6");
+    std::shared_ptr<pht::Node<std::string>> a7 = std::make_shared<pht::Node<std::string>>("7");
+    std::shared_ptr<pht::Node<std::string>> a8 = std::make_shared<pht::Node<std::string>>("8");
+    std::shared_ptr<pht::Node<std::string>> a9 = std::make_shared<pht::Node<std::string>>("9");
+    std::shared_ptr<pht::Node<std::string>> a10 = std::make_shared<pht::Node<std::string>>("10");
+    std::shared_ptr<pht::Node<std::string>> a11 = std::make_shared<pht::Node<std::string>>("11");
+    std::shared_ptr<pht::Node<std::string>> a12 = std::make_shared<pht::Node<std::string>>("12");
+    std::shared_ptr<pht::Node<std::string>> a13 = std::make_shared<pht::Node<std::string>>("13");
+    std::shared_ptr<pht::Node<std::string>> a14 = std::make_shared<pht::Node<std::string>>("14");
+    std::shared_ptr<pht::Node<std::string>> a15 = std::make_shared<pht::Node<std::string>>("15");
+    std::shared_ptr<pht::Node<std::string>> a16 = std::make_shared<pht::Node<std::string>>("16");
+    std::shared_ptr<pht::Node<std::string>> a17 = std::make_shared<pht::Node<std::string>>("17");
+    std::shared_ptr<pht::Node<std::string>> a18 = std::make_shared<pht::Node<std::string>>("18");
+    std::shared_ptr<pht::Node<std::string>> a19 = std::make_shared<pht::Node<std::string>>("19");
+    std::shared_ptr<pht::Node<std::string>> a20 = std::make_shared<pht::Node<std::string>>("20");
+    std::shared_ptr<pht::Node<std::string>> a21 = std::make_shared<pht::Node<std::string>>("21");
+    std::shared_ptr<pht::Node<std::string>> a22 = std::make_shared<pht::Node<std::string>>("22");
+    std::shared_ptr<pht::Node<std::string>> a23 = std::make_shared<pht::Node<std::string>>("23");
+    std::shared_ptr<pht::Node<std::string>> a24 = std::make_shared<pht::Node<std::string>>("24");
+    std::shared_ptr<pht::Node<std::string>> a25 = std::make_shared<pht::Node<std::string>>("25");
+    std::shared_ptr<pht::Node<std::string>> a26 = std::make_shared<pht::Node<std::string>>("26");
+    std::shared_ptr<pht::Node<std::string>> a27 = std::make_shared<pht::Node<std::string>>("27");
+    std::shared_ptr<pht::Node<std::string>> a28 = std::make_shared<pht::Node<std::string>>("28");
+    std::shared_ptr<pht::Node<std::string>> a29 = std::make_shared<pht::Node<std::string>>("29");
+    std::shared_ptr<pht::Node<std::string>> a30 = std::make_shared<pht::Node<std::string>>("30");
+    std::shared_ptr<pht::Node<std::string>> a31 = std::make_shared<pht::Node<std::string>>("31");
+    std::shared_ptr<pht::Node<std::string>> a32 = std::make_shared<pht::Node<std::string>>("32");
+    std::shared_ptr<pht::Node<std::string>> a33 = std::make_shared<pht::Node<std::string>>("33");
+    std::shared_ptr<pht::Node<std::string>> a34 = std::make_shared<pht::Node<std::string>>("34");
+    std::shared_ptr<pht::Node<std::string>> a35 = std::make_shared<pht::Node<std::string>>("35");
+    std::shared_ptr<pht::Node<std::string>> a36 = std::make_shared<pht::Node<std::string>>("36");
+    std::shared_ptr<pht::Node<std::string>> a37 = std::make_shared<pht::Node<std::string>>("37");
+    std::shared_ptr<pht::Node<std::string>> a38 = std::make_shared<pht::Node<std::string>>("38");
+    std::shared_ptr<pht::Node<std::string>> a39 = std::make_shared<pht::Node<std::string>>("39");
+    std::shared_ptr<pht::Node<std::string>> a40 = std::make_shared<pht::Node<std::string>>("40");
+    std::shared_ptr<pht::Node<std::string>> a41 = std::make_shared<pht::Node<std::string>>("41");
+    std::shared_ptr<pht::Node<std::string>> a42 = std::make_shared<pht::Node<std::string>>("42");
+    std::shared_ptr<pht::Node<std::string>> a43 = std::make_shared<pht::Node<std::string>>("43");
+    std::shared_ptr<pht::Node<std::string>> a44 = std::make_shared<pht::Node<std::string>>("44");
+    std::shared_ptr<pht::Node<std::string>> a45 = std::make_shared<pht::Node<std::string>>("45");
+    std::shared_ptr<pht::Node<std::string>> a46 = std::make_shared<pht::Node<std::string>>("46");
+    std::shared_ptr<pht::Node<std::string>> a47 = std::make_shared<pht::Node<std::string>>("47");
+    std::shared_ptr<pht::Node<std::string>> a48 = std::make_shared<pht::Node<std::string>>("48");
+    std::shared_ptr<pht::Node<std::string>> a49 = std::make_shared<pht::Node<std::string>>("49");
+    std::shared_ptr<pht::Node<std::string>> a50 = std::make_shared<pht::Node<std::string>>("50");
+    std::shared_ptr<pht::Node<std::string>> a51 = std::make_shared<pht::Node<std::string>>("51");
+    std::shared_ptr<pht::Node<std::string>> a52 = std::make_shared<pht::Node<std::string>>("52");
+    std::shared_ptr<pht::Node<std::string>> a53 = std::make_shared<pht::Node<std::string>>("53");
+    std::shared_ptr<pht::Node<std::string>> a54 = std::make_shared<pht::Node<std::string>>("54");
+    std::shared_ptr<pht::Node<std::string>> a55 = std::make_shared<pht::Node<std::string>>("55");
+    std::shared_ptr<pht::Node<std::string>> a56 = std::make_shared<pht::Node<std::string>>("56");
+    std::shared_ptr<pht::Node<std::string>> a57 = std::make_shared<pht::Node<std::string>>("57");
+    std::shared_ptr<pht::Node<std::string>> a58 = std::make_shared<pht::Node<std::string>>("58");
+    std::shared_ptr<pht::Node<std::string>> a59 = std::make_shared<pht::Node<std::string>>("59");
+    std::shared_ptr<pht::Node<std::string>> a60 = std::make_shared<pht::Node<std::string>>("60");
+
+
+    tree->add(a0);
+    //add(node,ancestor)
+    tree->add(a1, a0);
+    tree->add(a2, a0);
+    tree->add(a3, a0);
+    tree->add(a4, a0);
+    tree->add(a5, a0);
+    tree->add(a6, a1);
+    tree->add(a7, a1);
+    tree->add(a8, a2);
+    tree->add(a9, a3);
+    tree->add(a10, a3);
+    tree->add(a11, a4);
+    tree->add(a12, a6);
+    tree->add(a13, a7);
+    tree->add(a14, a7);
+    tree->add(a15, a8);
+    tree->add(a16, a8);
+    tree->add(a17, a8);
+    tree->add(a18, a9);
+    tree->add(a19, a11);
+    tree->add(a20, a11);
+    tree->add(a21, a11);
+    tree->add(a22, a11);
+    tree->add(a23, a12);
+    tree->add(a24, a13);
+    tree->add(a25, a14);
+    tree->add(a26, a14);
+    tree->add(a27, a14);
+    tree->add(a28, a16);
+    tree->add(a29, a18);
+    tree->add(a30, a18);
+    tree->add(a31, a18);
+    tree->add(a32, a19);
+    tree->add(a33, a19);
+    tree->add(a34, a21);
+    tree->add(a35, a22);
+    tree->add(a36, a22);
+    tree->add(a37, a22);
+    tree->add(a38, a23);
+    tree->add(a39, a24);
+    tree->add(a40, a25);
+    tree->add(a41, a26);
+    tree->add(a42, a26);
+    tree->add(a43, a28);
+    tree->add(a44, a28);
+    tree->add(a45, a28);
+    tree->add(a46, a30);
+    tree->add(a47, a30);
+    tree->add(a48, a32);
+    tree->add(a49, a33);
+    tree->add(a50, a35);
+    tree->add(a51, a35);
+    tree->add(a52, a36);
+    tree->add(a53, a37);
+    tree->add(a54, a37);
+    tree->add(a55, a43);
+    tree->add(a56, a44);
+    tree->add(a57, a45);
+    tree->add(a58, a52);
+    tree->add(a59, a57);
+    tree->add(a60, a58);
 
     return tree;
 }

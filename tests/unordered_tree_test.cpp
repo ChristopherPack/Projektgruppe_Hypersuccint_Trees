@@ -524,3 +524,15 @@ TEST_F(UnorderedTreeTest, ToBalancedParenthesisTest) {
     EXPECT_THAT(example->toBalancedParenthesis(), ::testing::UnorderedElementsAre(true, true, true, true, false, false, true, false, true, true, false, false, true, false, false, true, false, true, true, true, false, true, true, true, false, true, true, false, false, true, false, true, false, true, false, false, true, true, true, false, false, true, false, true, false, false, false, true, false, false, false, true, false, true, false, false));
     EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
 }
+
+TEST_F(UnorderedTreeTest, EnumerateTest) {
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(f), 5);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(a), 0);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(r), 17);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+    EXPECT_EQ(example->enumerate(w), 22);
+    EXPECT_STREQ(example->toString().c_str(), "a{b{g{l{}},h{},i{m{}},j{}},c{},d{k{n{},o{q{s{},t{A{}},u{},v{},w{}},r{x{B{}},y{},z{}}},p{}}},e{},f{}}");
+}

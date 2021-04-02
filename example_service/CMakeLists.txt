@@ -1,8 +1,8 @@
-file(GLOB example_service_src CONFIGURE_DEPENDS "*.h" "*.hpp" "*.c" "*.cc" "*.cpp")
-file(GLOB resource_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/*.xml")
-add_executable(example_service ${example_service_src} ../include/pht/hypersuccinct_tree.h ../include/pht/hypersuccinct_tree_factory.h)
-set_target_properties(example_service PROPERTIES LINKER_LANGUAGE CXX)
-target_compile_features(example_service PRIVATE cxx_std_17)
+set(EXAMPLE_SERVICE_SOURCES
+    example_service.cpp
+)
+list(TRANSFORM EXAMPLE_SERVICE_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
+add_executable(example_service)
+target_sources(example_service PRIVATE ${EXAMPLE_SERVICE_SOURCES})
+target_include_directories(example_service PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(example_service PRIVATE pht_lib irrxml)
-file(COPY ${resource_files} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
-file(COPY ${resource_files} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")

@@ -11,6 +11,7 @@
 #include <bitset>
 
 #include "node.h"
+#include "list_utils.h"
 
 #define ASSERT(condition, msg) assert((condition) && msg);
 
@@ -25,6 +26,7 @@ namespace pht {
      * @tparam T The type of data stored in the nodes. 
      */
     //TODO Caching
+    //Todo: Rewrite tree for consistent ORDER
     template<class T> class UnorderedTree {
     public:
         UnorderedTree() {
@@ -59,6 +61,37 @@ namespace pht {
             } else {
                 ancestors.insert({node, ancestor});
                 descendants.at(ancestor).push_back(node);
+            }
+        }
+
+        /**
+         * Todo: Rewrite tree for consistent ORDER
+         * Adds a node to the tree.
+         *
+         * This method will add a new node to the tree. The node will be a child of the given ancestor.
+         * A root node can be added by not setting the second parameter or using nullptr. Adding a root
+         * node to a non-empty tree will fail.
+         *
+         * @param[in] node A pointer to the node to add. A node cannot be added multiple times to the same
+         *  tree, use a new node with the same value instead.
+         * @param[in] ancestor Optional. A pointer to the ancestor of the new node, or nullptr to add a root.
+         *     Can only be nullptr if the tree is empty. Adding a node to an empty tree will ignore this parameter.
+         */
+        void insert(const std::shared_ptr<pht::Node<T>> node, uint32_t index, const std::shared_ptr<pht::Node<T>> ancestor = nullptr) {
+            ASSERT(node, "Invalid node");
+            ASSERT(ancestor || !root, "Invalid ancestor");
+            ASSERT(!root || std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
+            ASSERT(ancestor == nullptr || index <= descendants.at(ancestor).size() , "Invalid index");
+
+            nodes.push_back(node);
+            descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
+            if(root == nullptr) {
+                ancestors.insert({node, nullptr});
+                root = node;
+            } else {
+                ancestors.insert({node, ancestor});
+                descendants.at(ancestor).insert(descendants.at(ancestor).begin() + index, node);
             }
         }
 
@@ -264,6 +297,27 @@ namespace pht {
             }
         }
 
+        uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+            if(node==root) {
+                return 0;
+            }
+            uint32_t i = 1;
+            std::vector<std::shared_ptr<pht::Node<T>>> nodes = getDirectDescendants(root);
+            while(!nodes.empty()) {
+                std::shared_ptr<pht::Node<T>> current = nodes.front();
+                nodes.erase(nodes.begin());
+                ListUtils::combine(nodes, getDirectDescendants(current));
+                if(current == node) {
+                    return i;
+                }
+                i++;
+            }
+            ASSERT(false, "Node not found");
+            return 0;
+        }
+
         /**
          * Calculates the size of this tree. 
          * 
@@ -443,16 +497,10 @@ namespace pht {
             return bp;
         }
 
-    //private:
-        std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
-        std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
-        std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
-        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup. 
-
         /**
-         * Helper function to calculate the size of the tree. 
-         * 
-         * Used for recursive calls, calulcates the size of a subtree rooted at node. 
+         * Helper function to calculate the size of the tree.
+         *
+         * Used for recursive calls, calulcates the size of a subtree rooted at node.
          * @param[in] node A pointer to the root node of a subtree to calculate the size of.
          * @return The size of the subtree.
          */
@@ -463,6 +511,14 @@ namespace pht {
             }
             return size;
         }
+
+    private:
+        std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
+        std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
+        std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
+        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup. 
+
+
 
         /**
          * Helper function to stringify the tree (in order, relevant for testing). 
