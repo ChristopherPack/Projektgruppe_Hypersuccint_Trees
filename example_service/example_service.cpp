@@ -12,50 +12,14 @@
 #include "pht/hypersuccinct_tree.h"
 #include "pht/bitvector_utils.h"
 #include "pht/list_utils.h"
+#include "hyperTreeVisualization.h"
 
 using namespace std::filesystem;
+using namespace pht;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
-
-void printBitvector(const std::vector<bool>& bitvector) {
-    for(bool bit: bitvector) {
-        std::cout << bit;
-    }
-    std::cout << std::endl;
-}
-
-
-void printTree(pht::HypersuccinctTree<std::string> tree){
-
-    std::cout << "Hypersuccinct Tree:" << std::endl;
-    std::cout << "MiniSize:  ";
-    printBitvector(tree.getMiniSize());
-    std::cout << "MicroSize:  ";
-    printBitvector(tree.getMicroSize());
-    std::cout << std::endl;
-
-    std::cout << "Amount of MiniTrees: " << tree.getMiniTrees().size() << std::endl;
-    std::cout << "MiniFIDs:  ";
-    printBitvector(tree.getMiniFIDs());
-    std::cout << "MiniTypeVectors:  ";
-    printBitvector(tree.getminiTypeVectors());
-    std::cout << "MiniDummys:  ";
-    printBitvector(tree.getMiniDummys());
-
-    pht::MiniTree miniTree = tree.getMiniTree(0);
-    for(int index = 0 ; index < tree.getMiniTrees().size(); index++) {
-        std::cout << "MicroTreesinMiniTree" << index << ":  ";
-        printBitvector(tree.getMiniTree(index).microTrees);
-        std::cout << "MicroTreeFIDs:  ";
-        printBitvector(tree.getMiniTree(index).FIDs);
-        std::cout << "MicroTreeTypeVectors:  ";
-        printBitvector(tree.getMiniTree(index).typeVectors);
-        std::cout << "MicroTreeDummys:  ";
-        printBitvector(tree.getMiniTree(index).dummys);
-    }
-}
 
 int main() {
     //todo: Needs complete restructuring
@@ -106,7 +70,7 @@ int main() {
     std::cout << tree->getSize() << std::endl;
     std::cout << tree->toNewickString() << std::endl;
 
-    printTree(hst);
+    HypersuccinctTreeVisualizer::printTree(hst);
 
     return 0;
 }
