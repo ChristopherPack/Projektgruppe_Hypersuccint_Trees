@@ -1,7 +1,6 @@
 #include <iostream>
 #include "pht/hypersuccinct_tree.h"
-#include "hyperTreeVisualization.h"
-#include "pht/bitvector_utils.h"
+#include "pht/hst_output.h"
 
 
 using namespace pht;

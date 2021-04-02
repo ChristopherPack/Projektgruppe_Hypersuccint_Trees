@@ -12,7 +12,7 @@
 #include "pht/hypersuccinct_tree.h"
 #include "pht/bitvector_utils.h"
 #include "pht/list_utils.h"
-#include "hyperTreeVisualization.h"
+#include "pht/hst_output.h"
 
 using namespace std::filesystem;
 using namespace pht;
