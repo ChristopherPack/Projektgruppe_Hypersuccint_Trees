@@ -154,7 +154,7 @@ TEST_F(HypersuccinctTreeTest, MicroTreesTest){
 }
 
 TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::read("treeAlex.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
     pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
     EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
