@@ -1,6 +1,5 @@
 set(EXAMPLE_SERVICE_SOURCES
     example_service.cpp
-    xml_reader.cpp
 )
 list(TRANSFORM EXAMPLE_SERVICE_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_executable(example_service)

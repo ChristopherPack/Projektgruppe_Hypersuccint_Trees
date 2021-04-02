@@ -25,6 +25,7 @@ namespace pht {
      * 
      * @tparam T The type of data stored in the nodes. 
      */
+    //TODO Caching
     //Todo: Rewrite tree for consistent ORDER
     template<class T> class UnorderedTree {
     public:
@@ -81,7 +82,7 @@ namespace pht {
             ASSERT(ancestor || !root, "Invalid ancestor");
             ASSERT(!root || std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
-            ASSERT(ancestor == nullptr || index < descendants.at(ancestor).size() , "Invalid index");
+            ASSERT(ancestor == nullptr || index <= descendants.at(ancestor).size() , "Invalid index");
 
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
@@ -302,20 +303,18 @@ namespace pht {
             if(node==root) {
                 return 0;
             }
-            uint32_t i = 0;
-            return enumerateHelper(node,root,i);
-        }
-
-        uint32_t enumerateHelper(const std::shared_ptr<pht::Node<T>> searchNode,const std::shared_ptr<pht::Node<T>> currentNode, uint32_t& currentIndex) {
-            if(currentNode==searchNode) {
-                return currentIndex;
-            }
-            for(const std::shared_ptr<pht::Node<T>> node : ListUtils::reversed(descendants.at(currentNode))) {
-                uint32_t res = enumerateHelper(searchNode,node,++currentIndex);
-                if(res) {
-                    return res;
+            uint32_t i = 1;
+            std::vector<std::shared_ptr<pht::Node<T>>> nodes = getDirectDescendants(root);
+            while(!nodes.empty()) {
+                std::shared_ptr<pht::Node<T>> current = nodes.front();
+                nodes.erase(nodes.begin());
+                ListUtils::combine(nodes, getDirectDescendants(current));
+                if(current == node) {
+                    return i;
                 }
+                i++;
             }
+            ASSERT(false, "Node not found");
             return 0;
         }
 
