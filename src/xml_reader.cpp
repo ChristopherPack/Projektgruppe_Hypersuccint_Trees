@@ -19,14 +19,14 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     do {
         element++;
         if(reader->getNodeType() == irr::io::EXN_ELEMENT) {
-            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(reader->getNodeName());
+            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>("x");//reader->getNodeName());
             xmlTree->add(node, current);
             if(!reader->isEmptyElement())
                 current = node;
             for(int i = 0; i < reader->getAttributeCount(); i++) {
-                std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeName(i)));
+                std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>("x");//std::string(reader->getAttributeName(i)));
                 xmlTree->add(attributeName, current);
-                std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeValue(i)));
+                std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>("x");//std::string(reader->getAttributeValue(i)));
                 xmlTree->add(attributeValue, attributeName);
             }
         } else if(reader->getNodeType() == irr::io::EXN_ELEMENT_END) {
@@ -36,7 +36,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
         } else if(reader->getNodeType() == irr::io::EXN_TEXT) {
             std::string text = std::string(reader->getNodeData());
             if(!std::all_of(text.begin(), text.end(), isspace)) {
-                std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(text);
+                std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>("x");//text);
                 xmlTree->add(node, current);
             }
         }

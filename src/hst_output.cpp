@@ -87,6 +87,6 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
     HypersuccinctTree hst;
-    
+
     return hst;
 }

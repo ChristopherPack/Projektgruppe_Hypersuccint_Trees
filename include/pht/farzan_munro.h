@@ -91,7 +91,6 @@ namespace pht {
                 newComponents.push_back(newComponent);
             } while(!oldComponents.empty());
 
-            //todo: gehört in die DO Schleife?
             if(newComponents.size() == 1 && newComponents.at(0)->getSize() < idealSize) {
                 return newComponents;
             } else {
