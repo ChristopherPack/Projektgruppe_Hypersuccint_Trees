@@ -14,7 +14,7 @@
 class HypersuccinctTreeTest : public ::testing::Test {
 protected:
     std::shared_ptr<pht::UnorderedTree<std::string>> treeNath;
-    pht::HypersuccinctTree<std::string> hyperNath;
+    pht::HypersuccinctTree hyperNath;
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();
     std::shared_ptr<pht::Node<char>> a = std::make_shared<pht::Node<char>>('a');
     std::shared_ptr<pht::Node<char>> b = std::make_shared<pht::Node<char>>('b');
@@ -155,7 +155,7 @@ TEST_F(HypersuccinctTreeTest, MicroTreesTest){
 
 TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
     EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
     EXPECT_THAT(hst.getMicroSize(), ::testing::ElementsAre(1,0,0));

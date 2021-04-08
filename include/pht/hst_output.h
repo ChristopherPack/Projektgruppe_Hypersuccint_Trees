@@ -9,9 +9,41 @@ namespace pht {
     class HypersuccinctTreeVisualizer {
 
     public:
-        static void printTree(HypersuccinctTree<string> &tree);
+        /**
+         * prints a given hypersuccinct tree into the console
+         * @param tree the hypersuccinct tree to be printed
+         */
+        static void printTree(HypersuccinctTree &tree);
+
+        /**
+         * prints a given bitvector into the console
+         * @param bitvector the bitvector to be printed
+         */
         static void printBitvector(const vector<bool>& bitvector);
+
+        /**
+         * splits the FIDs of hypersuccinct Trees into easily readable parts
+         * @param bitvector the FID bitvector
+         * @param separator the separator for splitting
+         * @return Readable version of FID Bitvector as string
+         */
         static string splitFIDs(const vector<bool>& bitvector, const string& separator);
+
+        /**
+         * writes an entire hypersuccinct tree to a file
+         * todo: need some sort of file explorer or something
+         * todo: needs to somehow mark the different bitvectors (this could also be done in hypersuccinct bitvector)
+         * @param tree the hypersuccinct tree to be written
+         */
+        static void writeToFile(HypersuccinctTree &tree);
+
+        /**
+         * Reads an entire hypersuccinct tree from a file
+         * todo: needs to understand and work with markings from writeToFile
+         * @param path the path to the file as string
+         * @return hypersuccinct tree
+         */
+        static HypersuccinctTree readFromFile(string path);
     };
 }
 

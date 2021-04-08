@@ -50,7 +50,7 @@ namespace pht {
      * A lookup table for information regarding specific MicroTree structures.
      * It implements:
      * Get Functions Only!! No modifying functions!!!
-     * todo: All Get functions will need restructuring when MiniTrees become full bitvectors
+     * todo: All Get functions will need restructuring if MiniTrees become full bitvectors
      *
      * todo: MiniTrees could be condensed into a single Bitvector
      * todo: As a result, it might be possible to represent an entire tree by a SINGLE bitvector, making this class useless
@@ -60,7 +60,8 @@ namespace pht {
      * todo: IDEA: When Hypersuccinct Tree is complete, you only need to use this class to navigate the tree (move get functions here)
      * todo: Does this include queries or are those in a different class?
      */
-    template<class T> class HypersuccinctTree {
+    class HypersuccinctTree {
+        //todo: Remove template class
         friend class HypersuccinctTreeFactory;
     public:
 

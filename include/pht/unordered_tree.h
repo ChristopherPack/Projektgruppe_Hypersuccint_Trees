@@ -53,6 +53,7 @@ namespace pht {
             ASSERT(!root || std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
 
+            refreshEnumerate = true;
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
             if(root == nullptr) {
@@ -84,6 +85,7 @@ namespace pht {
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
             ASSERT(ancestor == nullptr || index <= descendants.at(ancestor).size() , "Invalid index");
 
+            refreshEnumerate = true;
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
             if(root == nullptr) {
@@ -116,6 +118,7 @@ namespace pht {
                 ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
             }
 
+            refreshEnumerate = true;
             nodes.insert(nodes.end(), newNodes.begin(), newNodes.end());
             descendants.insert(tree->descendants.begin(), tree->descendants.end());
             ancestors.insert(tree->ancestors.begin(), tree->ancestors.end());
@@ -267,6 +270,7 @@ namespace pht {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
+            refreshEnumerate = true;
             if(migrateDescendants && root != node) {
                 for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
                     ancestors.erase(desc);
@@ -298,24 +302,28 @@ namespace pht {
         }
 
         uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
-            ASSERT(node, "Invalid node");
-            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
-            if(node==root) {
-                return 0;
+            if(refreshEnumerate) {
+                enumerateCalculator();
+                refreshEnumerate = false;
             }
+            return enumeratedCache.at(node);
+        }
+
+        void enumerateCalculator() {
+            enumeratedCache.clear();
             uint32_t i = 1;
-            std::vector<std::shared_ptr<pht::Node<T>>> nodes = getDirectDescendants(root);
+            enumeratedCache.insert({root,0});
+            std::list<std::shared_ptr<pht::Node<T>>> nodes;
+            std::vector<std::shared_ptr<pht::Node<T>>> rootDesc = getDirectDescendants(root);
+            nodes.insert(nodes.end(),rootDesc.begin(),rootDesc.end());
             while(!nodes.empty()) {
                 std::shared_ptr<pht::Node<T>> current = nodes.front();
-                nodes.erase(nodes.begin());
-                ListUtils::combine(nodes, getDirectDescendants(current));
-                if(current == node) {
-                    return i;
-                }
+                nodes.pop_front();
+                std::vector<std::shared_ptr<pht::Node<T>>> desc = getDirectDescendants(current);
+                nodes.insert(nodes.end(), desc.begin(),desc.end());
+                enumeratedCache.insert({current,i});
                 i++;
             }
-            ASSERT(false, "Node not found");
-            return 0;
         }
 
         /**
@@ -516,7 +524,10 @@ namespace pht {
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
-        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup. 
+        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup.
+        std::map<std::shared_ptr<pht::Node<T>>, uint64_t > enumeratedCache; ///todo Map for enumeration of nodes in tree
+
+        bool refreshEnumerate = true;
 
 
 

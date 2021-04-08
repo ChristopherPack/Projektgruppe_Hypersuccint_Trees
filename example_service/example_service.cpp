@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #include <irrXML.h>
-#define PHT_TEST
+//#define PHT_TEST
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
@@ -22,21 +22,25 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    //todo: Needs complete restructuring
 
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeNath");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "DBLP");
     std::cout << "File Read. \n\n";
 
     //Couts are necessary like this
-    std::cout << "Original tree:\n" << *tree << "\n\n";
+    /*std::cout << "Original tree:\n" << *tree << "\n\n";
     std::cout << std::endl;
-    std::cout << tree->toNewickString() << std::endl;
+    std::cout << tree->toNewickString() << std::endl;*/
 
+    #ifdef PHT_TEST
     uint32_t sizeMini = 12;
     uint32_t sizeMicro = 4;
+    #else
+    uint32_t sizeMini = ceil(pow(log2(tree->getSize()), 2.0));
+    uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
+    #endif
 
-    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
+    /*std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
 
     std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
@@ -56,9 +60,9 @@ int main() {
             std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
         }
         std::cout << std::endl;
-    }
+    }*/
 
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree);
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;
