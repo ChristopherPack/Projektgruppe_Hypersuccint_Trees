@@ -58,7 +58,7 @@ int main() {
         std::cout << std::endl;
     }
 
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(tree);
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree);
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;

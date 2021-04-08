@@ -24,8 +24,8 @@ namespace pht {
          * @param tree the UnorderedTree to be encoded.
          * @return HypersuccinctTree class representing the Hypersuccinct code todo: see Class
          */
-        template<class T> static HypersuccinctTree<T> create(const std::shared_ptr<UnorderedTree<T>> tree) {
-            HypersuccinctTree<T> hypersuccinctTree;
+        template<class T> static HypersuccinctTree create(const std::shared_ptr<UnorderedTree<T>> tree) {
+            HypersuccinctTree hypersuccinctTree;
 
             #ifdef PHT_TEST
             uint32_t sizeMini = 12;
@@ -263,7 +263,7 @@ namespace pht {
          * @param size the size of the MiniTrees
          * @param hypersuccinctTree the HypersuccinctTree to save the created bitvectors into
          */
-        template<class T> static void createMiniInterconnections(std::shared_ptr<pht::UnorderedTree<T>> tree, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees, uint32_t size,HypersuccinctTree<T>& hypersuccinctTree) {
+        template<class T> static void createMiniInterconnections(std::shared_ptr<pht::UnorderedTree<T>> tree, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees, uint32_t size,HypersuccinctTree& hypersuccinctTree) {
             uint32_t dummySize = floor(log2(2*size+1))+1;
             assert(tree->getRoot() == fmMiniTrees.at(0)->getRoot());
             std::vector<std::shared_ptr<pht::Node<T>>> rootNodes;

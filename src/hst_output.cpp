@@ -6,7 +6,7 @@
 using namespace pht;
 using namespace std;
 
-void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree<string> &tree) {
+void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "Hypersuccinct Tree:" << endl;
     cout << "MiniSize:  ";
     printBitvector(tree.getMiniSize());
@@ -79,4 +79,14 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
         iterator++;
     };
     return result;
+}
+
+void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
+    //todo: implementing some sort of file explorer would be nice
+}
+
+HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
+    HypersuccinctTree hst;
+    
+    return hst;
 }
