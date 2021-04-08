@@ -302,9 +302,6 @@ namespace pht {
         }
 
         uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
-            static uint64_t i = 0;
-            i++;
-            std::cout << i << std::endl;
             if(refreshEnumerate) {
                 enumerateCalculator();
                 refreshEnumerate = false;
@@ -319,12 +316,7 @@ namespace pht {
             std::list<std::shared_ptr<pht::Node<T>>> nodes;
             std::vector<std::shared_ptr<pht::Node<T>>> rootDesc = getDirectDescendants(root);
             nodes.insert(nodes.end(),rootDesc.begin(),rootDesc.end());
-            uint64_t i2 = 0;
             while(!nodes.empty()) {
-                i2++;
-                if(i2 % 10000 == 0) {
-                    std::cout << i2 << std::endl;
-                }
                 std::shared_ptr<pht::Node<T>> current = nodes.front();
                 nodes.pop_front();
                 std::vector<std::shared_ptr<pht::Node<T>>> desc = getDirectDescendants(current);

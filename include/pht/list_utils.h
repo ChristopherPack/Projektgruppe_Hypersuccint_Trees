@@ -286,7 +286,6 @@ namespace pht {
          * @return A new vector with the mapped values. 
          */
         template<class T1, class T2> static std::vector<T2> mapped(const std::vector<T1>& vector, std::function<T2(T1)> mapper) {
-            std::cout << "MAPPED " << std::endl;
             if(vector.empty()) {
                 return std::vector<T2>();
             }
