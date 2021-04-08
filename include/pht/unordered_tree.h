@@ -302,24 +302,33 @@ namespace pht {
         }
 
         uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
+            static uint64_t i = 0;
+            i++;
+            std::cout << i << std::endl;
             if(refreshEnumerate) {
                 enumerateCalculator();
                 refreshEnumerate = false;
-            } else
-            {
-                return enumeratedCache.at(node);
             }
+            return enumeratedCache.at(node);
         }
 
         void enumerateCalculator() {
             enumeratedCache.clear();
             uint32_t i = 1;
             enumeratedCache.insert({root,0});
-            std::vector<std::shared_ptr<pht::Node<T>>> nodes = getDirectDescendants(root);
+            std::list<std::shared_ptr<pht::Node<T>>> nodes;
+            std::vector<std::shared_ptr<pht::Node<T>>> rootDesc = getDirectDescendants(root);
+            nodes.insert(nodes.end(),rootDesc.begin(),rootDesc.end());
+            uint64_t i2 = 0;
             while(!nodes.empty()) {
+                i2++;
+                if(i2 % 10000 == 0) {
+                    std::cout << i2 << std::endl;
+                }
                 std::shared_ptr<pht::Node<T>> current = nodes.front();
-                nodes.erase(nodes.begin());
-                ListUtils::combine(nodes, getDirectDescendants(current));
+                nodes.pop_front();
+                std::vector<std::shared_ptr<pht::Node<T>>> desc = getDirectDescendants(current);
+                nodes.insert(nodes.end(), desc.begin(),desc.end());
                 enumeratedCache.insert({current,i});
                 i++;
             }

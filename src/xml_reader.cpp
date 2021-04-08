@@ -62,7 +62,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(cons
         directory = directory.parent_path();
     }
 
-    directory /= "example_service\\";
+    directory /= "resources\\";
 
 
     std::string xml = ".xml";

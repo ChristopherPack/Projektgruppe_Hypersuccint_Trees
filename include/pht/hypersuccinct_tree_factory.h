@@ -56,11 +56,9 @@ namespace pht {
 
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
 
-                //todo: We might need this for Interconnections
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
 
-                //todo: Create Mini Dummy Nodes possible Position
                 std::tuple<Bitvector,Bitvector> microIntercon = create1_2_Interconnections(fmMiniTree,fmMicroTrees,sizeMicro);
                 miniTree.FIDs = std::get<0>(microIntercon);
                 miniTree.typeVectors = std::get<1>(microIntercon);

@@ -28,8 +28,10 @@ namespace pht {
          */
         static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result = decomposeRaw(tree, idealSize);
+            std::cout << "DONE FM" << std::endl;
             std::vector<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>> enumResult;
             enumResult = ListUtils::mapped<std::shared_ptr<pht::UnorderedTree<T>>, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(result, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){return std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>(tree->enumerate(tree1->getRoot()),tree1);});
+            std::cout << "ENUMRES DONE" << std::endl;
             ListUtils::sort<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeB){return treeA.first<treeB.first;});
             result.clear();
             result = ListUtils::mapped<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
