@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "pht/hypersuccinct_tree.h"
 #include "pht/hst_output.h"
 
@@ -81,8 +82,29 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
+void writeBitvector(std::ofstream &file, Bitvector bitvector) {
+    for(bool bit: bitvector) {
+        file << bit;
+    }
+}
+
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
+    //todo: need to think about how to make the bitvector
+    std::ofstream file;
+    file.open("tree.txt");
+    writeBitvector(file,tree.getMiniSize());
+    writeBitvector(file,tree.getMicroSize());
+    writeBitvector(file,tree.getMiniFIDs());
+    writeBitvector(file,tree.getminiTypeVectors());
+    writeBitvector(file,tree.getMiniDummys());
+    for(MiniTree &miniTree: tree.getMiniTrees()) {
+        writeBitvector(file,miniTree.FIDs);
+        writeBitvector(file,miniTree.dummys);
+        writeBitvector(file,miniTree.typeVectors);
+        writeBitvector(file,miniTree.microTrees);
+    }
+    file.close();
 }
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {

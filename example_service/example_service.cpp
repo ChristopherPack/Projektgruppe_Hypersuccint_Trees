@@ -24,7 +24,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 int main() {
 
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "DBLP");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeAlex");
     std::cout << "File Read. \n\n";
 
     //Couts are necessary like this
@@ -63,6 +63,7 @@ int main() {
     }*/
 
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree);
+    HypersuccinctTreeVisualizer::writeToFile(hst);
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;
