@@ -83,16 +83,36 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
 }
 
 void writeBitvector(std::ofstream &file, Bitvector bitvector) {
-    for(bool bit: bitvector) {
+    /*for(bool bit: bitvector) {
         file << bit;
+    }*/
+    uint32_t bytes = 0;
+    Bitvector tmp;
+    for(uint32_t i = 0; i < bitvector.size()/8; i++) {
+        tmp.clear();
+        for(uint32_t j = 0; j < 8; j++) {
+            tmp.push_back(bitvector.at(i*8+j));
+        }
+        uint32_t num = Bitvector_Utils::bitvectorToNumber(tmp);
+        file.write(reinterpret_cast<char*>(&num), 1);
+        bytes++;
     }
+    tmp.clear();
+    for(uint32_t i = 0; i < bitvector.size()%8; i++) {
+        tmp.push_back(bitvector.at(bytes+i));
+    }
+    for(uint32_t i = 0; i < 8-(bitvector.size()%8); i++) {
+        tmp.push_back(0);
+    }
+    uint32_t num = Bitvector_Utils::bitvectorToNumber(tmp);
+    file.write(reinterpret_cast<char*>(&num), 1);
 }
 
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
     std::ofstream file;
-    file.open("tree.txt");
+    file.open("tree.txt", std::ofstream::binary);
     Bitvector fileBitvector;
     Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMiniSize()));
     Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMicroSize()));
