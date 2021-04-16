@@ -34,10 +34,13 @@ namespace pht {
      * todo: check Struct for optimisation (more bitvectors!)
      */
     struct MicroTreeData {
+        Bitvector index;
+
         Bitvector bp;
-        explicit MicroTreeData(Bitvector bp) : bp(std::move(bp)) {}
+
+        explicit MicroTreeData(Bitvector index) : index(std::move(index)) {}
         bool operator==(const MicroTreeData& mtd) const {
-            return bp == mtd.bp;
+            return index == mtd.index;
         }
     };
 

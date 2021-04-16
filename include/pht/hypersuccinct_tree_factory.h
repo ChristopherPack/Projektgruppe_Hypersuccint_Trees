@@ -7,9 +7,12 @@
 
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <set>
 
+#include "huffman.h"
 #include "hypersuccinct_tree.h"
+#include "hst_output.h"
 
 namespace pht {
     /**
@@ -24,7 +27,7 @@ namespace pht {
          * @param tree the UnorderedTree to be encoded.
          * @return HypersuccinctTree class representing the Hypersuccinct code todo: see Class
          */
-        template<class T> static HypersuccinctTree create(const std::shared_ptr<UnorderedTree<T>> tree) {
+        template<class T> static HypersuccinctTree create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false) {
             HypersuccinctTree hypersuccinctTree;
 
             #ifdef PHT_TEST
@@ -54,6 +57,8 @@ namespace pht {
             Bitvector miniDummys = createDummyInterconnections(tree,fmMiniTrees,sizeMini);
             hypersuccinctTree.miniDummys = miniDummys;
 
+            std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
+
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
 
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
@@ -67,6 +72,12 @@ namespace pht {
 
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
                     std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
+                    if(huffman) {
+                        if(bpsAndOccurrences.find(bp) == bpsAndOccurrences.end()) {
+                            bpsAndOccurrences.insert({bp, 0});
+                        }
+                        bpsAndOccurrences.at(bp)++;
+                    }
                     MicroTreeData microTreeData(bp);
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
@@ -76,7 +87,29 @@ namespace pht {
                 hypersuccinctTree.miniTrees.push_back(miniTree);
             }
 
+            if(huffman) {
+                std::map<std::vector<bool>,std::vector<bool>> huffmanTable = Huffman::generateTable<std::vector<bool>>(bpsAndOccurrences);
+                convertToHuffman(hypersuccinctTree, huffmanTable);
+            }
+
             return hypersuccinctTree;
+        }
+
+        static void convertToHuffman(HypersuccinctTree& tree, std::map<std::vector<bool>,std::vector<bool>> huffmanTable) {
+            for(MicroTreeData& x : tree.lookupTable) {
+                x.bp = x.index;
+                x.index = huffmanTable.at(x.index);
+            }
+            for(MiniTree& x : tree.miniTrees) {
+                std::vector<bool> oldEncodedMicros = x.microTrees;
+                x.microTrees.clear();
+                uint32_t entryCount = Bitvector_Utils::getEGEntryCount(oldEncodedMicros, 2);
+                for(uint32_t i = 0; i < entryCount; i++) {
+                    std::vector<bool> bp = Bitvector_Utils::getBitvectorAtIndexEG(oldEncodedMicros, i, 2);
+                    ListUtils::combine(x.microTrees, huffmanTable.at(bp));
+                }
+                HypersuccinctTreeVisualizer::printBitvector(x.microTrees);
+            }
         }
 
         /**

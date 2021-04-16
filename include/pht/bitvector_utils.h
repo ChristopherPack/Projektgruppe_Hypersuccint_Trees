@@ -156,6 +156,19 @@ namespace pht{
             return micro;
         }
 
+        static uint32_t getEGEntryCount(Bitvector& bitvector, uint32_t multiplier) {
+            auto iterator = bitvector.begin();
+            uint32_t count = 0;
+            while(iterator != bitvector.end()) {
+                //decode Elias Gamma
+                int length = decodeEliasGamma(iterator)*multiplier;
+                //Count until Elias Gamma is done / skip this FID
+                iterator+=length;
+                count++;
+            }
+            return count;
+        }
+
         static Bitvector::iterator findEliasGammaIndex(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
             auto iterator = bitvector.begin();
             for(int i=0;i<index;i++) {

@@ -113,8 +113,8 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
         ListUtils::combine(fileBitvector, miniTree.microTrees);
     }
     for(MicroTreeData &microTreeData: tree.getLookupTable()) {
-        Bitvector_Utils::createEliasGamma(fileBitvector, microTreeData.bp.size());
-        ListUtils::combine(fileBitvector, microTreeData.bp);
+        Bitvector_Utils::createEliasGamma(fileBitvector, microTreeData.index.size());
+        ListUtils::combine(fileBitvector, microTreeData.index);
     }
     writeBitvector(file,fileBitvector);
     file.close();

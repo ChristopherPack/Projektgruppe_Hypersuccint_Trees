@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #include <irrXML.h>
-//#define PHT_TEST
+#define PHT_TEST
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
@@ -24,7 +24,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 int main() {
 
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName( "treeAlex");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeAlex");
     std::cout << "File Read. \n\n";
 
     //Couts are necessary like this
@@ -62,7 +62,7 @@ int main() {
         std::cout << std::endl;
     }*/
 
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree);
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);
     HypersuccinctTreeVisualizer::writeToFile(hst);
 
     std::cout << "Original Tree data:" << std::endl;
