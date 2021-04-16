@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "pht/hypersuccinct_tree.h"
 #include "pht/hst_output.h"
 
@@ -18,7 +19,7 @@ void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "MiniFIDs:  ";
     printBitvector(tree.getMiniFIDs());
     cout << "MiniTypeVectors:  ";
-    printBitvector(tree.getminiTypeVectors());
+    printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
     printBitvector(tree.getMiniDummys());
 
@@ -81,8 +82,42 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
+void writeBitvector(std::ofstream &file, Bitvector bitvector) {
+    for(bool bit: bitvector) {
+        file << bit;
+    }
+}
+
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
+    //todo: need to think about how to make the bitvector
+    std::ofstream file;
+    file.open("tree.txt");
+    Bitvector fileBitvector;
+    Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMiniSize()));
+    Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMicroSize()));
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniFIDs().size());
+    ListUtils::combine(fileBitvector, tree.getMiniFIDs());
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniTypeVectors().size());
+    ListUtils::combine(fileBitvector, tree.getMiniTypeVectors());
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniFIDs().size());
+    ListUtils::combine(fileBitvector, tree.getMiniFIDs());
+    for(MiniTree &miniTree: tree.getMiniTrees()) {
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.FIDs.size());
+        ListUtils::combine(fileBitvector, miniTree.FIDs);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.typeVectors.size());
+        ListUtils::combine(fileBitvector, miniTree.typeVectors);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.dummys.size());
+        ListUtils::combine(fileBitvector, miniTree.dummys);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.microTrees.size());
+        ListUtils::combine(fileBitvector, miniTree.microTrees);
+    }
+    for(MicroTreeData &microTreeData: tree.getLookupTable()) {
+        Bitvector_Utils::createEliasGamma(fileBitvector, microTreeData.bp.size());
+        ListUtils::combine(fileBitvector, microTreeData.bp);
+    }
+    writeBitvector(file,fileBitvector);
+    file.close();
 }
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {

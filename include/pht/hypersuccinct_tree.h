@@ -138,7 +138,7 @@ namespace pht {
             return miniFIDs;
         }
 
-        Bitvector getminiTypeVectors() {
+        Bitvector getMiniTypeVectors() {
             return miniTypeVectors;
         }
 
@@ -146,9 +146,22 @@ namespace pht {
             return miniDummys;
         }
 
+        /**
+         * todo: indexing via microTree structure!!
+         * @param index
+         * @return
+         */
+        MicroTreeData getLookupTableEntry(uint32_t index) {
+            return lookupTable.at(index);
+        }
+
+        std::vector<MicroTreeData> getLookupTable() {
+            return lookupTable;
+        }
+
         //private: /todo: readd private when factory is complete
         HypersuccinctTree() = default;
-        //todo: ORDER
+        //todo: ORDER and PRIVATE
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
