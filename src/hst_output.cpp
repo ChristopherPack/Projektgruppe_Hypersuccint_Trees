@@ -19,7 +19,7 @@ void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "MiniFIDs:  ";
     printBitvector(tree.getMiniFIDs());
     cout << "MiniTypeVectors:  ";
-    printBitvector(tree.getminiTypeVectors());
+    printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
     printBitvector(tree.getMiniDummys());
 
@@ -93,17 +93,30 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: need to think about how to make the bitvector
     std::ofstream file;
     file.open("tree.txt");
-    writeBitvector(file,tree.getMiniSize());
-    writeBitvector(file,tree.getMicroSize());
-    writeBitvector(file,tree.getMiniFIDs());
-    writeBitvector(file,tree.getminiTypeVectors());
-    writeBitvector(file,tree.getMiniDummys());
+    Bitvector fileBitvector;
+    Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMiniSize()));
+    Bitvector_Utils::createEliasGamma(fileBitvector, Bitvector_Utils::bitvectorToNumber(tree.getMicroSize()));
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniFIDs().size());
+    ListUtils::combine(fileBitvector, tree.getMiniFIDs());
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniTypeVectors().size());
+    ListUtils::combine(fileBitvector, tree.getMiniTypeVectors());
+    Bitvector_Utils::createEliasGamma(fileBitvector, tree.getMiniFIDs().size());
+    ListUtils::combine(fileBitvector, tree.getMiniFIDs());
     for(MiniTree &miniTree: tree.getMiniTrees()) {
-        writeBitvector(file,miniTree.FIDs);
-        writeBitvector(file,miniTree.dummys);
-        writeBitvector(file,miniTree.typeVectors);
-        writeBitvector(file,miniTree.microTrees);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.FIDs.size());
+        ListUtils::combine(fileBitvector, miniTree.FIDs);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.typeVectors.size());
+        ListUtils::combine(fileBitvector, miniTree.typeVectors);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.dummys.size());
+        ListUtils::combine(fileBitvector, miniTree.dummys);
+        Bitvector_Utils::createEliasGamma(fileBitvector, miniTree.microTrees.size());
+        ListUtils::combine(fileBitvector, miniTree.microTrees);
     }
+    for(MicroTreeData &microTreeData: tree.getLookupTable()) {
+        Bitvector_Utils::createEliasGamma(fileBitvector, microTreeData.bp.size());
+        ListUtils::combine(fileBitvector, microTreeData.bp);
+    }
+    writeBitvector(file,fileBitvector);
     file.close();
 }
 

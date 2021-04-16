@@ -98,7 +98,7 @@ TEST_F(HypersuccinctTreeTest, MiniTreesTest){
     pht::Bitvector miniDummys = convertToBitvector("0000000000000000000000100000000000000000");
     EXPECT_EQ(8, hyperNath.getMiniTrees().size());
     EXPECT_EQ(miniFIDs, hyperNath.getMiniFIDs());
-    EXPECT_EQ(miniConnectionTypeVectors, hyperNath.getminiTypeVectors());
+    EXPECT_EQ(miniConnectionTypeVectors, hyperNath.getMiniTypeVectors());
     EXPECT_EQ(miniDummys, hyperNath.getMiniDummys());
 }
 
@@ -162,7 +162,7 @@ TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
 
     EXPECT_EQ(hst.getMiniTrees().size(), 9);
     EXPECT_THAT(hst.getMiniFIDs(), ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,1,1,0,1));
-    EXPECT_THAT(hst.getminiTypeVectors(), ::testing::ElementsAre(0,0,1,0,0,1,0,1,1,1,1));
+    EXPECT_THAT(hst.getMiniTypeVectors(), ::testing::ElementsAre(0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1));
     EXPECT_THAT(hst.getMiniDummys(), ::testing::ElementsAre(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
 
     pht::MiniTree miniTree = hst.getMiniTree(0);
