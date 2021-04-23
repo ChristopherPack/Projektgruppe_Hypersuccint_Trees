@@ -12,6 +12,8 @@
 
 namespace pht {
     typedef std::vector<bool> Bitvector;
+    //node identification by: Minitree, MicroTree, NodeInMicroTree
+    typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
     /**
      * MiniTrees consist of:
@@ -25,6 +27,8 @@ namespace pht {
         Bitvector FIDs;
         Bitvector typeVectors;
         Bitvector dummys;
+        Bitvector rootAncestors;
+        Bitvector dummyAncestors;
     };
 
     /**
@@ -148,6 +152,19 @@ namespace pht {
         Bitvector getMiniDummys() {
             return miniDummys;
         }
+
+        /**
+         * todo: tests
+         * @param index
+         * @return
+         */
+        Bitvector getMiniDummy(uint32_t index) {
+            uint32_t size = pht::Bitvector_Utils::bitvectorToNumber(miniSize);
+            uint32_t dummySize = floor(log2(2*size+1))+1;
+            return pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(miniDummys, index ,dummySize);
+        }
+
+        bool isDummyAncestorWithinMiniTree(HstNode node, HstNode dummy);
 
         /**
          * todo: indexing via microTree structure!!

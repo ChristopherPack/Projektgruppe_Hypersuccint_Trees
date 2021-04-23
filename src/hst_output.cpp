@@ -7,6 +7,10 @@
 using namespace pht;
 using namespace std;
 
+/**
+ * todo: include printing the Lookup Table
+ * @param tree
+ */
 void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "Hypersuccinct Tree:" << endl;
     cout << "MiniSize:  ";

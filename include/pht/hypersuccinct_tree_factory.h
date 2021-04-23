@@ -92,7 +92,13 @@ namespace pht {
                 convertToHuffman(hypersuccinctTree, huffmanTable);
             }
 
+            //generateQueryData(hypersuccinctTree,fmMiniTrees);
+
             return hypersuccinctTree;
+        }
+
+        template<class T> static void generateQueryData(HypersuccinctTree& tree,std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree) {
+
         }
 
         static void convertToHuffman(HypersuccinctTree& tree, std::map<std::vector<bool>,std::vector<bool>> huffmanTable) {

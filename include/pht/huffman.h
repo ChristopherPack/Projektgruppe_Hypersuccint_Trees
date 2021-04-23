@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "list_utils.h"
+#include "unordered_tree.h"
 
 namespace pht {
     template<class T> std::ostream& operator<<(std::ostream& out, std::pair<T,uint32_t> entry) {
