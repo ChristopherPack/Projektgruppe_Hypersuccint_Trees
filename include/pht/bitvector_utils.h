@@ -21,229 +21,33 @@ namespace pht{
      */
     class Bitvector_Utils {
     public:
-        /**
-         * This Class creates a Bitvector from a List of given UnorderedTrees
-         * It is supposed to use a List of MicroTrees from the Farzan Munro Algorithm
-         * Encoding consists of Elias Gamma Code of the size of the MicroTrees and their structure in Balanced Parenthesis form.
-         *
-         * @tparam T Class implemented in UnorderedTree
-         * @param fmMicroTrees List of UnorderedTrees (MicroTrees)
-         */
-        template<class T> static Bitvector createBitVectorforMicroTrees(std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees) {
-            //determine size of Bitvector
-            Bitvector res;
-            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                createBitVectorForMicroTree(res,fmMicroTree);
-            }
-            return res;
-        }
+        enum class NumberEncoding {
+            BINARY, ELIAS_GAMMA
+        };
+        enum class BitvectorEncoding {
+            ELIAS_GAMMA, VECTOR_INDEX, STATIC
+        };
 
-        /**
-         * This Class modifies a Bitvector with a given UnorderedTree
-         * It is supposed to use a MicroTree from the Farzan Munro Algorithm
-         *
-         * @tparam T Class implemented in UnorderedTree
-         * @param vector The Bitvector to be modified
-         * @param microTree The UnorderedTree (MicroTree)
-         */
-        template<class T> static void createBitVectorForMicroTree(Bitvector& vector,std::shared_ptr<pht::UnorderedTree<T>> microTree) {
-            int32_t size = microTree->getSize();
-            //elias gamma code SIZE
-            createEliasGamma(vector,size);
-            //BP FORM in bitform
-            Bitvector bp = microTree->toBalancedParenthesis();
-            pht::ListUtils::combine(vector,bp);
-        }
+        struct IndexingInformation {
+            uint32_t multiplier;
+            uint32_t staticSize;
+            Bitvector::const_iterator& indexStart;
+            const Bitvector::const_iterator& indexEnd;
+        };
 
-        /**
-         * This class creates EliasGamma Code for a given Number and adds it to a Bitvector
-         * It is supposed to encode the size of a tree from the Farzan Munro Algorithm
-         *
-         * @param vector The Bitvector to be modified
-         * @param size The size to encode
-         */
-        static void createEliasGamma(Bitvector& vector, const uint32_t size) {
-            int32_t logSize = floor((log2(size)));
-            for(int i=0; i<logSize;i++) {
-                vector.push_back(false);
-            }
-            for(int i =0; i<logSize+1;i++) {
-                vector.push_back((size>>(logSize-i))%2==1);
-            }
-        }
+        static Bitvector::const_iterator nullIterator;
 
-        /**
-         * Decodes Elias Gamma Code into an integer
-         * This function uses an integer an is supposed to return the amount of bits that are important after the Elias Gamma Code in the Bitvector while moving the iterator to the begin of these important bits.
-         *
-         * @tparam I template for Iterator functionality
-         * @param iterator Iterator over a Bitvector with Elias Gamma code, pointing at the start of the Elias Gamma Code
-         * @return Integer of decoded Elias Gamma
-         */
-        template<class I> static uint32_t decodeEliasGamma(I& iterator) {
-            if(*iterator == false) {
-                uint32_t size = 0;
-                while(*iterator == false) {
-                    size++;
-                    iterator++;
-                }
-                Bitvector num;
-                for(int j =0; j<=size; j++) {
-                    num.push_back(*iterator);
-                    iterator++;
-                }
-                return bitvectorToNumber(num);
-            }
-            iterator++;
-            return 1;
-        }
+        static uint32_t encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding);
 
-        /**
-         * Converts at number to a bitvector
-         *
-         * @param num the number as integer
-         * @return vector<bool> representing the number
-         */
-        static Bitvector numberToBitvector(uint32_t num) {
-            Bitvector res;
-            if (num == 0) {
-                res.push_back(false);
-                return res;
-            }
-            int size = floor(log2(num)) + 1;
-            for(uint32_t i = 0; i<size; i++) {
-                res.push_back((num>>(size-1-i))&1);
-            }
-            return res;
-        }
+        static uint32_t encodeNumber(std::insert_iterator<Bitvector> iterator, uint32_t num, NumberEncoding encoding);
 
-        /**
-         * Converts a bitvector to a Number
-         *
-         * @param bitvector the bitvector to convert
-         * @return the number represented by the bitvector
-         */
-        static uint32_t bitvectorToNumber(Bitvector bitvector) {
-            uint32_t res = 0;
-            for(uint32_t i = 0; i<bitvector.size(); i++) {
-                res <<= 1;
-                res = res | (bitvector.at(i)?1:0);
-            }
-            return res;
-        }
+        static uint32_t decodeNumber(const Bitvector& bitvector, NumberEncoding encoding);
 
-        /**
-         * Finds a bitvector from a bitvector indexed by Elias Gamma Code
-         * The Bitvector can use multiplied Elias Gamma codes for indexing
-         *
-         * @param bitvector the indexed bitvector
-         * @param index the index as integer
-         * @param multiplier the index multiplier as integer
-         * @return the bitvector at given index
-         */
-        static Bitvector getBitvectorAtIndexEG(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
-            //iterator
-            auto iterator = findEliasGammaIndex(bitvector, index, multiplier);
-            //when index is found:
-            //decode Elias Gamma
-            int length = decodeEliasGamma(iterator)*multiplier;
-            //return until Elias Gamma is done / Return this FID
-            Bitvector micro;
-            for(int j =0; j<length; j++) {
-                micro.push_back(*iterator);
-                iterator++;
-            }
-            return micro;
-        }
+        static uint32_t decodeNumber(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, NumberEncoding encoding);
 
-        static uint32_t getEGEntryCount(Bitvector& bitvector, uint32_t multiplier) {
-            auto iterator = bitvector.begin();
-            uint32_t count = 0;
-            while(iterator != bitvector.end()) {
-                //decode Elias Gamma
-                int length = decodeEliasGamma(iterator)*multiplier;
-                //Count until Elias Gamma is done / skip this FID
-                iterator+=length;
-                count++;
-            }
-            return count;
-        }
+        static Bitvector getEntry(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information);
 
-        static Bitvector::iterator findEliasGammaIndex(Bitvector& bitvector, uint32_t index, uint32_t multiplier) {
-            auto iterator = bitvector.begin();
-            for(int i=0;i<index;i++) {
-                //decode Elias Gamma
-                int length = decodeEliasGamma(iterator)*multiplier;
-                //Count until Elias Gamma is done / skip this FID
-                iterator+=length;
-            }
-            return iterator;
-        }
-
-        /**
-         * Finds a bitvector from a bitvector indexed by another bitvector
-         * second bitvector must be indexed by Elias Gamma
-         *
-         * @param bitvector the indexed bitvector
-         * @param indexvector the bitvector that indexes the primary bitvector
-         * @param index the index as integer
-         * @return the bitvector at given index
-         */
-        static Bitvector getBitvectorAtIndexvector(Bitvector bitvector, Bitvector& indexvector, uint32_t index) {
-            //iterator
-            //skip these TypeVectors
-            auto iterator = bitvector.begin();
-            for(int i=0; i<index;i++) {
-                uint32_t indexLength = findBitvectorLength(indexvector, i);
-                iterator+=indexLength;
-            }
-
-            //return typeVector
-            uint32_t indexLength = findBitvectorLength(indexvector, index);
-            Bitvector typeV;
-            for(int j =0;j<indexLength; j++) {
-                typeV.push_back(*iterator);
-                iterator++;
-            }
-            return typeV;
-        }
-
-        /**
-         *
-         * @param bitvector
-         * @param index
-         * @return
-         */
-        static uint32_t findBitvectorLength(Bitvector& bitvector, uint32_t index) {
-            Bitvector fid;
-            fid = getBitvectorAtIndexEG(bitvector, index, 1);
-            int indexLength = 0;
-            for(auto && j : fid) {
-                if(j) {
-                    indexLength++;
-                }
-            }
-            return indexLength;
-        }
-
-        /**
-         * Finds a bitvector from a bitvector indexed by a static size
-         *
-         * @param bitvector the indexed bitvector
-         * @param index the index as integer
-         * @param size the size as integer
-         * @return the bitvector at given index
-         */
-        static Bitvector getBitvectorAtIndexStaticSize(Bitvector bitvector, uint32_t index, uint32_t size) {
-            auto iterator = bitvector.begin();
-            iterator+=(size*index);
-            Bitvector dummy;
-            for(int j =0;j<size; j++) {
-                dummy.push_back(*iterator);
-                iterator++;
-            }
-            return dummy;
-        }
+        static uint32_t getEntryCount(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information);
 
         /**
          * Converts a string of type 0100110 into a bitvector
@@ -251,15 +55,30 @@ namespace pht{
          * @param input
          * @return bitvector
          */
-        static Bitvector convertToBitvector(const std::string& input){
-            Bitvector result;
+        static Bitvector convertToBitvector(const std::string& input);
 
-            for(char i : input){
-                result.push_back(i=='1');
-            }
+    private:
+        static uint32_t decodeEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end);
 
-            return result;
-        }
+        static uint32_t decodeBinary(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end);
+
+        static uint32_t encodeBinary(std::insert_iterator<Bitvector>& iterator, uint32_t num);
+
+        static uint32_t encodeEliasGamma(std::insert_iterator<Bitvector>& iterator, uint32_t num);
+
+        static Bitvector getEntryAtEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t multiplier);
+
+        static Bitvector getEntryAtVectorIndex(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd);
+
+        static uint32_t countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros = false);
+
+        static Bitvector getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size);
+
+        static uint32_t getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier);
+
+        static uint32_t getEntryCountVectorIndex(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd);
+
+        static uint32_t getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size);
     };
 }
 

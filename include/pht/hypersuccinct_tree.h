@@ -77,7 +77,8 @@ namespace pht {
          * @return the MicroTree in Balanced Parenthesis form as bitvector
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.microTrees, index, 2);
+            auto iterD = miniTree.microTrees.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
         /**
@@ -88,7 +89,8 @@ namespace pht {
          * @return the FID as bitvector
          */
         Bitvector getMicroFID(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.FIDs, index, 1);
+            auto iterD = miniTree.FIDs.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
         /**
@@ -100,7 +102,9 @@ namespace pht {
          * @return the Typevector as bitvector
          */
         Bitvector getMicroTypeVector(MiniTree& miniTree , uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexvector(miniTree.typeVectors, miniTree.FIDs, index);
+            auto iterD = miniTree.typeVectors.cbegin();
+            auto iterF = miniTree.FIDs.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {2, 0, iterF, miniTree.FIDs.cend()});
         }
 
         /**
@@ -111,9 +115,11 @@ namespace pht {
          * @return the Dummy is bitvector
          */
         Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index) {
-            uint32_t size = pht::Bitvector_Utils::bitvectorToNumber(microSize);
+            auto iter = microSize.cbegin();
+            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            return pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(miniTree.dummys, index, dummySize);
+            auto iterD = miniTree.dummys.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
 
@@ -156,9 +162,11 @@ namespace pht {
          * @return
          */
         Bitvector getMiniDummy(uint32_t index) {
-            uint32_t size = pht::Bitvector_Utils::bitvectorToNumber(miniSize);
+            auto iter = miniSize.cbegin();
+            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            return pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(miniDummys, index ,dummySize);
+            auto iterD = miniDummys.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
         bool isDummyAncestorWithinMiniTree(HstNode node, HstNode dummy);

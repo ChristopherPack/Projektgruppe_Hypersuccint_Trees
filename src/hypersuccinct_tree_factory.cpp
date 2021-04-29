@@ -16,7 +16,7 @@ template<class T> static void generateQueryData(HypersuccinctTree& tree,std::sha
     std::cout << fmMiniTree->getSize();
 }
 
-void generateIsDummyAncestorWithinMiniTree(HypersuccinctTree & tree) {
+/*void generateIsDummyAncestorWithinMiniTree(HypersuccinctTree & tree) {
     for(uint32_t i = 0; i<tree.miniTrees.size(); i++) {
         if(Bitvector_Utils::bitvectorToNumber(tree.getMiniDummy(i)) != 0) {
             MiniTree& mini = tree.miniTrees.at(i);
@@ -31,7 +31,7 @@ void generateIsDummyAncestorWithinMiniTree(HypersuccinctTree & tree) {
              * 54- 6 -> 53-48 = 5
              * Dummy = 5. Node in 9. MicroTree
              * todo: same roots don't count
-             */
+             *//*
             uint32_t size = 0;
             uint32_t microTree = 0;
             for(int j =0 ; j < Bitvector_Utils::getEGEntryCount(mini.microTrees, 2) ; j++) {
@@ -43,11 +43,8 @@ void generateIsDummyAncestorWithinMiniTree(HypersuccinctTree & tree) {
                 size+= (bp.size()/2);
             }
             //rootAncestors set microTree to 1
-            /*
-             *
-             */
 
         }
     }
-}
+}*/
 

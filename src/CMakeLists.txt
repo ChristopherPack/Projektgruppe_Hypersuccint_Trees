@@ -3,6 +3,7 @@ set(PHT_LIB_SOURCES
    hst_output.cpp
         hypersuccinct_tree.cpp
         hypersuccinct_tree_factory.cpp
+        bitvector_utils.cpp
 )
 list(TRANSFORM PHT_LIB_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_library(pht_lib STATIC)
