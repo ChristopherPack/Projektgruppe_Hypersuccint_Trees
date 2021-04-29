@@ -86,6 +86,11 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
+/**
+ * Writes a Bitvector to a given file in a (decently) space efficient way
+ * @param file The file to write into
+ * @param bitvector the bitvector to write into the file
+ */
 void writeBitvector(std::ofstream &file, Bitvector bitvector) {
     /*for(bool bit: bitvector) {
         file << bit;
@@ -112,6 +117,12 @@ void writeBitvector(std::ofstream &file, Bitvector bitvector) {
     file.write(reinterpret_cast<char*>(&num), 1);
 }
 
+/**
+ * Writes a Hypersuccinct Tree into a file
+ * todo: add file as option/parameter
+ * todo: Explain coding
+ * @param tree
+ */
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
