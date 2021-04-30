@@ -7,6 +7,10 @@
 using namespace pht;
 using namespace std;
 
+/**
+ * todo: include printing the Lookup Table
+ * @param tree
+ */
 void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "Hypersuccinct Tree:" << endl;
     cout << "MiniSize:  ";
@@ -48,7 +52,7 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     string result;
 
     while(iterator != bitvector.end()){
-        int eg = 0;
+        uint32_t eg = 0;
         if(!*iterator) {
             uint32_t size = 0;
             while(!*iterator) {
@@ -62,7 +66,8 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
                 result.append(to_string(*iterator));
                 iterator++;
             }
-            eg = Bitvector_Utils::bitvectorToNumber(num);
+            auto iter = num.cbegin();
+            eg = pht::Bitvector_Utils::decodeNumber(iter, num.cend(),Bitvector_Utils::NumberEncoding::BINARY);
         } else{
             result.append(to_string(*iterator));
             iterator++;
@@ -82,6 +87,11 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
+/**
+ * Writes a Bitvector to a given file in a (decently) space efficient way
+ * @param file The file to write into
+ * @param bitvector the bitvector to write into the file
+ */
 void writeBitvector(std::ofstream &file, Bitvector bitvector) {
     /*for(bool bit: bitvector) {
         file << bit;
@@ -93,7 +103,8 @@ void writeBitvector(std::ofstream &file, Bitvector bitvector) {
         for(uint32_t j = 0; j < 8; j++) {
             tmp.push_back(bitvector.at(i*8+j));
         }
-        uint32_t num = Bitvector_Utils::bitvectorToNumber(tmp);
+        auto iter = tmp.cbegin();
+        uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
         file.write(reinterpret_cast<char*>(&num), 1);
         bytes++;
     }
@@ -104,11 +115,19 @@ void writeBitvector(std::ofstream &file, Bitvector bitvector) {
     for(uint32_t i = 0; i < 8-(bitvector.size()%8); i++) {
         tmp.push_back(0);
     }
-    uint32_t num = Bitvector_Utils::bitvectorToNumber(tmp);
+    auto iter = tmp.cbegin();
+    uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
     file.write(reinterpret_cast<char*>(&num), 1);
 }
 
-void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
+/**
+ * Writes a Hypersuccinct Tree into a file
+ * todo: fix Bitvector Utils function calls
+ * todo: add file as option/parameter
+ * todo: Explain coding
+ * @param tree
+ */
+/*void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
     std::ofstream file;
@@ -138,7 +157,7 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     }
     writeBitvector(file,fileBitvector);
     file.close();
-}
+}*/
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
     HypersuccinctTree hst;

@@ -38,7 +38,7 @@ namespace pht {
             uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
             #endif
 
-            hypersuccinctTree.miniSize = pht::Bitvector_Utils::numberToBitvector(sizeMini);
+            pht::Bitvector_Utils::encodeNumber(std::inserter(hypersuccinctTree.miniSize, hypersuccinctTree.miniSize.begin()), sizeMini,Bitvector_Utils::NumberEncoding::BINARY);
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::FarzanMunro<T>::decompose(tree, sizeMini);
 
             /*for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
@@ -48,7 +48,7 @@ namespace pht {
                 std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
             }*/
 
-            hypersuccinctTree.microSize = pht::Bitvector_Utils::numberToBitvector(sizeMicro);
+            pht::Bitvector_Utils::encodeNumber(std::inserter(hypersuccinctTree.microSize, hypersuccinctTree.microSize.begin()), sizeMicro,Bitvector_Utils::NumberEncoding::BINARY);
 
             std::tuple<Bitvector,Bitvector> miniIntercon = create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
             hypersuccinctTree.miniFIDs = std::get<0>(miniIntercon);
@@ -83,7 +83,7 @@ namespace pht {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
                 }
-                miniTree.microTrees = pht::Bitvector_Utils::createBitVectorforMicroTrees(fmMicroTrees);
+                miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
             }
 
@@ -92,7 +92,35 @@ namespace pht {
                 convertToHuffman(hypersuccinctTree, huffmanTable);
             }
 
+            //generateQueryData(hypersuccinctTree,fmMiniTrees);
+
             return hypersuccinctTree;
+        }
+
+        template<class T> static void generateQueryData(HypersuccinctTree& tree,std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree) {
+
+        }
+
+        /**
+         * This Class creates a Bitvector from a List of given UnorderedTrees
+         * It is supposed to use a List of MicroTrees from the Farzan Munro Algorithm
+         * Encoding consists of Elias Gamma Code of the size of the MicroTrees and their structure in Balanced Parenthesis form.
+         *
+         * @tparam T Class implemented in UnorderedTree
+         * @param fmMicroTrees List of UnorderedTrees (MicroTrees)
+         */
+        template<class T> static Bitvector createBitVectorforMicroTrees(std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees) {
+            //determine size of Bitvector
+            Bitvector res;
+            for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
+                int32_t size = fmMicroTree->getSize();
+                //elias gamma code SIZE
+                pht::Bitvector_Utils::encodeNumber(std::inserter(res, res.end()), size,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //BP FORM in bitform
+                Bitvector bp = fmMicroTree->toBalancedParenthesis();
+                pht::ListUtils::combine(res,bp);
+            }
+            return res;
         }
 
         static void convertToHuffman(HypersuccinctTree& tree, std::map<std::vector<bool>,std::vector<bool>> huffmanTable) {
@@ -103,9 +131,10 @@ namespace pht {
             for(MiniTree& x : tree.miniTrees) {
                 std::vector<bool> oldEncodedMicros = x.microTrees;
                 x.microTrees.clear();
-                uint32_t entryCount = Bitvector_Utils::getEGEntryCount(oldEncodedMicros, 2);
+                uint32_t entryCount = Bitvector_Utils::getEntryCount(oldEncodedMicros.cbegin(), oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
                 for(uint32_t i = 0; i < entryCount; i++) {
-                    std::vector<bool> bp = Bitvector_Utils::getBitvectorAtIndexEG(oldEncodedMicros, i, 2);
+                    auto iter = oldEncodedMicros.cbegin();
+                    std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
                     ListUtils::combine(x.microTrees, huffmanTable.at(bp));
                 }
                 HypersuccinctTreeVisualizer::printBitvector(x.microTrees);
@@ -134,7 +163,7 @@ namespace pht {
             //FIDs und TypeVectors
             for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
                 std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(rootNode);
-                pht::Bitvector_Utils::createEliasGamma(FIDs, children.size());
+                pht::Bitvector_Utils::encodeNumber(std::inserter(FIDs, FIDs.end()), children.size(),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 for(std::shared_ptr<pht::Node<T>> node : children) {
                     if(ListUtils::containsAny(rootNodes,{node})) {
                         FIDs.push_back(true);
@@ -178,7 +207,8 @@ namespace pht {
                                 //Index für Tree order
                                 fmMicroTree->insert(dummyNode,ind, node);
                                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
-                                Bitvector num = pht::Bitvector_Utils::numberToBitvector(fmMicroTree->enumerate(dummyNode));
+                                Bitvector num;
+                                pht::Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), fmMicroTree->enumerate(dummyNode),Bitvector_Utils::NumberEncoding::BINARY);
                                 for (int i = 0; i < dummySize-num.size(); i++) {
                                     dummys.push_back(false);
                                 }

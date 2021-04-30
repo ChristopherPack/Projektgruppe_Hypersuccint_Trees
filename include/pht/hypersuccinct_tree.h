@@ -12,6 +12,8 @@
 
 namespace pht {
     typedef std::vector<bool> Bitvector;
+    //node identification by: Minitree, MicroTree, NodeInMicroTree
+    typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
     /**
      * MiniTrees consist of:
@@ -19,19 +21,24 @@ namespace pht {
      * a Bitvector of Fully Indexable Dictionaries for MicroTrees
      * a Bitvector that determines specific Connections between MicroTrees
      * a Bitvector that indicates added Dummy Nodes to MicroTrees
+     * todo: a Bitvector that indicates if roots of MircoTrees are ancestors of a potential MiniTree Dummy
+     * todo: a Bitvector that indicates if... well what even exactly?
      */
     struct MiniTree {
         Bitvector microTrees;
         Bitvector FIDs;
         Bitvector typeVectors;
         Bitvector dummys;
+        Bitvector rootAncestors;
+        Bitvector dummyAncestors;
     };
 
     /**
      * MicroTreeData is a table of generic MicroTree structures, indexed by the structures' Balanced Parenthesis form.
-     * The table contains a lot of information about these structures
-     * todo: add information
-     * todo: check Struct for optimisation (more bitvectors!)
+     * The table contains a lot of information about these structures:
+     * a Bitvector that contains the balanced parenthesis form if Huffman coding is used
+     * todo: a Bitvector that indicates if a MicroTree contains a MiniTree Dummy and its position
+     * todo: check Struct for optimisation
      */
     struct MicroTreeData {
         Bitvector index;
@@ -53,18 +60,12 @@ namespace pht {
      * A lookup table for information regarding specific MicroTree structures.
      * It implements:
      * Get Functions Only!! No modifying functions!!!
+     *
      * todo: All Get functions will need restructuring if MiniTrees become full bitvectors
      *
-     * todo: MiniTrees could be condensed into a single Bitvector
-     * todo: As a result, it might be possible to represent an entire tree by a SINGLE bitvector, making this class useless
-     * todo: representing the entire class as one bitvector will be done with Elias Gamma indexing
-     *
-     *
-     * todo: IDEA: When Hypersuccinct Tree is complete, you only need to use this class to navigate the tree (move get functions here)
-     * todo: Does this include queries or are those in a different class?
+     * todo: queries
      */
     class HypersuccinctTree {
-        //todo: Remove template class
         friend class HypersuccinctTreeFactory;
     public:
 
@@ -76,7 +77,8 @@ namespace pht {
          * @return the MicroTree in Balanced Parenthesis form as bitvector
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.microTrees, index, 2);
+            auto iterD = miniTree.microTrees.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
         /**
@@ -87,7 +89,8 @@ namespace pht {
          * @return the FID as bitvector
          */
         Bitvector getMicroFID(MiniTree& miniTree,uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexEG(miniTree.FIDs, index, 1);
+            auto iterD = miniTree.FIDs.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
         /**
@@ -99,7 +102,9 @@ namespace pht {
          * @return the Typevector as bitvector
          */
         Bitvector getMicroTypeVector(MiniTree& miniTree , uint32_t index) {
-            return pht::Bitvector_Utils::getBitvectorAtIndexvector(miniTree.typeVectors, miniTree.FIDs, index);
+            auto iterD = miniTree.typeVectors.cbegin();
+            auto iterF = miniTree.FIDs.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {2, 0, iterF, miniTree.FIDs.cend()});
         }
 
         /**
@@ -110,14 +115,16 @@ namespace pht {
          * @return the Dummy is bitvector
          */
         Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index) {
-            uint32_t size = pht::Bitvector_Utils::bitvectorToNumber(microSize);
+            auto iter = microSize.cbegin();
+            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t dummySize = floor(log2(2*size+1))+1;
-            return pht::Bitvector_Utils::getBitvectorAtIndexStaticSize(miniTree.dummys, index, dummySize);
+            auto iterD = miniTree.dummys.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
 
         /**
-         * todo: will need full restructuring when MiniTrees become a bitvector
+         * returns the MiniTree at the given index
          * @param index the index as integer
          * @return MiniTree as MiniTree
          */
@@ -150,6 +157,21 @@ namespace pht {
         }
 
         /**
+         * todo: tests
+         * @param index
+         * @return
+         */
+        Bitvector getMiniDummy(uint32_t index) {
+            auto iter = miniSize.cbegin();
+            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+            uint32_t dummySize = floor(log2(2*size+1))+1;
+            auto iterD = miniDummys.cbegin();
+            return Bitvector_Utils::getEntry(iterD, index, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+        }
+
+        bool isDummyAncestorWithinMiniTree(HstNode node, HstNode dummy);
+
+        /**
          * todo: indexing via microTree structure!!
          * @param index
          * @return
@@ -162,19 +184,18 @@ namespace pht {
             return lookupTable;
         }
 
-        //private: /todo: readd private when factory is complete
+        //private: //todo: read private when factory is complete
         HypersuccinctTree() = default;
-        //todo: ORDER and PRIVATE
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
         //miniTrees
-        std::vector<MiniTree> miniTrees; //todo: restructure into a single bitvector
+        std::vector<MiniTree> miniTrees;
         std::vector<bool> miniFIDs;
         std::vector<bool> miniTypeVectors;
         std::vector<bool> miniDummys;
         //LookupTable
-        std::vector<MicroTreeData> lookupTable; //todo: restructure into a single bitvector
+        std::vector<MicroTreeData> lookupTable;
     };
 }
 
