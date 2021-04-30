@@ -3,6 +3,7 @@
 //
 
 #include <pht/bitvector_utils.h>
+#include <regex>
 
 using namespace pht;
 
@@ -68,6 +69,20 @@ uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterato
             assert(false);
             return 0;
     }
+}
+
+std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> Bitvector_Utils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
+    //TODO
+    std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> res;
+    Bitvector pattern = convertToBitvector(patternString);
+    assert(iterator+pattern.size() < end);
+    auto iterStart = iterator;
+    auto iterEnd = iterator+pattern.size();
+    for(;iterEnd >= end; iterStart++, iterEnd++) {
+
+    }
+    //std::regex_match()
+    return res;
 }
 
 Bitvector Bitvector_Utils::convertToBitvector(const std::string& input) {

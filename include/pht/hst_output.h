@@ -31,8 +31,6 @@ namespace pht {
 
         /**
          * writes an entire hypersuccinct tree to a file
-         * todo: need some sort of file explorer or something
-         * todo: needs to somehow mark the different bitvectors (this could also be done in hypersuccinct bitvector)
          * @param tree the hypersuccinct tree to be written
          */
         static void writeToFile(HypersuccinctTree &tree);
@@ -44,6 +42,18 @@ namespace pht {
          * @return hypersuccinct tree
          */
         static HypersuccinctTree readFromFile(string path);
+
+    private:
+        static void writeBitvector(std::ofstream &file, Bitvector& bitvector);
+
+        /**
+         * Duplicates every instance of the given separator in a given Bitvector
+         * Helper function for writeToFile
+         * @param bitvector the given Bitvector
+         * @param separator the separator as string
+         * @return the modified Bitvector
+         */
+        static Bitvector addDuplicateSeparator(const Bitvector& bitvector, const string& separator);
     };
 }
 

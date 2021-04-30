@@ -50,6 +50,15 @@ namespace pht{
         static uint32_t getEntryCount(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information);
 
         /**
+         * Finds all occurrences of a given pattern in a bitvector
+         * @param iterator Begin of the bitvector to be matched
+         * @param end End of the bitvector to be matched
+         * @param separator the pattern as String (ie 00101)
+         * @return Vector of Pairs of Iterators marking begin and end of the pattern
+         */
+        static std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString);
+
+        /**
          * Converts a string of type 0100110 into a bitvector
          *
          * @param input
