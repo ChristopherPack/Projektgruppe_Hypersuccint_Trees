@@ -88,9 +88,6 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
 }
 
 void HypersuccinctTreeVisualizer::writeBitvector(std::ofstream &file, Bitvector& bitvector) {
-    /*for(bool bit: bitvector) {
-        file << bit;
-    }*/
     uint32_t bytes = 0;
     Bitvector tmp;
     for(uint32_t i = 0; i < bitvector.size()/8; i++) {
@@ -118,57 +115,71 @@ void HypersuccinctTreeVisualizer::writeBitvector(std::ofstream &file, Bitvector&
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
-    //encode mit trenzeichen: 00000000000000000000000000000000 (32 nullen)
+    //encode mit trennzeichen: 10000000000000000000000000000001 (30 nullen)
     std::ofstream file;
     file.open("tree.txt", std::ofstream::binary);
     Bitvector fileBitvector;
     Bitvector_Utils::encodeNumber(fileBitvector,Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector_Utils::encodeNumber(fileBitvector,Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-    Bitvector temp = addDuplicateSeparator(tree.getMiniFIDs(),"00000000000000000000000000000000");
+    Bitvector_Utils::encodeNumber(fileBitvector, tree.getMiniTrees().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(fileBitvector, tree.getLookupTable().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+    Bitvector temp = addDuplicateSeparator(tree.getMiniFIDs(),"10000000000000000000000000000001");
     ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-    temp = addDuplicateSeparator(tree.getMiniTypeVectors(),"00000000000000000000000000000000");
+    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+    temp.clear();
+    temp = addDuplicateSeparator(tree.getMiniTypeVectors(),"10000000000000000000000000000001");
     ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-    temp = addDuplicateSeparator(tree.getMiniDummys(),"00000000000000000000000000000000");
+    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+    temp = addDuplicateSeparator(tree.getMiniDummys(),"10000000000000000000000000000001");
     ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
+    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
     for(MiniTree& miniTree : tree.getMiniTrees()) {
-        temp = addDuplicateSeparator(miniTree.FIDs, "00000000000000000000000000000000");
+        temp = addDuplicateSeparator(miniTree.FIDs, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(miniTree.typeVectors, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(miniTree.typeVectors, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(miniTree.dummys, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(miniTree.dummys, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(miniTree.microTrees, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(miniTree.microTrees, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(miniTree.rootAncestors, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(miniTree.rootAncestors, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(miniTree.dummyAncestors, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(miniTree.dummyAncestors, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
     }
     for(MicroTreeData& microTreeData : tree.getLookupTable()) {
-        temp = addDuplicateSeparator(microTreeData.index, "00000000000000000000000000000000");
+        temp = addDuplicateSeparator(microTreeData.index, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
-        temp = addDuplicateSeparator(microTreeData.bp, "00000000000000000000000000000000");
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        temp = addDuplicateSeparator(microTreeData.bp, "10000000000000000000000000000001");
         ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("00000000000000000000000000000000"));
+        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
     }
     writeBitvector(file,fileBitvector);
     file.close();
 }
 
 Bitvector HypersuccinctTreeVisualizer::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
-    //TODO
-    return {};
+    Bitvector temp = bitvector;
+    Bitvector sep = Bitvector_Utils::convertToBitvector(separator);
+    uint32_t sepNum = Bitvector_Utils::decodeNumber(sep, Bitvector_Utils::NumberEncoding::BINARY);
+    std::vector<std::pair<Bitvector::const_iterator, Bitvector::const_iterator>> patternMatches = Bitvector_Utils::findMatches(temp.cbegin(),temp.cend(), separator);
+
+    for(std::pair<Bitvector::const_iterator, Bitvector::const_iterator> match : patternMatches) {
+        //TODO: This is apparently optimal - other option is to advance to the const_iter
+        auto iterMin = temp.erase(match.first,match.first);
+        uint32_t add = Bitvector_Utils::encodeNumber(std::inserter(temp, iterMin), sepNum, Bitvector_Utils::NumberEncoding::BINARY);
+        assert(match.first+add < match.second);
+    }
+
+    return temp;
 }
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {

@@ -3,7 +3,6 @@
 //
 
 #include <pht/bitvector_utils.h>
-#include <regex>
 
 using namespace pht;
 
@@ -71,17 +70,27 @@ uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterato
     }
 }
 
-std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> Bitvector_Utils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
-    //TODO
-    std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> res;
+std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitvector_Utils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
+    //TODO std::regex_match()???
+    std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
     Bitvector pattern = convertToBitvector(patternString);
-    assert(iterator+pattern.size() < end);
-    auto iterStart = iterator;
-    auto iterEnd = iterator+pattern.size();
-    for(;iterEnd >= end; iterStart++, iterEnd++) {
-
+    //TODO: Need a check for size of the bitvector
+    //This works ONCE for temp, then not for a second time.
+    if(iterator + pattern.size() < end) {
+        uint32_t patternID = decodeNumber(pattern, NumberEncoding::BINARY);
+        uint32_t patternSize = pattern.size();
+        auto iterStart = iterator;
+        auto iterEnd = iterator + patternSize;
+        for (; iterEnd >= end; iterStart++, iterEnd++) {
+            uint32_t currentPattern = decodeNumber(iterStart, iterEnd, NumberEncoding::BINARY);
+            if (patternID == currentPattern) {
+                res.emplace_back(iterStart, iterEnd);
+                iterStart += patternSize;
+                iterEnd += patternSize;
+            }
+        }
     }
-    //std::regex_match()
+
     return res;
 }
 

@@ -51,12 +51,15 @@ namespace pht{
 
         /**
          * Finds all occurrences of a given pattern in a bitvector
+         * Does not identify concatenated patterns (ie 10101 only matches once at the beginning for pattern 101)
+         * TODO: Maybe Output iterators not const?
+         *
          * @param iterator Begin of the bitvector to be matched
          * @param end End of the bitvector to be matched
          * @param separator the pattern as String (ie 00101)
          * @return Vector of Pairs of Iterators marking begin and end of the pattern
          */
-        static std::vector<std::pair<Bitvector::iterator,Bitvector::iterator>> findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString);
+        static std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString);
 
         /**
          * Converts a string of type 0100110 into a bitvector

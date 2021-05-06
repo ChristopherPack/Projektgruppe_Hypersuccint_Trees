@@ -63,7 +63,8 @@ int main() {
     }*/
 
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, false);
-    //HypersuccinctTreeVisualizer::writeToFile(hst);
+    //TODO Offset size check does not work twice in a row on the same vector (see bitvector utils)
+    HypersuccinctTreeVisualizer::writeToFile(hst);
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;
