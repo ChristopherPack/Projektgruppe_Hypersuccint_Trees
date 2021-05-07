@@ -87,31 +87,6 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
-void HypersuccinctTreeVisualizer::writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector) {
-    uint32_t bytes = 0;
-    Bitvector tmp;
-    for(uint32_t i = 0; i < bitvector.size()/8; i++) {
-        tmp.clear();
-        for(uint32_t j = 0; j < 8; j++) {
-            tmp.push_back(bitvector.at(i*8+j));
-        }
-        auto iter = tmp.cbegin();
-        uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
-        file.write(reinterpret_cast<char*>(&num), 1);
-        bytes++;
-    }
-    tmp.clear();
-    for(uint32_t i = 0; i < bitvector.size()%8; i++) {
-        tmp.push_back(bitvector.at(bytes+i));
-    }
-    for(uint32_t i = 0; i < 8-(bitvector.size()%8); i++) {
-        tmp.push_back(0);
-    }
-    auto iter = tmp.cbegin();
-    uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
-    file.write(reinterpret_cast<char*>(&num), 1);
-}
-
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
@@ -164,6 +139,92 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     file.close();
 }
 
+HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
+    HypersuccinctTree hst;
+    std::ifstream file;
+    file.open("tree.txt", std::ifstream::binary);
+    Bitvector fileBitvector = readBitvectorFromFile(file);
+    file.close();
+    auto iter = fileBitvector.begin();
+    uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    uint32_t miniTreesSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+    uint32_t tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector miniFIDs;
+    for(uint32_t i=0; i<tempSize; i++) {
+        miniFIDs.push_back(*iter);
+        iter++;
+    }
+
+    tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector miniTypeVectors;
+    for(uint32_t i=0; i<tempSize; i++) {
+        miniTypeVectors.push_back(*iter);
+        iter++;
+    }
+
+    tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector miniDummys;
+    for(uint32_t i=0; i<tempSize; i++) {
+        miniDummys.push_back(*iter);
+        iter++;
+    }
+
+    for(uint32_t j=0; j<miniTreesSize; j++) {
+
+    }
+
+    for(uint32_t j=0; j<lookupTableSize; j++) {
+
+    }
+    return hst;
+}
+
+void HypersuccinctTreeVisualizer::writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector) {
+    uint32_t bytes = 0;
+    Bitvector tmp;
+    for(uint32_t i = 0; i < bitvector.size()/8; i++) {
+        tmp.clear();
+        for(uint32_t j = 0; j < 8; j++) {
+            tmp.push_back(bitvector.at(i*8+j));
+        }
+        auto iter = tmp.cbegin();
+        uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+        file.write(reinterpret_cast<char*>(&num), 1);
+        bytes++;
+    }
+    tmp.clear();
+    for(uint32_t i = 0; i < bitvector.size()%8; i++) {
+        tmp.push_back(bitvector.at(bytes+i));
+    }
+    for(uint32_t i = 0; i < 8-(bitvector.size()%8); i++) {
+        tmp.push_back(0);
+    }
+    auto iter = tmp.cbegin();
+    uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+    file.write(reinterpret_cast<char*>(&num), 1);
+}
+
+Bitvector HypersuccinctTreeVisualizer::readBitvectorFromFile(std::ifstream &file) {
+    Bitvector bitvector;
+    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
+    for(unsigned char cNum : buffer) {
+        Bitvector temp;
+        Bitvector_Utils::encodeNumber(std::inserter(temp, temp.end()), cNum, Bitvector_Utils::NumberEncoding::BINARY);
+        if(temp.size() < 8) {
+            std::insert_iterator<Bitvector> iterator = std::inserter(temp, temp.begin());
+            while(temp.size()<8) {
+                iterator.operator=(0);
+            }
+        }
+        ListUtils::combine(bitvector,temp);
+        temp.clear();
+    }
+    return bitvector;
+}
+
 Bitvector HypersuccinctTreeVisualizer::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
     Bitvector temp = bitvector;
     Bitvector sep = Bitvector_Utils::convertToBitvector(separator);
@@ -178,20 +239,4 @@ Bitvector HypersuccinctTreeVisualizer::addDuplicateSeparator(const Bitvector& bi
     }
 
     return temp;
-}
-
-HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
-    HypersuccinctTree hst;
-    std::ofstream file;
-    file.open("tree.txt", std::ofstream::binary);
-    Bitvector fileBitvector = readBitvectorFromFile(file);
-
-    file.close();
-    return hst;
-}
-
-Bitvector HypersuccinctTreeVisualizer::readBitvectorFromFile(std::ofstream &file) {
-    Bitvector bitvector;
-
-    return bitvector;
 }

@@ -66,6 +66,7 @@ int main() {
 
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, false);
     HypersuccinctTreeVisualizer::writeToFile(hst);
+    pht::HypersuccinctTree fileHst = HypersuccinctTreeVisualizer::readFromFile("tree.txt");
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;

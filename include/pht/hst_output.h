@@ -30,6 +30,7 @@ namespace pht {
         static string splitFIDs(const vector<bool>& bitvector, const string& separator);
 
         /**
+         * TODO: Needs to be adjusted for every change in HypersuccinctTree
          * writes an entire hypersuccinct tree to a file
          * @param tree the hypersuccinct tree to be written
          */
@@ -37,7 +38,8 @@ namespace pht {
 
         /**
          * Reads an entire hypersuccinct tree from a file
-         * todo: needs to understand and work with encoding from writeToFile
+         * TODO: Has to conform to WriteToFile encoding
+         * TODO: Needs to figure out how to even manipulate a hst object from here (via Factory?)
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
@@ -52,7 +54,13 @@ namespace pht {
          */
         static void writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector);
 
-        static Bitvector readBitvectorFromFile(std::ofstream &file);
+        /**
+         * Reads a space efficient Bitvector from a file
+         * 
+         * @param file the file to read from
+         * @return the read bitvector
+         */
+        static Bitvector readBitvectorFromFile(std::ifstream &file);
 
         /**
          * Duplicates every instance of the given separator in a given Bitvector
