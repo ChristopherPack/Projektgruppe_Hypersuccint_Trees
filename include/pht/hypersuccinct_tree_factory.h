@@ -237,6 +237,7 @@ namespace pht {
                                 //Index für Tree order
                                 fmMicroTree->insert(dummyNode, ind, node);
                                 fmMicroTree->setDummy(dummyNode);
+                                baseTree->insert(dummyNode, ind, node);
                                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                                 Bitvector num;
                                 pht::Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), fmMicroTree->enumerate(dummyNode),Bitvector_Utils::NumberEncoding::BINARY);

@@ -123,10 +123,10 @@ namespace pht {
             descendants.insert(tree->descendants.begin(), tree->descendants.end());
             ancestors.insert(tree->ancestors.begin(), tree->ancestors.end());
             if(root == nullptr) {
-                ancestors.insert({tree->root, nullptr});
+                ancestors.insert_or_assign(tree->root, nullptr);
                 root = tree->root;
             } else {
-                ancestors.insert({tree->root, ancestor});
+                ancestors.insert_or_assign(tree->root, ancestor);
                 descendants.at(ancestor).push_back(tree->root);
             }
         }
