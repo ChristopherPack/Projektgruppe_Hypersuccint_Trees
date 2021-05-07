@@ -37,6 +37,16 @@ void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).typeVectors);
         cout << "MicroTreeDummys:  ";
         printBitvector(tree.getMiniTree(index).dummys);
+        cout << "RootAncestors:  ";
+        printBitvector(tree.getMiniTree(index).rootAncestors);
+        cout << "DummyAncestors:  ";
+        printBitvector(tree.getMiniTree(index).dummyAncestors);
+    }
+    for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
+        cout << "LookupTableIndex:   ";
+        printBitvector(tree.getLookupTableEntry(index).index);
+        cout << "AncestorMap:   ";
+        printBitvector(tree.getLookupTableEntry(index).matrix);
     }
 }
 

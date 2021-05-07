@@ -5,8 +5,6 @@
 #ifndef PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 #define PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 
-#include <cmath>
-
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -93,8 +91,7 @@ namespace pht {
                         }
                         bpsAndOccurrences.at(bp)++;
                     }
-                    uint32_t n = bp.size()/2;
-                    std::vector<bool> matrix(pow(n, 2));
+                    std::vector<bool> matrix;
                     std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
                     ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
                     for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
