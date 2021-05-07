@@ -30,20 +30,47 @@ namespace pht {
         static string splitFIDs(const vector<bool>& bitvector, const string& separator);
 
         /**
+         * TODO: Needs to be adjusted for every change in HypersuccinctTree
          * writes an entire hypersuccinct tree to a file
-         * todo: need some sort of file explorer or something
-         * todo: needs to somehow mark the different bitvectors (this could also be done in hypersuccinct bitvector)
          * @param tree the hypersuccinct tree to be written
          */
         static void writeToFile(HypersuccinctTree &tree);
 
         /**
          * Reads an entire hypersuccinct tree from a file
-         * todo: needs to understand and work with markings from writeToFile
+         * TODO: Has to conform to WriteToFile encoding
+         * TODO: Needs to figure out how to even manipulate a hst object from here (via Factory?)
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
         static HypersuccinctTree readFromFile(string path);
+
+    private:
+        /**
+         * Writes a Bitvector to a file in a space efficient way
+         *
+         * @param file File to write to
+         * @param bitvector the bitvector to write
+         */
+        static void writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector);
+
+        /**
+         * Reads a space efficient Bitvector from a file
+         *
+         * @param file the file to read from
+         * @return the read bitvector
+         */
+        static Bitvector readBitvectorFromFile(std::ifstream &file);
+
+        /**
+         * Duplicates every instance of the given separator in a given Bitvector
+         * Helper function for writeToFile
+         * TODO: Currently unused
+         * @param bitvector the given Bitvector
+         * @param separator the separator as string
+         * @return the modified Bitvector
+         */
+        static Bitvector addDuplicateSeparator(const Bitvector& bitvector, const string& separator);
     };
 }
 

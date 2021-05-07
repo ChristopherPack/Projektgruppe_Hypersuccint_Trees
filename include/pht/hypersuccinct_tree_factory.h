@@ -97,6 +97,11 @@ namespace pht {
             return hypersuccinctTree;
         }
 
+        static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
+            HypersuccinctTree hst;
+            return hst;
+        }
+
         template<class T> static void generateQueryData(HypersuccinctTree& tree,std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree) {
 
         }

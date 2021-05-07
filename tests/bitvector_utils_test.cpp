@@ -102,8 +102,16 @@ TEST(BitvectorUtilsTest, encodeEliasGammaTest) {
     EXPECT_THAT(bitvector, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,1,1,1,1,0,1,1,1));
 }
 
-TEST(BitvectorUtilsTest, convertToBitvector){
+TEST(BitvectorUtilsTest, convertToBitvectorTest){
     pht::Bitvector bitvector = {0,1,0,1,1,0};
     std::string string = "010110";
     EXPECT_EQ(bitvector, pht::Bitvector_Utils::convertToBitvector(string));
+}
+
+TEST(BitvectorUtilsTest, findMatchesTest) {
+    //TODO
+    pht::Bitvector bitvector = {0,0,1,0,1,0,0,1,0,1,1,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,0,0};
+    std::string pattern = "101";
+    //matches should be at: 2,7,10,19,23
+    std::vector<std::pair<pht::Bitvector::const_iterator,pht::Bitvector::const_iterator>> res = pht::Bitvector_Utils::findMatches(bitvector.cbegin(),bitvector.cend(),pattern);
 }

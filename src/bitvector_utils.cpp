@@ -70,6 +70,29 @@ uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterato
     }
 }
 
+std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitvector_Utils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
+    //TODO std::regex_match()???
+    std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
+    Bitvector pattern = convertToBitvector(patternString);
+    //TODO: Size check does NOT work if vector is too small ???
+    if(iterator + pattern.size() < end) {
+        uint32_t patternID = decodeNumber(pattern, NumberEncoding::BINARY);
+        uint32_t patternSize = pattern.size();
+        auto iterStart = iterator;
+        auto iterEnd = iterator + patternSize;
+        for (; iterEnd >= end; iterStart++, iterEnd++) {
+            uint32_t currentPattern = decodeNumber(iterStart, iterEnd, NumberEncoding::BINARY);
+            if (patternID == currentPattern) {
+                res.emplace_back(iterStart, iterEnd);
+                iterStart += patternSize;
+                iterEnd += patternSize;
+            }
+        }
+    }
+
+    return res;
+}
+
 Bitvector Bitvector_Utils::convertToBitvector(const std::string& input) {
     Bitvector result;
     for(char i : input){
