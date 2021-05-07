@@ -87,7 +87,7 @@ string HypersuccinctTreeVisualizer::splitFIDs(const vector<bool> &bitvector, con
     return result;
 }
 
-void HypersuccinctTreeVisualizer::writeBitvector(std::ofstream &file, Bitvector& bitvector) {
+void HypersuccinctTreeVisualizer::writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector) {
     uint32_t bytes = 0;
     Bitvector tmp;
     for(uint32_t i = 0; i < bitvector.size()/8; i++) {
@@ -115,54 +115,52 @@ void HypersuccinctTreeVisualizer::writeBitvector(std::ofstream &file, Bitvector&
 void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     //todo: implementing some sort of file explorer would be nice
     //todo: need to think about how to make the bitvector
-    //encode mit trennzeichen: 10000000000000000000000000000001 (30 nullen)
+    //encode mit Elias Gamma
     std::ofstream file;
     file.open("tree.txt", std::ofstream::binary);
     Bitvector fileBitvector;
-    Bitvector_Utils::encodeNumber(fileBitvector,Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(fileBitvector,Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(fileBitvector, tree.getMiniTrees().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(fileBitvector, tree.getLookupTable().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-    Bitvector temp = addDuplicateSeparator(tree.getMiniFIDs(),"10000000000000000000000000000001");
-    ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-    temp.clear();
-    temp = addDuplicateSeparator(tree.getMiniTypeVectors(),"10000000000000000000000000000001");
-    ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-    temp = addDuplicateSeparator(tree.getMiniDummys(),"10000000000000000000000000000001");
-    ListUtils::combine(fileBitvector, temp);
-    ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniTrees().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getLookupTable().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniFIDs().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    ListUtils::combine(fileBitvector, tree.getMiniFIDs());
+
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniTypeVectors().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    ListUtils::combine(fileBitvector, tree.getMiniTypeVectors());
+
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniDummys().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    ListUtils::combine(fileBitvector, tree.getMiniDummys());
+
     for(MiniTree& miniTree : tree.getMiniTrees()) {
-        temp = addDuplicateSeparator(miniTree.FIDs, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(miniTree.typeVectors, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(miniTree.dummys, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(miniTree.microTrees, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(miniTree.rootAncestors, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(miniTree.dummyAncestors, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.FIDs.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.FIDs);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.typeVectors.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.typeVectors);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.dummys.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.dummys);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.microTrees.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.microTrees);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.rootAncestors.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.rootAncestors);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), miniTree.dummyAncestors.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, miniTree.dummyAncestors);
     }
+
     for(MicroTreeData& microTreeData : tree.getLookupTable()) {
-        temp = addDuplicateSeparator(microTreeData.index, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
-        temp = addDuplicateSeparator(microTreeData.bp, "10000000000000000000000000000001");
-        ListUtils::combine(fileBitvector, temp);
-        ListUtils::combine(fileBitvector, Bitvector_Utils::convertToBitvector("10000000000000000000000000000001"));
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), microTreeData.index.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, microTreeData.index);
+
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), microTreeData.bp.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(fileBitvector, microTreeData.bp);
     }
-    writeBitvector(file,fileBitvector);
+    writeBitvectorToFile(file,fileBitvector);
     file.close();
 }
 
@@ -184,6 +182,16 @@ Bitvector HypersuccinctTreeVisualizer::addDuplicateSeparator(const Bitvector& bi
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
     HypersuccinctTree hst;
+    std::ofstream file;
+    file.open("tree.txt", std::ofstream::binary);
+    Bitvector fileBitvector = readBitvectorFromFile(file);
 
+    file.close();
     return hst;
+}
+
+Bitvector HypersuccinctTreeVisualizer::readBitvectorFromFile(std::ofstream &file) {
+    Bitvector bitvector;
+
+    return bitvector;
 }

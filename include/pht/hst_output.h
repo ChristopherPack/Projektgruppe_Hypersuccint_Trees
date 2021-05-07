@@ -37,18 +37,27 @@ namespace pht {
 
         /**
          * Reads an entire hypersuccinct tree from a file
-         * todo: needs to understand and work with markings from writeToFile
+         * todo: needs to understand and work with encoding from writeToFile
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
         static HypersuccinctTree readFromFile(string path);
 
     private:
-        static void writeBitvector(std::ofstream &file, Bitvector& bitvector);
+        /**
+         * Writes a Bitvector to a file in a space efficient way
+         *
+         * @param file File to write to
+         * @param bitvector the bitvector to write
+         */
+        static void writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector);
+
+        static Bitvector readBitvectorFromFile(std::ofstream &file);
 
         /**
          * Duplicates every instance of the given separator in a given Bitvector
          * Helper function for writeToFile
+         * TODO: Currently unused
          * @param bitvector the given Bitvector
          * @param separator the separator as string
          * @return the modified Bitvector

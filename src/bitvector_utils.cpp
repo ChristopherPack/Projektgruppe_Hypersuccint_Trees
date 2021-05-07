@@ -74,8 +74,7 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
     //TODO std::regex_match()???
     std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
     Bitvector pattern = convertToBitvector(patternString);
-    //TODO: Need a check for size of the bitvector
-    //This works ONCE for temp, then not for a second time.
+    //TODO: Size check does NOT work if vector is too small ???
     if(iterator + pattern.size() < end) {
         uint32_t patternID = decodeNumber(pattern, NumberEncoding::BINARY);
         uint32_t patternSize = pattern.size();

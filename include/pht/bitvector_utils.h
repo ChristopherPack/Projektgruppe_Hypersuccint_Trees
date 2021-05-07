@@ -52,7 +52,8 @@ namespace pht{
         /**
          * Finds all occurrences of a given pattern in a bitvector
          * Does not identify concatenated patterns (ie 10101 only matches once at the beginning for pattern 101)
-         * TODO: Maybe Output iterators not const?
+         * TODO: Does not work currently
+         * TODO: Currently unused
          *
          * @param iterator Begin of the bitvector to be matched
          * @param end End of the bitvector to be matched

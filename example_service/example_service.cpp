@@ -42,6 +42,8 @@ int main() {
 
     /*std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
 
+    std::cout << "WARNING: OUTPUT WITHOUT INTERCONNECTIONS" << std::endl;
+
     std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
     for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
@@ -63,7 +65,6 @@ int main() {
     }*/
 
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, false);
-    //TODO Offset size check does not work twice in a row on the same vector (see bitvector utils)
     HypersuccinctTreeVisualizer::writeToFile(hst);
 
     std::cout << "Original Tree data:" << std::endl;
