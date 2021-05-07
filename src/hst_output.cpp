@@ -145,6 +145,7 @@ HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
     file.open("tree.txt", std::ifstream::binary);
     Bitvector fileBitvector = readBitvectorFromFile(file);
     file.close();
+    //TODO: funktion in Factory:
     auto iter = fileBitvector.begin();
     uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);

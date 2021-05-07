@@ -56,7 +56,7 @@ namespace pht {
 
         /**
          * Reads a space efficient Bitvector from a file
-         * 
+         *
          * @param file the file to read from
          * @return the read bitvector
          */
