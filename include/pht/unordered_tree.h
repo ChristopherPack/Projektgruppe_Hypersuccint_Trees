@@ -234,6 +234,26 @@ namespace pht {
             return result;
         }
 
+        bool isAncestor(const std::shared_ptr<pht::Node<T>>& node, const std::shared_ptr<pht::Node<T>>& ancestor) {
+            ASSERT(node,     "Invalid node");
+            ASSERT(ancestor, "Invalid ancestor");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node)     != nodes.end(), "Node not found");
+            ASSERT(std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
+
+            if(node == ancestor) {
+                return true;
+            }
+
+            std::shared_ptr<pht::Node<T>> current = node;
+            while(current != root) {
+                current = ancestors.at(current);
+                if(current == ancestor) {
+                    return true;
+                }
+            }
+            return root == ancestor;
+        }
+
         /**
          * Returns the subtree at the current node. 
          * 
@@ -520,12 +540,27 @@ namespace pht {
             return size;
         }
 
+        bool hasDummy() {
+            return dummy != nullptr;
+        }
+
+        std::shared_ptr<pht::Node<T>> getDummy() {
+            return dummy;
+        }
+
+        void setDummy(std::shared_ptr<pht::Node<T>> dummy) {
+            ASSERT(dummy, "Invalid dummy");
+            ASSERT(std::find(nodes.begin(), nodes.end(), dummy) != nodes.end(), "Dummy not found");
+            this->dummy = dummy;
+        }
+
     private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup.
-        std::map<std::shared_ptr<pht::Node<T>>, uint64_t > enumeratedCache; ///todo Map for enumeration of nodes in tree
+        std::map<std::shared_ptr<pht::Node<T>>, uint64_t> enumeratedCache; ///Map for enumeration of nodes in tree
+        std::shared_ptr<pht::Node<T>> dummy; ///The optional dummy in the tree. 
 
         bool refreshEnumerate = true;
 

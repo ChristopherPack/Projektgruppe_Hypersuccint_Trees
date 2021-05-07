@@ -37,15 +37,17 @@ namespace pht {
      * MicroTreeData is a table of generic MicroTree structures, indexed by the structures' Balanced Parenthesis form.
      * The table contains a lot of information about these structures:
      * a Bitvector that contains the balanced parenthesis form if Huffman coding is used
-     * todo: a Bitvector that indicates if a MicroTree contains a MiniTree Dummy and its position
-     * todo: check Struct for optimisation
+     * TODO: a Bitvector that indicates if a MicroTree contains a MiniTree Dummy and its position
+     * TODO: check Struct for optimisation
      */
     struct MicroTreeData {
         Bitvector index;
 
         Bitvector bp;
 
-        explicit MicroTreeData(Bitvector index) : index(std::move(index)) {}
+        Bitvector matrix;
+
+        MicroTreeData(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
         bool operator==(const MicroTreeData& mtd) const {
             return index == mtd.index;
         }

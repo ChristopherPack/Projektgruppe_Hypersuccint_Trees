@@ -5,6 +5,8 @@
 #ifndef PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 #define PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 
+#include <cmath>
+
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -60,15 +62,28 @@ namespace pht {
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
 
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
-
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
+                if(fmMiniTree->hasDummy()) {
+                    for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
+                        miniTree.rootAncestors.push_back(fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getRoot()));
+                    }
+                }
 
                 std::tuple<Bitvector,Bitvector> microIntercon = create1_2_Interconnections(fmMiniTree,fmMicroTrees,sizeMicro);
                 miniTree.FIDs = std::get<0>(microIntercon);
                 miniTree.typeVectors = std::get<1>(microIntercon);
-                Bitvector dummys = createDummyInterconnections(fmMiniTree,fmMicroTrees,sizeMicro);
+                Bitvector dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
                 miniTree.dummys = dummys;
+                if(fmMiniTree->hasDummy()) {
+                    for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
+                        if(fmMicroTree->hasDummy()) {
+                            miniTree.dummyAncestors.push_back(fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getDummy()));
+                        } else {
+                            miniTree.dummyAncestors.push_back(false);
+                        }
+                    }
+                }
 
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
                     std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
@@ -78,7 +93,16 @@ namespace pht {
                         }
                         bpsAndOccurrences.at(bp)++;
                     }
-                    MicroTreeData microTreeData(bp);
+                    uint32_t n = bp.size()/2;
+                    std::vector<bool> matrix(pow(n, 2));
+                    std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
+                    ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
+                    for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
+                        for(std::shared_ptr<pht::Node<T>> node2 : orderedNodes) {
+                            matrix.push_back(fmMicroTree->isAncestor(node2, node1));
+                        }
+                    }
+                    MicroTreeData microTreeData(bp, matrix);
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
@@ -206,11 +230,13 @@ namespace pht {
                 for(std::shared_ptr<pht::Node<T>> node : fmMicroTree->getNodes()) {
                     if(node != fmMicroTree->getRoot()) {
                         std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(node);
-                        for(int ind = 0; ind<children.size();ind++) {
+                        for(int ind = 0; ind < children.size(); ind++) {
                             if(!ListUtils::containsAny(fmMicroTree->getNodes(),{children.at(ind)})) {
                                 std::shared_ptr<pht::Node<T>> dummyNode = std::make_shared<pht::Node<T>>(T());
+                                dummyNode->setMiniDummy();
                                 //Index für Tree order
-                                fmMicroTree->insert(dummyNode,ind, node);
+                                fmMicroTree->insert(dummyNode, ind, node);
+                                fmMicroTree->setDummy(dummyNode);
                                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                                 Bitvector num;
                                 pht::Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), fmMicroTree->enumerate(dummyNode),Bitvector_Utils::NumberEncoding::BINARY);

@@ -46,8 +46,17 @@ namespace pht {
             return value;
         }
 
+        bool isMiniDummy() {
+            return miniDummy;
+        }
+
+        void setMiniDummy(bool val = true) {
+            miniDummy = val;
+        }
+
     private:
         T value;///The stored value of the node 
+        bool miniDummy;
     };
 }
 
