@@ -14,6 +14,8 @@ using namespace std;
  */
 void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     cout << "Hypersuccinct Tree:" << endl;
+    cout << "IsHuffman:   ";
+    cout << tree.isHuffman() << endl;
     cout << "MiniSize:  ";
     printBitvector(tree.getMiniSize());
     cout << "MicroSize:  ";
@@ -112,6 +114,7 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
     std::ofstream file;
     file.open("tree.txt", std::ofstream::binary);
     Bitvector fileBitvector;
+    fileBitvector.push_back(tree.isHuffman());
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniTrees().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);

@@ -46,6 +46,7 @@ namespace pht {
         Bitvector matrix;
 
         MicroTreeData(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
+        MicroTreeData(const Bitvector& index,const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
         bool operator==(const MicroTreeData& mtd) const {
             return index == mtd.index;
         }
@@ -157,6 +158,10 @@ namespace pht {
             return miniDummys;
         }
 
+        bool isHuffman() {
+            return huffmanFlag;
+        }
+
         /**
          * todo: tests
          * @param index
@@ -185,8 +190,9 @@ namespace pht {
             return lookupTable;
         }
 
-        //private: //todo: read private when factory is complete
+    private:
         HypersuccinctTree() = default;
+        bool huffmanFlag;
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
