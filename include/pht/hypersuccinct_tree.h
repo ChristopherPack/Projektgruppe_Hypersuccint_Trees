@@ -21,8 +21,6 @@ namespace pht {
      * a Bitvector of Fully Indexable Dictionaries for MicroTrees
      * a Bitvector that determines specific Connections between MicroTrees
      * a Bitvector that indicates added Dummy Nodes to MicroTrees
-     * todo: a Bitvector that indicates if roots of MircoTrees are ancestors of a potential MiniTree Dummy
-     * todo: a Bitvector that indicates if... well what even exactly?
      */
     struct MiniTree {
         Bitvector microTrees;

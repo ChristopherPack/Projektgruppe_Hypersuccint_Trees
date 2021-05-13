@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "pht/hypersuccinct_tree.h"
+#include "pht/hypersuccinct_tree_factory.h"
 #include "pht/hst_output.h"
 
 
@@ -45,6 +46,8 @@ void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
         cout << "LookupTableIndex:   ";
         printBitvector(tree.getLookupTableEntry(index).index);
+        cout<< "BP for Huffman:   ";
+        printBitvector(tree.getLookupTableEntry(index).bp);
         cout << "AncestorMap:   ";
         printBitvector(tree.getLookupTableEntry(index).matrix);
     }
@@ -150,47 +153,12 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
 }
 
 HypersuccinctTree HypersuccinctTreeVisualizer::readFromFile(string path) {
-    HypersuccinctTree hst;
     std::ifstream file;
     file.open("tree.txt", std::ifstream::binary);
     Bitvector fileBitvector = readBitvectorFromFile(file);
     file.close();
-    //TODO: funktion in Factory:
-    auto iter = fileBitvector.begin();
-    uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    uint32_t miniTreesSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-
-    uint32_t tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector miniFIDs;
-    for(uint32_t i=0; i<tempSize; i++) {
-        miniFIDs.push_back(*iter);
-        iter++;
-    }
-
-    tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector miniTypeVectors;
-    for(uint32_t i=0; i<tempSize; i++) {
-        miniTypeVectors.push_back(*iter);
-        iter++;
-    }
-
-    tempSize = Bitvector_Utils::decodeNumber(iter, fileBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector miniDummys;
-    for(uint32_t i=0; i<tempSize; i++) {
-        miniDummys.push_back(*iter);
-        iter++;
-    }
-
-    for(uint32_t j=0; j<miniTreesSize; j++) {
-
-    }
-
-    for(uint32_t j=0; j<lookupTableSize; j++) {
-
-    }
-    return hst;
+    //funktion in Factory:
+    return HypersuccinctTreeFactory::createFromFile(fileBitvector);
 }
 
 void HypersuccinctTreeVisualizer::writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector) {

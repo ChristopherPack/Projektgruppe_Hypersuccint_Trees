@@ -120,6 +120,86 @@ namespace pht {
 
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
+            auto iter = fullBitvector.begin();
+            uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            uint32_t miniTreesSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+            uint32_t tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniFIDs.push_back(*iter);
+                iter++;
+            }
+
+            tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniTypeVectors.push_back(*iter);
+                iter++;
+            }
+
+            tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniDummys.push_back(*iter);
+                iter++;
+            }
+
+            for(uint32_t j=0; j<miniTreesSize; j++) {
+                MiniTree mini;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.FIDs.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.typeVectors.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.dummys.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.microTrees.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.rootAncestors.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.dummyAncestors.push_back(*iter);
+                    iter++;
+                }
+                hst.miniTrees.push_back(mini);
+            }
+
+            for(uint32_t j=0; j<lookupTableSize; j++) {
+                Bitvector index;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    index.push_back(*iter);
+                    iter++;
+                }
+                /*Bitvector bp; TODO: How to check if huffman is used?
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    bp.push_back(*iter);
+                    iter++;
+                }*/
+                Bitvector matrix;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    matrix.push_back(*iter);
+                    iter++;
+                }
+                MicroTreeData microTreeData(index, matrix);
+            }
             return hst;
         }
 
