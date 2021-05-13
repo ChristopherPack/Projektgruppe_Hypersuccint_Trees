@@ -71,6 +71,7 @@ namespace pht {
 
         /**
          * Returns the MicroTree representation from the MicroTree Bitvector at the given index
+         * TODO: Need handling for huffman encoding!!!
          *
          * @param bitvector the MicroTree bitvector
          * @param index the index as integer

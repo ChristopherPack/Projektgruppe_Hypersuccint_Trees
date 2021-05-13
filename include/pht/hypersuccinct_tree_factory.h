@@ -119,15 +119,19 @@ namespace pht {
         }
 
         /**
-         *
-         * @param fullBitvector
-         * @return
+         * Creates a HypersuccinctTree from a given full Bitvector
+         * WARNING: Function is very sensitive to badly formatted bitvectors (see write to File for formatting)
+         * TODO: Need error handling for bad bitvectors
+         * @param fullBitvector the bitvector
+         * @return Hypersuccinct Tree
          */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
             auto iter = fullBitvector.begin();
             uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            Bitvector_Utils::encodeNumber(hst.miniSize, miniSize, Bitvector_Utils::NumberEncoding::BINARY);
+            Bitvector_Utils::encodeNumber(hst.microSize, microSize, Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t miniTreesSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
