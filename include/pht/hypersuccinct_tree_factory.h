@@ -118,6 +118,11 @@ namespace pht {
             return hypersuccinctTree;
         }
 
+        /**
+         *
+         * @param fullBitvector
+         * @return
+         */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
             auto iter = fullBitvector.begin();
@@ -186,12 +191,12 @@ namespace pht {
                     index.push_back(*iter);
                     iter++;
                 }
-                /*Bitvector bp; TODO: How to check if huffman is used?
+                Bitvector bp; //TODO: How to check if huffman is even used?
                 tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 for(uint32_t i=0; i<tempSize; i++) {
                     bp.push_back(*iter);
                     iter++;
-                }*/
+                }
                 Bitvector matrix;
                 tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 for(uint32_t i=0; i<tempSize; i++) {

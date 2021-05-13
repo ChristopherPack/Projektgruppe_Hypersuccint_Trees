@@ -2,6 +2,8 @@
 #include "gmock/gmock.h"
 #include "gmock/gmock-matchers.h"
 
+#define PHT_TEST
+
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree.h"
 #include "pht/hypersuccinct_tree_factory.h"
@@ -64,7 +66,7 @@ TEST(BitvectorUtilsTest, getEntryEliasGammaTest) {
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
 }
 
-TEST(BitvectorUtilsTest, getEntryEliasGammaTest2) {
+TEST(BitvectorUtilsTest, getEntryEliasGammaOffsetTest) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
@@ -72,9 +74,9 @@ TEST(BitvectorUtilsTest, getEntryEliasGammaTest2) {
     auto iter = miniTree1.microTrees.cbegin();
     EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 0, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,1,1,0,0,0,0));
     iter = miniTree1.microTrees.cbegin();
-    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 1, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,1,0));
+    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 1, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,0,1,1,0,0,1,1,1,0,0,0,0));
     iter = miniTree1.microTrees.cbegin();
-    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 2, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(0,1,0,1,0,0));
+    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 2, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,0,1,0,1,0,0));
 }
 
 TEST(BitvectorUtilsTest, getEntryVectorIndexTest) {

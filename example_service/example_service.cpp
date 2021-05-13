@@ -64,17 +64,17 @@ int main() {
         std::cout << std::endl;
     }*/
 
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, false);
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);
     HypersuccinctTreeVisualizer::writeToFile(hst);
-    //pht::HypersuccinctTree fileHst = HypersuccinctTreeVisualizer::readFromFile("tree.txt");
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;
     std::cout << tree->toNewickString() << std::endl;
 
     HypersuccinctTreeVisualizer::printTree(hst);
-    //std::cout << std::endl << "FileTree:" << std::endl;
-    //HypersuccinctTreeVisualizer::printTree(fileHst);
+    pht::HypersuccinctTree fileHst = HypersuccinctTreeVisualizer::readFromFile("tree.txt");
+    std::cout << std::endl << "FileTree:" << std::endl;
+    HypersuccinctTreeVisualizer::printTree(fileHst);
 
     return 0;
 }
