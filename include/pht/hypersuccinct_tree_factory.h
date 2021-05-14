@@ -74,6 +74,21 @@ namespace pht {
                 miniTree.typeVectors = std::get<1>(microIntercon);
                 Bitvector dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
                 miniTree.dummys = dummys;
+                Bitvector miniDummyTree;
+                Bitvector miniDummyIndex;
+                for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
+                    if(fmMicroTree->contains(fmMiniTree->getDummy())) {
+                        auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
+                        uint32_t dist = std::distance(fmMicroTrees.begin(), iter);
+                        Bitvector_Utils::encodeNumber(miniDummyTree,dist,Bitvector_Utils::NumberEncoding::BINARY);
+                        miniTree.miniDummyTree = miniDummyTree;
+                        std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
+                        auto iter1 = std::find(nodes.begin(),nodes.end(), fmMiniTree->getDummy());
+                        dist = std::distance(nodes.begin(), iter1);
+                        Bitvector_Utils::encodeNumber(miniDummyIndex,dist,Bitvector_Utils::NumberEncoding::BINARY);
+                        miniTree.miniDummyIndex = miniDummyIndex;
+                    }
+                }
                 if(fmMiniTree->hasDummy()) {
                     for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
                         if(fmMicroTree->hasDummy()) {

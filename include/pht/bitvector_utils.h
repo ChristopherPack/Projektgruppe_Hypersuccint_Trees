@@ -25,14 +25,19 @@ namespace pht{
             BINARY, ELIAS_GAMMA
         };
         enum class BitvectorEncoding {
-            ELIAS_GAMMA, VECTOR_INDEX, STATIC
+            ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN
+        };
+
+        struct HuffmanComparator {
+            bool operator()(const Bitvector &a, const Bitvector &b)const;
         };
 
         struct IndexingInformation {
-            uint32_t multiplier;
-            uint32_t staticSize;
+            uint32_t multiplier = 0;
+            uint32_t staticSize = 0;
             Bitvector::const_iterator& indexStart;
-            const Bitvector::const_iterator& indexEnd;
+            const Bitvector::const_iterator& indexEnd = nullIterator;
+            const std::set<Bitvector, HuffmanComparator>& huffmanTable = {};
         };
 
         static Bitvector::const_iterator nullIterator;
@@ -52,8 +57,7 @@ namespace pht{
         /**
          * Finds all occurrences of a given pattern in a bitvector
          * Does not identify concatenated patterns (ie 10101 only matches once at the beginning for pattern 101)
-         * TODO: Does not work currently
-         * TODO: Currently unused
+         * TODO: Generalize with Encoding if necessary
          *
          * @param iterator Begin of the bitvector to be matched
          * @param end End of the bitvector to be matched
@@ -61,6 +65,8 @@ namespace pht{
          * @return Vector of Pairs of Iterators marking begin and end of the pattern
          */
         static std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString);
+
+        static bool findBeginningMatch(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const Bitvector& patternBitvector);
 
         /**
          * Converts a string of type 0100110 into a bitvector
@@ -86,6 +92,8 @@ namespace pht{
         static uint32_t countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros = false);
 
         static Bitvector getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size);
+
+        static Bitvector getEntryAtHuffman(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes);
 
         static uint32_t getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier);
 

@@ -24,7 +24,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 int main() {
 
     std::cout << "Reading File... \n";
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeAlex");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath");
     std::cout << "File Read. \n\n";
 
     //Couts are necessary like this

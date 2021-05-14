@@ -6,6 +6,10 @@
 
 using namespace pht;
 
+bool Bitvector_Utils::HuffmanComparator::operator()(const Bitvector &a, const Bitvector &b) const {
+    return ((a.size() != b.size()) ? a.size() < b.size() : a < b);
+}
+
 uint32_t Bitvector_Utils::encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding) {
     return encodeNumber(std::inserter(bitvector, bitvector.begin()), num, encoding);
 }
@@ -49,6 +53,8 @@ Bitvector Bitvector_Utils::getEntry(Bitvector::const_iterator& iterator, uint32_
             return getEntryAtVectorIndex(iterator, offset, end, information.indexStart, information.indexEnd);
         case BitvectorEncoding::STATIC:
             return getEntryAtStatic(iterator, offset, end, information.staticSize);
+        case BitvectorEncoding::HUFFMAN:
+            return getEntryAtHuffman(iterator, offset, end, information.huffmanTable);
         default:
             assert(false);
             return {};
@@ -91,6 +97,20 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
     }
 
     return res;
+}
+
+bool Bitvector_Utils::findBeginningMatch(const Bitvector::const_iterator &iterator, const Bitvector::const_iterator& end, const Bitvector& patternBitvector) {
+    auto iter = iterator;
+    if(end-iter < patternBitvector.size()) {
+        return false;
+    }
+    for(bool i : patternBitvector) {
+        if(*iter != i) {
+            return false;
+        }
+        iter++;
+    }
+    return true;
 }
 
 Bitvector Bitvector_Utils::convertToBitvector(const std::string& input) {
@@ -218,6 +238,31 @@ Bitvector Bitvector_Utils::getEntryAtStatic(Bitvector::const_iterator& iterator,
     iterator += size*offset;
     auto temp = iterator;
     iterator += size;
+    return Bitvector(temp, iterator);
+}
+
+Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator, uint32_t offset, const Bitvector::const_iterator &end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
+    for(uint32_t i = 0; i < offset; i++) {
+        for(Bitvector code : huffmanCodes) {
+            if(findBeginningMatch(iterator,end, code)) {
+                if(end-iterator < code.size()) {
+                    throw std::runtime_error("Invalid Offset!");
+                }
+                iterator+=code.size();
+                break;
+            }
+        }
+    }
+    auto temp = iterator;
+    for(Bitvector code : huffmanCodes) {
+        if(findBeginningMatch(iterator,end, code)) {
+            if(end-iterator < code.size()) {
+                throw std::runtime_error("Invalid Offset!");
+            }
+            iterator+=code.size();
+            break;
+        }
+    }
     return Bitvector(temp, iterator);
 }
 
