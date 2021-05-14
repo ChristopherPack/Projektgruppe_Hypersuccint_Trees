@@ -44,6 +44,10 @@ void HypersuccinctTreeVisualizer::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).rootAncestors);
         cout << "DummyAncestors:  ";
         printBitvector(tree.getMiniTree(index).dummyAncestors);
+        cout << "MiniDummyTree:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyTree);
+        cout << "MiniDummyIndex:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyIndex);
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
         cout << "LookupTableIndex:   ";

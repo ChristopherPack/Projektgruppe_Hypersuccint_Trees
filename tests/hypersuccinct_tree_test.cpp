@@ -13,8 +13,8 @@
 
 class HypersuccinctTreeTest : public ::testing::Test {
 protected:
-    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath;
-    pht::HypersuccinctTree hyperNath;
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath  = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hyperNath = pht::HypersuccinctTreeFactory::create(treeNath);
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();
     std::shared_ptr<pht::Node<char>> a = std::make_shared<pht::Node<char>>('a');
     std::shared_ptr<pht::Node<char>> b = std::make_shared<pht::Node<char>>('b');
@@ -75,8 +75,8 @@ protected:
         example->add(A, t);
         example->add(B, x);
 
-        treeNath  = pht::XMLReader::readByName("treeNath.xml");
-        hyperNath = pht::HypersuccinctTreeFactory::create(treeNath);
+
+
 
     }
 
@@ -218,4 +218,44 @@ TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1));
     EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1));
     EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+}
+
+TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
+    pht::HstNode node = {4,1,1};
+    EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,0,0};
+    EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,0};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,2};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,2};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,4};
+    EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
+    node = {4,0,0};
+    EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,0};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,2};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,2};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,4};
+    EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
+}
+
+TEST_F(HypersuccinctTreeTest, getEntryHuffmanTest) {
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
+    pht::MiniTree mini = hst.getMiniTree(4);
+    std::vector<bool> res = hst.getMicroTree(mini, 0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hst.getMicroTree(mini, 1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
+    res = hst.getMicroTree(mini, 2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+
 }

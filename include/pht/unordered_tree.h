@@ -384,7 +384,9 @@ namespace pht {
          * @return True when contained. 
          */
         bool contains(const std::shared_ptr<pht::Node<T>> node) const {
-            ASSERT(node, "Invalid node");
+            if(node == nullptr) {
+                return false;
+            }
 
             return std::find(nodes.begin(), nodes.end(), node) != nodes.end();
         }

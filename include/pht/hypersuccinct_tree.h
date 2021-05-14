@@ -29,6 +29,8 @@ namespace pht {
         Bitvector dummys;
         Bitvector rootAncestors;
         Bitvector dummyAncestors;
+        Bitvector miniDummyTree;
+        Bitvector miniDummyIndex;
     };
 
     /**
@@ -79,8 +81,21 @@ namespace pht {
          * @return the MicroTree in Balanced Parenthesis form as bitvector
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index) {
-            auto iterD = miniTree.microTrees.cbegin();
-            return Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+            if(huffmanFlag) {
+                auto iterD = miniTree.microTrees.cbegin();
+                std::set<Bitvector, Bitvector_Utils::HuffmanComparator> huffmanCodes;
+                for(MicroTreeData& microTreeData : lookupTable) {
+                    huffmanCodes.insert(microTreeData.index);
+                }
+                Bitvector indexH = Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(), Bitvector_Utils::BitvectorEncoding::HUFFMAN, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, huffmanCodes});
+                return std::find_if(lookupTable.begin(),lookupTable.end(), [&indexH](const MicroTreeData& microTreeData){ return microTreeData.index == indexH;})->bp;
+            }
+            else {
+                auto iterD = miniTree.microTrees.cbegin();
+                return Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(),
+                                                 Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,
+                                                 {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+            }
         }
 
         /**
@@ -175,10 +190,7 @@ namespace pht {
             return Bitvector_Utils::getEntry(iterD, index, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
         }
 
-        bool isDummyAncestorWithinMiniTree(HstNode node, HstNode dummy);
-
         /**
-         * todo: indexing via microTree structure!!
          * @param index
          * @return
          */
@@ -186,9 +198,41 @@ namespace pht {
             return lookupTable.at(index);
         }
 
+        MicroTreeData getLookupTableEntry(Bitvector indexV) {
+            if(huffmanFlag) {
+                auto iter = std::find_if(lookupTable.begin(), lookupTable.end(),[&indexV](const MicroTreeData &microTreeData) {return microTreeData.bp == indexV;});
+                if (iter == lookupTable.end()) {
+
+                }
+                return *iter;
+            } else {
+                auto iter = std::find_if(lookupTable.begin(), lookupTable.end(),[&indexV](const MicroTreeData &microTreeData) {return microTreeData.index == indexV;});
+                if (iter == lookupTable.end()) {
+
+                }
+                return *iter;
+            }
+        }
+
+        /**
+         * Is node1Index ancestor of node2Index
+         * @param entry
+         * @param node1Index
+         * @param node2Index
+         * @return
+         */
+        bool lookupTableMatrixComparison(const MicroTreeData& entry,uint32_t node1Index, uint32_t node2Index) {
+            auto iter = entry.matrix.cbegin();
+            uint32_t size = sqrt(entry.matrix.size());
+            Bitvector segment = Bitvector_Utils::getEntry(iter, node1Index, entry.matrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, size, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+            return segment.at(node2Index);
+        }
+
         std::vector<MicroTreeData> getLookupTable() {
             return lookupTable;
         }
+
+        bool isDummyAncestorWithinMiniTree(HstNode node);
 
     private:
         HypersuccinctTree() = default;
