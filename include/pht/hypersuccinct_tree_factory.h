@@ -129,7 +129,6 @@ namespace pht {
          */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
-            HypersuccinctTreeVisualizer::printBitvector(fullBitvector);
             auto iter = fullBitvector.begin();
             hst.huffmanFlag = *iter;
             iter++;
