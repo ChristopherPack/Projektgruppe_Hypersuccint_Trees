@@ -32,6 +32,7 @@ namespace pht {
         /**
          * TODO: Needs to be adjusted for every change in HypersuccinctTree
          * writes an entire hypersuccinct tree to a file
+         * Add a 0 for all empty Bitvectors
          * @param tree the hypersuccinct tree to be written
          */
         static void writeToFile(HypersuccinctTree &tree);

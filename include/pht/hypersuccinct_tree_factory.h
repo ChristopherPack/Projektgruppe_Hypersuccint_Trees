@@ -29,6 +29,7 @@ namespace pht {
          */
         template<class T> static HypersuccinctTree create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false) {
             HypersuccinctTree hypersuccinctTree;
+            hypersuccinctTree.huffmanFlag = false;
 
             #ifdef PHT_TEST
             uint32_t sizeMini = 12;
@@ -86,6 +87,7 @@ namespace pht {
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
                     std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
                     if(huffman) {
+                        hypersuccinctTree.huffmanFlag = true;
                         if(bpsAndOccurrences.find(bp) == bpsAndOccurrences.end()) {
                             bpsAndOccurrences.insert({bp, 0});
                         }
@@ -118,8 +120,106 @@ namespace pht {
             return hypersuccinctTree;
         }
 
+        /**
+         * Creates a HypersuccinctTree from a given full Bitvector
+         * WARNING: Function is very sensitive to badly formatted bitvectors (see write to File for formatting)
+         * TODO: Need error handling for bad bitvectors
+         * @param fullBitvector the bitvector
+         * @return Hypersuccinct Tree
+         */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
+            auto iter = fullBitvector.begin();
+            hst.huffmanFlag = *iter;
+            iter++;
+            uint32_t miniSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            uint32_t microSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            Bitvector_Utils::encodeNumber(hst.miniSize, miniSize, Bitvector_Utils::NumberEncoding::BINARY);
+            Bitvector_Utils::encodeNumber(hst.microSize, microSize, Bitvector_Utils::NumberEncoding::BINARY);
+            uint32_t miniTreesSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+            uint32_t tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniFIDs.push_back(*iter);
+                iter++;
+            }
+
+            tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniTypeVectors.push_back(*iter);
+                iter++;
+            }
+
+            tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                hst.miniDummys.push_back(*iter);
+                iter++;
+            }
+
+            for(uint32_t j=0; j<miniTreesSize; j++) {
+                MiniTree mini;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.FIDs.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.typeVectors.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.dummys.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.microTrees.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.rootAncestors.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.dummyAncestors.push_back(*iter);
+                    iter++;
+                }
+                hst.miniTrees.push_back(mini);
+            }
+
+            for(uint32_t j=0; j<lookupTableSize; j++) {
+                Bitvector index;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    index.push_back(*iter);
+                    iter++;
+                }
+                Bitvector bp;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    bp.push_back(*iter);
+                    iter++;
+                }
+                Bitvector matrix;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    matrix.push_back(*iter);
+                    iter++;
+                } //TODO: Last Bit is 0, should be 1; seems to be an encoding issue
+                /**
+                 * 1111111010110000100110001000000010000000100000001 correct bitvector
+                 * 1111111010110000100110001000000010000000100000000 createFromFile
+                 * 1111111010110000100110001000000010000000100000001 fileoutput
+                 * 1111111010110000100110001000000010000000100000000000000 fileinput???
+                 */
+                MicroTreeData microTreeData(index, bp, matrix);
+                hst.lookupTable.push_back(microTreeData);
+            }
             return hst;
         }
 

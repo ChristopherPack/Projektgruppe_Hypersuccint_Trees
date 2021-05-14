@@ -75,7 +75,7 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
     std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
     Bitvector pattern = convertToBitvector(patternString);
     //TODO: Size check does NOT work if vector is too small ???
-    if(iterator + pattern.size() < end) {
+    if(end-iterator < pattern.size()) {
         uint32_t patternID = decodeNumber(pattern, NumberEncoding::BINARY);
         uint32_t patternSize = pattern.size();
         auto iterStart = iterator;
@@ -168,13 +168,13 @@ uint32_t Bitvector_Utils::encodeEliasGamma(std::insert_iterator<Bitvector>& iter
 Bitvector Bitvector_Utils::getEntryAtEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t multiplier) {
     for(uint32_t i = 0; i < offset; i++) {
         uint32_t length = decodeEliasGamma(iterator, end)*multiplier;
-        iterator += length; //Skip entry
-        if(iterator+length > end) {
+        if(end-iterator < length) {
             throw std::runtime_error("Invalid Offset!");
         }
+        iterator += length; //Skip entry
     }
     uint32_t length = decodeEliasGamma(iterator, end)*multiplier;
-    if(iterator+length > end) {
+    if(end-iterator < length) {
         throw std::runtime_error("Invalid Offset!");
     }
     auto temp = iterator;
@@ -187,13 +187,13 @@ Bitvector Bitvector_Utils::getEntryAtVectorIndex(Bitvector::const_iterator& iter
         Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
         uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
         iterator += indexLength; //skip Entry
-        if(iterator+indexLength > end) {
+        if(end-iterator < indexLength) {
             throw std::runtime_error("Invalid Offset!");
         }
     }
     Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
     uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
-    if(iterator+indexLength > end) {
+    if(end-iterator < indexLength) {
         throw std::runtime_error("Invalid Offset!");
     }
     auto temp = iterator;
@@ -212,7 +212,7 @@ uint32_t Bitvector_Utils::countOccurences(const Bitvector::const_iterator& itera
 }
 
 Bitvector Bitvector_Utils::getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
-    if(iterator+size*offset > end) {
+    if(end-iterator < size*offset) {
         throw std::runtime_error("Invalid Offset!");
     }
     iterator += size*offset;

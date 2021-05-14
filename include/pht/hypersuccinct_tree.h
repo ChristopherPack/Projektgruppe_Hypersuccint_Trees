@@ -21,8 +21,6 @@ namespace pht {
      * a Bitvector of Fully Indexable Dictionaries for MicroTrees
      * a Bitvector that determines specific Connections between MicroTrees
      * a Bitvector that indicates added Dummy Nodes to MicroTrees
-     * todo: a Bitvector that indicates if roots of MircoTrees are ancestors of a potential MiniTree Dummy
-     * todo: a Bitvector that indicates if... well what even exactly?
      */
     struct MiniTree {
         Bitvector microTrees;
@@ -48,6 +46,7 @@ namespace pht {
         Bitvector matrix;
 
         MicroTreeData(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
+        MicroTreeData(const Bitvector& index,const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
         bool operator==(const MicroTreeData& mtd) const {
             return index == mtd.index;
         }
@@ -73,6 +72,7 @@ namespace pht {
 
         /**
          * Returns the MicroTree representation from the MicroTree Bitvector at the given index
+         * TODO: Need handling for huffman encoding!!!
          *
          * @param bitvector the MicroTree bitvector
          * @param index the index as integer
@@ -158,6 +158,10 @@ namespace pht {
             return miniDummys;
         }
 
+        bool isHuffman() {
+            return huffmanFlag;
+        }
+
         /**
          * todo: tests
          * @param index
@@ -186,8 +190,9 @@ namespace pht {
             return lookupTable;
         }
 
-        //private: //todo: read private when factory is complete
+    private:
         HypersuccinctTree() = default;
+        bool huffmanFlag;
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
