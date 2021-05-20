@@ -207,6 +207,24 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
                                           miniTree.dummyAncestors.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             ListUtils::combine(fileBitvector, miniTree.dummyAncestors);
         }
+        if(miniTree.miniDummyTree.empty()) {
+            fileBitvector.push_back(true);
+            fileBitvector.push_back(false);
+        } else {
+            Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),
+                                          miniTree.miniDummyTree.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            ListUtils::combine(fileBitvector, miniTree.miniDummyTree);
+        }
+        if(miniTree.miniDummyIndex.empty()) {
+            fileBitvector.push_back(true);
+            fileBitvector.push_back(false);
+        } else {
+            Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),
+                                          miniTree.miniDummyIndex.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            ListUtils::combine(fileBitvector, miniTree.miniDummyIndex);
+        }
+        /*Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);*/
     }
 
     for(MicroTreeData& microTreeData : tree.getLookupTable()) {
@@ -237,6 +255,7 @@ void HypersuccinctTreeVisualizer::writeToFile(HypersuccinctTree &tree) {
             ListUtils::combine(fileBitvector, microTreeData.matrix);
         }
     }
+    printBitvector(fileBitvector);
     writeBitvectorToFile(file,fileBitvector);
     file.close();
 }

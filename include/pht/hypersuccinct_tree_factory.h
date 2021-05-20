@@ -22,7 +22,7 @@ namespace pht {
     public:
         /**
          * Creates Hypersuccinct Code for a given Unordered Tree utilizing the Farzan Munro Algorithm.
-         *
+         * TODO: I don't think this class can be restructured majorly, but one could add comments for structure
          * @tparam T Class implemented in UnorderedTree.
          * @param tree the UnorderedTree to be encoded.
          * @return HypersuccinctTree class representing the Hypersuccinct code todo: see Class
@@ -144,6 +144,7 @@ namespace pht {
          */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
+            HypersuccinctTreeVisualizer::printBitvector(fullBitvector);
             auto iter = fullBitvector.begin();
             hst.huffmanFlag = *iter;
             iter++;
@@ -204,6 +205,20 @@ namespace pht {
                     mini.dummyAncestors.push_back(*iter);
                     iter++;
                 }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.miniDummyTree.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.miniDummyIndex.push_back(*iter);
+                    iter++;
+                }
+                /*uint32_t miniDummyTreeNum = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                uint32_t miniDummyIndexNum = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                Bitvector_Utils::encodeNumber(mini.miniDummyTree, miniDummyTreeNum, Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(mini.miniDummyIndex, miniDummyIndexNum, Bitvector_Utils::NumberEncoding::BINARY);*/
                 hst.miniTrees.push_back(mini);
             }
 
@@ -225,21 +240,22 @@ namespace pht {
                 for(uint32_t i=0; i<tempSize; i++) {
                     matrix.push_back(*iter);
                     iter++;
-                } //TODO: Last Bit is 0, should be 1; seems to be an encoding issue
+                }
+                //TODO: Last Bit is SOMETIMES 0, should be 1; seems to be an encoding issue
                 /**
+                 * On TreeAlex:
                  * 1111111010110000100110001000000010000000100000001 correct bitvector
                  * 1111111010110000100110001000000010000000100000000 createFromFile
                  * 1111111010110000100110001000000010000000100000001 fileoutput
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
+                 *
+                 * HOWEVER:
+                 * Behaves correctly on TreeNath!
                  */
                 MicroTreeData microTreeData(index, bp, matrix);
                 hst.lookupTable.push_back(microTreeData);
             }
             return hst;
-        }
-
-        template<class T> static void generateQueryData(HypersuccinctTree& tree,std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree) {
-
         }
 
         /**
