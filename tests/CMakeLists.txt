@@ -3,8 +3,7 @@ set(PHT_TEST_SOURCES
    bitvector_utils_test.cpp
    farzan_munro_test.cpp
    hypersuccinct_tree_test.cpp
-   hypersuccinct_tree_factory_test.cpp
-   list_utils_test.cpp
+        list_utils_test.cpp
    node_test.cpp
    unordered_tree_test.cpp
 )

@@ -1,20 +1,12 @@
 #include <iostream>
 #include <string>
-#include <filesystem>
 
-#include <irrXML.h>
 #define PHT_TEST
 #include "pht/unordered_tree.h"
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
-#include <direct.h>
-#include "pht/hypersuccinct_tree.h"
-#include "pht/bitvector_utils.h"
-#include "pht/list_utils.h"
-#include "pht/hst_output.h"
 
-using namespace std::filesystem;
 using namespace pht;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
@@ -65,16 +57,16 @@ int main() {
     }*/
 
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);
-    HypersuccinctTreeVisualizer::writeToFile(hst);
+    HypersuccinctTreeOutput::writeToFile(hst);
 
     std::cout << "Original Tree data:" << std::endl;
     std::cout << tree->getSize() << std::endl;
     std::cout << tree->toNewickString() << std::endl;
 
-    HypersuccinctTreeVisualizer::printTree(hst);
-    pht::HypersuccinctTree fileHst = HypersuccinctTreeVisualizer::readFromFile("tree.txt");
+    HypersuccinctTreeOutput::printTree(hst);
+    pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
     std::cout << std::endl << "FileTree:" << std::endl;
-    HypersuccinctTreeVisualizer::printTree(fileHst);
+    HypersuccinctTreeOutput::printTree(fileHst);
 
     return 0;
 }

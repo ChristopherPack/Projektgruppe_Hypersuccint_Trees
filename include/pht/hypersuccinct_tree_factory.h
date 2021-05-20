@@ -63,6 +63,7 @@ namespace pht {
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
+
                 if(fmMiniTree->hasDummy()) {
                     for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
                         miniTree.rootAncestors.push_back(fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getRoot()));
@@ -72,10 +73,13 @@ namespace pht {
                 std::tuple<Bitvector,Bitvector> microIntercon = create1_2_Interconnections(fmMiniTree,fmMicroTrees,sizeMicro);
                 miniTree.FIDs = std::get<0>(microIntercon);
                 miniTree.typeVectors = std::get<1>(microIntercon);
+
                 Bitvector dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
                 miniTree.dummys = dummys;
+
                 Bitvector miniDummyTree;
                 Bitvector miniDummyIndex;
+
                 for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
                     if(fmMicroTree->contains(fmMiniTree->getDummy())) {
                         auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
@@ -89,6 +93,7 @@ namespace pht {
                         miniTree.miniDummyIndex = miniDummyIndex;
                     }
                 }
+
                 if(fmMiniTree->hasDummy()) {
                     for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
                         if(fmMicroTree->hasDummy()) {
@@ -100,7 +105,7 @@ namespace pht {
                 }
 
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
-                    std::vector<bool> bp = fmMicroTree->toBalancedParenthesis();
+                    Bitvector bp = fmMicroTree->toBalancedParenthesis();
                     if(huffman) {
                         hypersuccinctTree.huffmanFlag = true;
                         if(bpsAndOccurrences.find(bp) == bpsAndOccurrences.end()) {
@@ -108,7 +113,8 @@ namespace pht {
                         }
                         bpsAndOccurrences.at(bp)++;
                     }
-                    std::vector<bool> matrix;
+
+                    Bitvector matrix;
                     std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
                     ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
                     for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
@@ -116,11 +122,13 @@ namespace pht {
                             matrix.push_back(fmMicroTree->isAncestor(node2, node1));
                         }
                     }
-                    MicroTreeData microTreeData(bp, matrix);
+
+                    LookupTableEntry microTreeData(bp, matrix);
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
                 }
+
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
             }
@@ -129,8 +137,6 @@ namespace pht {
                 std::map<std::vector<bool>,std::vector<bool>> huffmanTable = Huffman::generateTable<std::vector<bool>>(bpsAndOccurrences);
                 convertToHuffman(hypersuccinctTree, huffmanTable);
             }
-
-            //generateQueryData(hypersuccinctTree,fmMiniTrees);
 
             return hypersuccinctTree;
         }
@@ -144,7 +150,6 @@ namespace pht {
          */
         static HypersuccinctTree createFromFile(Bitvector fullBitvector) {
             HypersuccinctTree hst;
-            HypersuccinctTreeVisualizer::printBitvector(fullBitvector);
             auto iter = fullBitvector.begin();
             hst.huffmanFlag = *iter;
             iter++;
@@ -252,7 +257,7 @@ namespace pht {
                  * HOWEVER:
                  * Behaves correctly on TreeNath!
                  */
-                MicroTreeData microTreeData(index, bp, matrix);
+                LookupTableEntry microTreeData(index, bp, matrix);
                 hst.lookupTable.push_back(microTreeData);
             }
             return hst;
@@ -281,7 +286,7 @@ namespace pht {
         }
 
         static void convertToHuffman(HypersuccinctTree& tree, std::map<std::vector<bool>,std::vector<bool>> huffmanTable) {
-            for(MicroTreeData& x : tree.lookupTable) {
+            for(LookupTableEntry& x : tree.lookupTable) {
                 x.bp = x.index;
                 x.index = huffmanTable.at(x.index);
             }
@@ -294,7 +299,7 @@ namespace pht {
                     std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
                     ListUtils::combine(x.microTrees, huffmanTable.at(bp));
                 }
-                HypersuccinctTreeVisualizer::printBitvector(x.microTrees);
+                HypersuccinctTreeOutput::printBitvector(x.microTrees);
             }
         }
 
