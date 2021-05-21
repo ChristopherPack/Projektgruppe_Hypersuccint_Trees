@@ -220,6 +220,18 @@ TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
 }
 
+TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
+    pht::MiniTree mini = hst.getMiniTree(4);
+    std::vector<bool> res = hst.getMicroTree(mini, 0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hst.getMicroTree(mini, 1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
+    res = hst.getMicroTree(mini, 2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+}
+
 TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     pht::HstNode node = {4,1,1};
     EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
@@ -247,15 +259,29 @@ TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
 }
 
-TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
-    pht::MiniTree mini = hst.getMiniTree(4);
-    std::vector<bool> res = hst.getMicroTree(mini, 0);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = hst.getMicroTree(mini, 1);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
-    res = hst.getMicroTree(mini, 2);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+TEST_F(HypersuccinctTreeTest, isAncestorTest) {
+    pht::HstNode node1 = {4,1,4};
+    pht::HstNode anc = {4,1,4};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,1};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,0,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,2,0};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,2,2};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,2};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,4};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
 
+    anc = {0,0,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {0,1,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {0,1,3};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {1,1,0};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
 }
