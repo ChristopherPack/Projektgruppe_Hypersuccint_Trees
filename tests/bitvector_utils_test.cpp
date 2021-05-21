@@ -45,24 +45,24 @@ TEST(BitvectorUtilsTest, decodeEliasGammaTest) {
 TEST(BitvectorUtilsTest, getEntryEliasGammaTest) {
     std::vector<bool> bitvector = {0,1,1, 1,1,0,1,0,0 ,0,1,0 ,1,1,0,0 ,0,0,1,0,0 ,1,1,1,0,1,0,0,0 ,1, 1,0 ,0,0,1,0,1 ,1,1,1,0,0,1,0,1,0,0, 0,1,0,1,1,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,0,1,0,0,0,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,1,1,0,0,0};
     auto iter = bitvector.cbegin();
-    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,0,1,0,1,0,0));
 
     std::vector<bool> bitvector2 = {0,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0};
     auto iter2 = bitvector2.cbegin();
-    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 1, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,1,1,1));
-    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 1, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector2.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 1, 0});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
 }
 
@@ -72,11 +72,11 @@ TEST(BitvectorUtilsTest, getEntryEliasGammaOffsetTest) {
 
     pht::MiniTree miniTree1 = hst.getMiniTree(1);
     auto iter = miniTree1.microTrees.cbegin();
-    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 0, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,1,1,0,0,0,0));
+    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 0, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0}), testing::ElementsAre(1,1,1,1,0,0,0,0));
     iter = miniTree1.microTrees.cbegin();
-    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 1, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,0,1,1,0,0,1,1,1,0,0,0,0));
+    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 1, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0}), testing::ElementsAre(1,1,0,1,1,0,0,1,1,1,0,0,0,0));
     iter = miniTree1.microTrees.cbegin();
-    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 2, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator}), testing::ElementsAre(1,1,0,1,0,1,0,0));
+    EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 2, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 2, 0}), testing::ElementsAre(1,1,0,1,0,1,0,0));
 }
 
 TEST(BitvectorUtilsTest, getEntryVectorIndexTest) {
@@ -84,11 +84,11 @@ TEST(BitvectorUtilsTest, getEntryVectorIndexTest) {
     std::vector<bool> bitvector = {1,0,1,0,1,0,0,1,1,1,1,1};
     auto iter2 = bitvector.cbegin();
     auto iterFIDs = fids.cbegin();
-    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {0, 0, iterFIDs, fids.cend()});
+    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {iterFIDs, fids.cend()});
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,1,0));
-    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {0, 0, iterFIDs, fids.cend()});
+    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {iterFIDs, fids.cend()});
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {0, 0, iterFIDs, fids.cend()});
+    res = pht::Bitvector_Utils::getEntry(iter2, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {iterFIDs, fids.cend()});
     EXPECT_THAT(res, ::testing::ElementsAre(0,0));
 
 }
@@ -96,9 +96,9 @@ TEST(BitvectorUtilsTest, getEntryVectorIndexTest) {
 TEST(BitvectorUtilsTest, getEntryStaticTest) {
     std::vector<bool> bitvector = {0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     auto iter = bitvector.cbegin();
-    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 1, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::STATIC, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 1, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::STATIC, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4});
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,0,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::STATIC, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::STATIC, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4});
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,1));
 }
 
@@ -149,18 +149,18 @@ TEST(BitvectorUtilsTest, getEntyAtHuffmanTest) {
     huffmanCodes.insert({0,0,1,1,1});
     huffmanCodes.insert({1,0,1,1});
     auto iter = bitvector.cbegin();
-    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(0,1));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,0,1));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,1,1));
     auto iter2 = bitvector.cbegin();
-    res = pht::Bitvector_Utils::getEntry(iter2, 3, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    res = pht::Bitvector_Utils::getEntry(iter2, 3, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, 0, 4, huffmanCodes});
     EXPECT_THAT(res, ::testing::ElementsAre(1,1));
 }
 
@@ -184,13 +184,13 @@ TEST(BitvectorUtilsTest, getEntyCountTest) {
     huffmanCodes.insert({0,0,1,1,0});
     huffmanCodes.insert({0,0,1,1,1});
     huffmanCodes.insert({1,0,1,1});
-    uint32_t res = pht::Bitvector_Utils::getEntryCount(bitvectorEG.cbegin(),bitvectorEG.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{mult,0,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator});
+    uint32_t res = pht::Bitvector_Utils::getEntryCount(bitvectorEG.cbegin(),bitvectorEG.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator,mult,0});
     EXPECT_EQ(res, 5);
     auto iter = bitvectorTvIndex.cbegin();
-    res = pht::Bitvector_Utils::getEntryCount(bitvectorTV.cbegin(),bitvectorTV.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{0,0,iter,bitvectorTvIndex.cend()});
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorTV.cbegin(),bitvectorTV.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{iter,bitvectorTvIndex.cend()});
     EXPECT_EQ(res, 3);
-    res = pht::Bitvector_Utils::getEntryCount(bitvectorStatic.cbegin(),bitvectorStatic.cend(),pht::Bitvector_Utils::BitvectorEncoding::STATIC,{0,staticSize,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator});
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorStatic.cbegin(),bitvectorStatic.cend(),pht::Bitvector_Utils::BitvectorEncoding::STATIC,{pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator,0,staticSize});
     EXPECT_EQ(res, 5);
-    res = pht::Bitvector_Utils::getEntryCount(bitvectorHuff.cbegin(),bitvectorHuff.cend(),pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN,{0,0,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator,huffmanCodes});
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorHuff.cbegin(),bitvectorHuff.cend(),pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN,{pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator,0,0,huffmanCodes});
     EXPECT_EQ(res, 5);
 }
