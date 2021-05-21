@@ -70,6 +70,8 @@ uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterato
             return getEntryCountVectorIndex(iterator, end, information.indexStart, information.indexEnd);
         case BitvectorEncoding::STATIC:
             return getEntryCountStatic(iterator, end, information.staticSize);
+        case BitvectorEncoding::HUFFMAN:
+            return getEntryCountHuffman(iterator, end, information.huffmanTable);
         default:
             assert(false);
             return 0;
@@ -293,6 +295,24 @@ uint32_t Bitvector_Utils::getEntryCountVectorIndex(const Bitvector::const_iterat
 uint32_t Bitvector_Utils::getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size) {
     assert((end-iterator)%size == 0);
     return (end-iterator)/size;
+}
+
+uint32_t Bitvector_Utils::getEntryCountHuffman(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
+    uint32_t count = 0;
+    auto it = iterator;
+    while(it != end) {
+        for(Bitvector code : huffmanCodes) {
+            if(findBeginningMatch(it,end, code)) {
+                if(end-it < code.size()) {
+                    throw std::runtime_error("Invalid Code!");
+                }
+                it+=code.size();
+                break;
+            }
+        }
+        count++;
+    }
+    return count;
 }
 
 Bitvector::const_iterator Bitvector_Utils::nullIterator = Bitvector::const_iterator();

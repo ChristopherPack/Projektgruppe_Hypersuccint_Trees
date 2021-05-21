@@ -36,6 +36,8 @@ namespace pht {
         Bitvector miniDummyTree;
         //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
         Bitvector miniDummyIndex;
+        //Ancestor matrix for MicroTrees
+        Bitvector ancMatrix;
     };
 
     /**
@@ -119,6 +121,10 @@ namespace pht {
             return miniDummys;
         }
 
+        Bitvector getMiniAncMatrix() {
+            return miniAncMatrix;
+        }
+
         std::vector<LookupTableEntry> getLookupTable() {
             return lookupTable;
         }
@@ -186,16 +192,20 @@ namespace pht {
          */
         LookupTableEntry getLookupTableEntry(Bitvector indexV);
 
+        bool miniTreeAncMatrixComparison(uint32_t ancTree, uint32_t treeIndex2);
+
+        bool microTreeAncMatrixComparison(const MiniTree& miniTree, uint32_t ancTree, uint32_t treeIndex2);
+
         /**
          * Returns if node1 is ancestor of node2 with the given LookupTable Entry
          * Both nodes only need their index inside the MicroTree (HstNode index 2)
          *
          * @param entry The LookupTable Entry
-         * @param node1Index Index of Node 1
+         * @param anc Index of Node 1
          * @param node2Index Index of Node 2
          * @return if node1 is ancestor of node2 as bool
          */
-        bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t node1Index, uint32_t node2Index);
+        bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
 
         /**
          * Returns of given Node is ancestor of Dummy within the Node's MiniTree
@@ -204,6 +214,8 @@ namespace pht {
          * @return if Node is ancestor of MiniDummy as bool
          */
         bool isDummyAncestorWithinMiniTree(HstNode node);
+
+        bool isAncestor(HstNode node, HstNode anc);
 
     private:
         HypersuccinctTree() = default;
@@ -216,6 +228,7 @@ namespace pht {
         std::vector<bool> miniFIDs;
         std::vector<bool> miniTypeVectors;
         std::vector<bool> miniDummys;
+        std::vector<bool> miniAncMatrix;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
     };

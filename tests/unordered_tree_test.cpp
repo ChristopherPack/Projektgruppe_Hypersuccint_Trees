@@ -321,7 +321,7 @@ TEST_F(UnorderedTreeTest, GetHeightTest1) {
 
 TEST_F(UnorderedTreeTest, ContainsTest) {
     std::shared_ptr<pht::Node<char>> x = std::make_shared<pht::Node<char>>('X');
-	EXPECT_DEATH({ empty->contains(nullptr); }, "Invalid node");
+	EXPECT_FALSE(empty->contains(nullptr));
     empty->add(a);
     EXPECT_STREQ(empty->toString().c_str(), "a{}");
     EXPECT_TRUE(empty->contains(a));

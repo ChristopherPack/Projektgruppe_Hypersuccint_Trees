@@ -83,8 +83,8 @@ protected:
 };
 
 TEST_F(HypersuccinctTreeTest, TreeDataTest) {
-    EXPECT_EQ(77, treeNath->getSize());
-    EXPECT_EQ("((((((((24)23,(26)25)22)21)20,((29,30,31,32)28,(34,35)33)27)19,(37,38)36)18,(((42,43,44)41,(46,47)45,(((51,52,53)50,(55,56)54)49,(58,59)57,(61,(63,64,65,66)62,(68)67)60,(70)69)48)40)39)17,((((14,15)13)12,16)11,((((7,8)6,(10)9)5)4)3)2,((73,74)72,(76,77)75)71)1;",
+    EXPECT_EQ(78, treeNath->getSize());
+    EXPECT_EQ("((((((x,x)x,(x)x)x)x)x,(((x,x)x)x,x)x)x,(((((((x)x,(x)x)x)x)x,((x,x,x,x)x,(x,x)x)x)x,(x,x)x)x,((,(x,x,x)x,(x,x)x,(((x,x,x)x,(x,x)x)x,(x,x)x,(x,(x,x,x,x)x,(x)x)x,(x)x)x)x)x)x,((x,x)x,(x,x)x)x)x;",
               treeNath->toNewickString());
     pht::Bitvector miniSize = convertToBitvector("1100");
     pht::Bitvector microSize = convertToBitvector("100");
@@ -220,6 +220,18 @@ TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
 }
 
+TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
+    pht::MiniTree mini = hst.getMiniTree(4);
+    std::vector<bool> res = hst.getMicroTree(mini, 0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hst.getMicroTree(mini, 1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
+    res = hst.getMicroTree(mini, 2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+}
+
 TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     pht::HstNode node = {4,1,1};
     EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
@@ -247,15 +259,29 @@ TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
 }
 
-TEST_F(HypersuccinctTreeTest, getEntryHuffmanTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
-    pht::MiniTree mini = hst.getMiniTree(4);
-    std::vector<bool> res = hst.getMicroTree(mini, 0);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = hst.getMicroTree(mini, 1);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
-    res = hst.getMicroTree(mini, 2);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+TEST_F(HypersuccinctTreeTest, isAncestorTest) {
+    pht::HstNode node1 = {4,1,4};
+    pht::HstNode anc = {4,1,4};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,1};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,0,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {4,2,0};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,2,2};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,2};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {4,1,4};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
 
+    anc = {0,0,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {0,1,0};
+    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
+    anc = {0,1,3};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
+    anc = {1,1,0};
+    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
 }

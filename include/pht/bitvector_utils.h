@@ -33,10 +33,10 @@ namespace pht{
         };
 
         struct IndexingInformation {
-            uint32_t multiplier = 0;
-            uint32_t staticSize = 0;
             Bitvector::const_iterator& indexStart;
             const Bitvector::const_iterator& indexEnd = nullIterator;
+            uint32_t multiplier = 0;
+            uint32_t staticSize = 0;
             const std::set<Bitvector, HuffmanComparator>& huffmanTable = {};
         };
 
@@ -100,6 +100,8 @@ namespace pht{
         static uint32_t getEntryCountVectorIndex(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd);
 
         static uint32_t getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size);
+
+        static uint32_t getEntryCountHuffman(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes);
     };
 }
 
