@@ -6,7 +6,7 @@
 using namespace std;
 
 namespace pht {
-    class HypersuccinctTreeVisualizer {
+    class HypersuccinctTreeOutput {
 
     public:
         /**

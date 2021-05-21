@@ -16,137 +16,83 @@ namespace pht {
     typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
     /**
-     * MiniTrees consist of:
-     * a Bitvector of encoded MicroTrees
-     * a Bitvector of Fully Indexable Dictionaries for MicroTrees
-     * a Bitvector that determines specific Connections between MicroTrees
-     * a Bitvector that indicates added Dummy Nodes to MicroTrees
+     * MiniTree represents MiniTree of the HypersuccinctTree
+     * It contains all information needed to query a single MiniTree.
      */
     struct MiniTree {
+        //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         Bitvector microTrees;
+        //MicroFIDs
         Bitvector FIDs;
+        //MicroTypeVectors
         Bitvector typeVectors;
+        //MicroDummys
         Bitvector dummys;
+        //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
         Bitvector rootAncestors;
+        //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
         Bitvector dummyAncestors;
+        //If MiniTree has Dummy: Which MicroTree contains this Dummy?
         Bitvector miniDummyTree;
+        //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
         Bitvector miniDummyIndex;
     };
 
     /**
-     * MicroTreeData is a table of generic MicroTree structures, indexed by the structures' Balanced Parenthesis form.
-     * The table contains a lot of information about these structures:
-     * a Bitvector that contains the balanced parenthesis form if Huffman coding is used
-     * TODO: a Bitvector that indicates if a MicroTree contains a MiniTree Dummy and its position
-     * TODO: check Struct for optimisation
+     * LookupTableEntry represents a single Entry of the Hypersuccinct Tree's Lookp Table.
+     * It is indexed by the MicroTrees Balanced Parenthesis form (if no encoding is chosen) or by their Huffman code (if Huffman encoding is chosen)
+     * It contains all fields necessary to satisfy the query's need for structural information
      */
-    struct MicroTreeData {
+    struct LookupTableEntry {
+        //Index of the LookupTableEntry
         Bitvector index;
-
+        //BP of the Entry. Empty if index is BP
         Bitvector bp;
-
+        //Ancestor matrix
         Bitvector matrix;
 
-        MicroTreeData(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
-        MicroTreeData(const Bitvector& index,const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
-        bool operator==(const MicroTreeData& mtd) const {
+        //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
+        LookupTableEntry(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
+        //TODO: Extend construcor as more fields are added!
+        LookupTableEntry(const Bitvector& index, const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
+        bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
         }
     };
 
 
     /**
-     * This class is supposed to represent the full hypersuccinct code for any given tree
+     * This class represents the full hypersuccinct code for any given tree, created by HypersuccinctTreeFactory
+     * as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro.
+     * All code is represented as Bitvectors
+     * It can be encoded with huffman encoding for MicroTrees
+     *
      * It contains:
-     * A List of MiniTrees which contain information about their contained MicroTrees.
-     * Bitvectors to represent interconnections between MiniTrees
-     * A lookup table for information regarding specific MicroTree structures.
-     * It implements:
-     * Get Functions Only!! No modifying functions!!!
+     * The FarzanMunro Algorithm Sizes of MiniTrees and MicroTrees
+     * The MiniTrees as a vector of MiniTree
+     * The MiniTree FIDs, TypeVectors, and Dummys
+     * The LookupTable as a vector of LookUpTableEntry
      *
-     * todo: All Get functions will need restructuring if MiniTrees become full bitvectors
-     *
-     * todo: queries
+     * This class implements:
+     * Get functions for all Bitvectors
+     * Queries as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro
      */
     class HypersuccinctTree {
         friend class HypersuccinctTreeFactory;
     public:
 
         /**
-         * Returns the MicroTree representation from the MicroTree Bitvector at the given index
-         * TODO: Need handling for huffman encoding!!!
+         * Returns the MiniTree at the given index
          *
-         * @param bitvector the MicroTree bitvector
-         * @param index the index as integer
-         * @return the MicroTree in Balanced Parenthesis form as bitvector
-         */
-        Bitvector getMicroTree(MiniTree& miniTree,uint32_t index) {
-            if(huffmanFlag) {
-                auto iterD = miniTree.microTrees.cbegin();
-                std::set<Bitvector, Bitvector_Utils::HuffmanComparator> huffmanCodes;
-                for(MicroTreeData& microTreeData : lookupTable) {
-                    huffmanCodes.insert(microTreeData.index);
-                }
-                Bitvector indexH = Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(), Bitvector_Utils::BitvectorEncoding::HUFFMAN, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, huffmanCodes});
-                return std::find_if(lookupTable.begin(),lookupTable.end(), [&indexH](const MicroTreeData& microTreeData){ return microTreeData.index == indexH;})->bp;
-            }
-            else {
-                auto iterD = miniTree.microTrees.cbegin();
-                return Bitvector_Utils::getEntry(iterD, index, miniTree.microTrees.cend(),
-                                                 Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,
-                                                 {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
-            }
-        }
-
-        /**
-         * Returns the MicroTree FID representation from the FID Bitvector at the given index
-         *
-         * @param bitvector the FID bitvector
-         * @param index the index as integer
-         * @return the FID as bitvector
-         */
-        Bitvector getMicroFID(MiniTree& miniTree,uint32_t index) {
-            auto iterD = miniTree.FIDs.cbegin();
-            return Bitvector_Utils::getEntry(iterD, index, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {1, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
-        }
-
-        /**
-         * Returns the MicroTree Typevector representation from the Typevector Bitvector at the given index
-         *
-         * @param bitvector the Typevector bitvector
-         * @param fids the FID bitvector
-         * @param index the index as integer
-         * @return the Typevector as bitvector
-         */
-        Bitvector getMicroTypeVector(MiniTree& miniTree , uint32_t index) {
-            auto iterD = miniTree.typeVectors.cbegin();
-            auto iterF = miniTree.FIDs.cbegin();
-            return Bitvector_Utils::getEntry(iterD, index, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, {2, 0, iterF, miniTree.FIDs.cend()});
-        }
-
-        /**
-         * Returns the Dummy Node representation from the Dummy Bitvector at the given index
-         *
-         * @param bitvector the Dummy bitvector
-         * @param index the index as integer
-         * @return the Dummy is bitvector
-         */
-        Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index) {
-            auto iter = microSize.cbegin();
-            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
-            uint32_t dummySize = floor(log2(2*size+1))+1;
-            auto iterD = miniTree.dummys.cbegin();
-            return Bitvector_Utils::getEntry(iterD, index, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
-        }
-
-
-        /**
-         * returns the MiniTree at the given index
-         * @param index the index as integer
+         * @param index The Index of the MiniTree as integer
          * @return MiniTree as MiniTree
          */
         MiniTree getMiniTree(uint32_t index ) {
             return miniTrees.at(index);
+        }
+
+        bool isHuffman() {
+            return huffmanFlag;
         }
 
         Bitvector getMicroSize() {
@@ -173,65 +119,90 @@ namespace pht {
             return miniDummys;
         }
 
-        bool isHuffman() {
-            return huffmanFlag;
-        }
-
-        /**
-         * todo: tests
-         * @param index
-         * @return
-         */
-        Bitvector getMiniDummy(uint32_t index) {
-            auto iter = miniSize.cbegin();
-            uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
-            uint32_t dummySize = floor(log2(2*size+1))+1;
-            auto iterD = miniDummys.cbegin();
-            return Bitvector_Utils::getEntry(iterD, index, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, dummySize, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
-        }
-
-        /**
-         * @param index
-         * @return
-         */
-        MicroTreeData getLookupTableEntry(uint32_t index) {
-            return lookupTable.at(index);
-        }
-
-        MicroTreeData getLookupTableEntry(Bitvector indexV) {
-            if(huffmanFlag) {
-                auto iter = std::find_if(lookupTable.begin(), lookupTable.end(),[&indexV](const MicroTreeData &microTreeData) {return microTreeData.bp == indexV;});
-                if (iter == lookupTable.end()) {
-
-                }
-                return *iter;
-            } else {
-                auto iter = std::find_if(lookupTable.begin(), lookupTable.end(),[&indexV](const MicroTreeData &microTreeData) {return microTreeData.index == indexV;});
-                if (iter == lookupTable.end()) {
-
-                }
-                return *iter;
-            }
-        }
-
-        /**
-         * Is node1Index ancestor of node2Index
-         * @param entry
-         * @param node1Index
-         * @param node2Index
-         * @return
-         */
-        bool lookupTableMatrixComparison(const MicroTreeData& entry,uint32_t node1Index, uint32_t node2Index) {
-            auto iter = entry.matrix.cbegin();
-            uint32_t size = sqrt(entry.matrix.size());
-            Bitvector segment = Bitvector_Utils::getEntry(iter, node1Index, entry.matrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {0, size, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
-            return segment.at(node2Index);
-        }
-
-        std::vector<MicroTreeData> getLookupTable() {
+        std::vector<LookupTableEntry> getLookupTable() {
             return lookupTable;
         }
 
+        /**
+         * Returns the MicroTree Entry of the given MiniTree at the given MicroTree Index
+         * Always returns Balanced parenthesis form of the MicroTree, regardless of encoding (Huffman or not)
+         *
+         * @param miniTree The MiniTree of the MicroTree
+         * @param index The index of the MicroTree as int
+         * @return the MicroTree in Balanced Parenthesis form as bitvector
+         */
+        Bitvector getMicroTree(MiniTree& miniTree,uint32_t index);
+
+        /**
+         * Returns the MicroFID Entry of the given MiniTree at the given MicroTree Index
+         *
+         * @param miniTree The MiniTree of the MicroFID
+         * @param index The index of the MicroTree as int
+         * @return the FID Entry as bitvector
+         */
+        Bitvector getMicroFID(MiniTree& miniTree,uint32_t index);
+
+        /**
+         * Returns the TypeVector Entry of the given MiniTree at the given MicroTree Index
+         *
+         * @param miniTree The MiniTree of the TypeVector
+         * @param index The index of the MicroTree es int
+         * @return the Typevector Entry as bitvector
+         */
+        Bitvector getMicroTypeVector(MiniTree& miniTree , uint32_t index);
+
+        /**
+         * Returns the MicroDummy Entry from the perspective of the MicroTree
+         *
+         * @param miniTree The MiniTree of the Dummy
+         * @param index The index of the MicroTree as int
+         * @return the Dummy Entry as bitvector
+         */
+        Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index);
+
+        /**
+         * Returns the MiniDummy Entry from the perspective of the MiniTree
+         *
+         * @param index The index of the MiniTree as int
+         * @return The Dummy Entry as bitvector
+         */
+        Bitvector getMiniDummy(uint32_t index);
+
+        /**
+         * Returns the LookupTable Entry at the given index
+         *
+         * @param index The index as int
+         * @return LookupTable Entry as LookupTableEntry
+         */
+        LookupTableEntry getLookupTableEntry(uint32_t index) {
+            return lookupTable.at(index);
+        }
+
+        /**
+         * Returns the LookupTable Entry of the given MicroTree
+         *
+         * @param indexV The MicroTree as bitvector from a miniTree
+         * @return LookupTable Entry of the MicroTree as LookupTableEntry
+         */
+        LookupTableEntry getLookupTableEntry(Bitvector indexV);
+
+        /**
+         * Returns if node1 is ancestor of node2 with the given LookupTable Entry
+         * Both nodes only need their index inside the MicroTree (HstNode index 2)
+         *
+         * @param entry The LookupTable Entry
+         * @param node1Index Index of Node 1
+         * @param node2Index Index of Node 2
+         * @return if node1 is ancestor of node2 as bool
+         */
+        bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t node1Index, uint32_t node2Index);
+
+        /**
+         * Returns of given Node is ancestor of Dummy within the Node's MiniTree
+         *
+         * @param node The Node as HstNode
+         * @return if Node is ancestor of MiniDummy as bool
+         */
         bool isDummyAncestorWithinMiniTree(HstNode node);
 
     private:
@@ -246,7 +217,7 @@ namespace pht {
         std::vector<bool> miniTypeVectors;
         std::vector<bool> miniDummys;
         //LookupTable
-        std::vector<MicroTreeData> lookupTable;
+        std::vector<LookupTableEntry> lookupTable;
     };
 }
 
