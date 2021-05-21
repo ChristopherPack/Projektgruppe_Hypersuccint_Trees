@@ -293,10 +293,10 @@ namespace pht {
             for(MiniTree& x : tree.miniTrees) {
                 std::vector<bool> oldEncodedMicros = x.microTrees;
                 x.microTrees.clear();
-                uint32_t entryCount = Bitvector_Utils::getEntryCount(oldEncodedMicros.cbegin(), oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+                uint32_t entryCount = Bitvector_Utils::getEntryCount(oldEncodedMicros.cbegin(), oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 2, 0});
                 for(uint32_t i = 0; i < entryCount; i++) {
                     auto iter = oldEncodedMicros.cbegin();
-                    std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+                    std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 2, 0});
                     ListUtils::combine(x.microTrees, huffmanTable.at(bp));
                 }
                 HypersuccinctTreeOutput::printBitvector(x.microTrees);

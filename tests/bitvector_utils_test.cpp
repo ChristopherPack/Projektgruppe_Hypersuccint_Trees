@@ -133,3 +133,64 @@ TEST(BitvectorUtilsTest, findMatchesTest) {
     //matches should be at: 2,7,10,19,23
     std::vector<std::pair<pht::Bitvector::const_iterator,pht::Bitvector::const_iterator>> res = pht::Bitvector_Utils::findMatches(bitvector.cbegin(),bitvector.cend(),pattern);
 }
+
+TEST(BitvectorUtilsTest, getEntyAtHuffmanTest) {
+    pht::Bitvector bitvector = {0,1,1,0,0,0,0,1,0,1,1,1,0,0,1,1,1};
+    std::set<pht::Bitvector, pht::Bitvector_Utils::HuffmanComparator> huffmanCodes;
+    huffmanCodes.insert({0,1});
+    huffmanCodes.insert({0,0,1,0,1});
+    huffmanCodes.insert({0,0,0,1});
+    huffmanCodes.insert({0,0,0,0});
+    huffmanCodes.insert({1,0,1,0});
+    huffmanCodes.insert({1,0,0});
+    huffmanCodes.insert({0,0,1,0,0});
+    huffmanCodes.insert({1,1});
+    huffmanCodes.insert({0,0,1,1,0});
+    huffmanCodes.insert({0,0,1,1,1});
+    huffmanCodes.insert({1,0,1,1});
+    auto iter = bitvector.cbegin();
+    std::vector<bool> res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(0,1));
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,0,1));
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = pht::Bitvector_Utils::getEntry(iter, 0, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(0,0,1,1,1));
+    auto iter2 = bitvector.cbegin();
+    res = pht::Bitvector_Utils::getEntry(iter2, 3, bitvector.cend(), pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN, {0, 4, pht::Bitvector_Utils::nullIterator, pht::Bitvector_Utils::nullIterator, huffmanCodes});
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+}
+
+TEST(BitvectorUtilsTest, getEntyCountTest) {
+    pht::Bitvector bitvectorEG = {1,1,0,0,1,1,1,1,1,0,0,0,0,1,0,1,1,0,0,0,0,1,0,0,1,1,1,0,1,0,0,0,0,0,1,1,0,1,1,1,0,1,0,0,1,1,0,0,0};
+    pht::Bitvector bitvectorTV = {0,0,1,0,1,1,1};
+    pht::Bitvector bitvectorStatic = {0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    pht::Bitvector bitvectorHuff = {0,1,1,0,0,0,0,1,0,1,1,1,0,0,1,1,1};
+    uint32_t mult = 2;
+    pht::Bitvector bitvectorTvIndex = {0,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,0,1,0};
+    uint32_t staticSize = bitvectorStatic.size()/5;
+    std::set<pht::Bitvector, pht::Bitvector_Utils::HuffmanComparator> huffmanCodes;
+    huffmanCodes.insert({0,1});
+    huffmanCodes.insert({0,0,1,0,1});
+    huffmanCodes.insert({0,0,0,1});
+    huffmanCodes.insert({0,0,0,0});
+    huffmanCodes.insert({1,0,1,0});
+    huffmanCodes.insert({1,0,0});
+    huffmanCodes.insert({0,0,1,0,0});
+    huffmanCodes.insert({1,1});
+    huffmanCodes.insert({0,0,1,1,0});
+    huffmanCodes.insert({0,0,1,1,1});
+    huffmanCodes.insert({1,0,1,1});
+    uint32_t res = pht::Bitvector_Utils::getEntryCount(bitvectorEG.cbegin(),bitvectorEG.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{mult,0,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator});
+    EXPECT_EQ(res, 5);
+    auto iter = bitvectorTvIndex.cbegin();
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorTV.cbegin(),bitvectorTV.cend(),pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{0,0,iter,bitvectorTvIndex.cend()});
+    EXPECT_EQ(res, 3);
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorStatic.cbegin(),bitvectorStatic.cend(),pht::Bitvector_Utils::BitvectorEncoding::STATIC,{0,staticSize,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator});
+    EXPECT_EQ(res, 5);
+    res = pht::Bitvector_Utils::getEntryCount(bitvectorHuff.cbegin(),bitvectorHuff.cend(),pht::Bitvector_Utils::BitvectorEncoding::HUFFMAN,{0,0,pht::Bitvector_Utils::nullIterator,pht::Bitvector_Utils::nullIterator,huffmanCodes});
+    EXPECT_EQ(res, 5);
+}

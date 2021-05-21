@@ -13,7 +13,7 @@
 
 class HypersuccinctTreeTest : public ::testing::Test {
 protected:
-    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath  = pht::XMLReader::readByName("treeNath.xml");
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath  = pht::XMLReader::readByName("treeAlex.xml");
     pht::HypersuccinctTree hyperNath = pht::HypersuccinctTreeFactory::create(treeNath);
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();
     std::shared_ptr<pht::Node<char>> a = std::make_shared<pht::Node<char>>('a');
@@ -83,8 +83,8 @@ protected:
 };
 
 TEST_F(HypersuccinctTreeTest, TreeDataTest) {
-    EXPECT_EQ(77, treeNath->getSize());
-    EXPECT_EQ("((((((((24)23,(26)25)22)21)20,((29,30,31,32)28,(34,35)33)27)19,(37,38)36)18,(((42,43,44)41,(46,47)45,(((51,52,53)50,(55,56)54)49,(58,59)57,(61,(63,64,65,66)62,(68)67)60,(70)69)48)40)39)17,((((14,15)13)12,16)11,((((7,8)6,(10)9)5)4)3)2,((73,74)72,(76,77)75)71)1;",
+    EXPECT_EQ(78, treeNath->getSize());
+    EXPECT_EQ("((((((x,x)x,(x)x)x)x)x,(((x,x)x)x,x)x)x,(((((((x)x,(x)x)x)x)x,((x,x,x,x)x,(x,x)x)x)x,(x,x)x)x,((,(x,x,x)x,(x,x)x,(((x,x,x)x,(x,x)x)x,(x,x)x,(x,(x,x,x,x)x,(x)x)x,(x)x)x)x)x)x,((x,x)x,(x,x)x)x)x;",
               treeNath->toNewickString());
     pht::Bitvector miniSize = convertToBitvector("1100");
     pht::Bitvector microSize = convertToBitvector("100");
@@ -247,7 +247,7 @@ TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
 }
 
-TEST_F(HypersuccinctTreeTest, getEntryHuffmanTest) {
+TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
     pht::MiniTree mini = hst.getMiniTree(4);
