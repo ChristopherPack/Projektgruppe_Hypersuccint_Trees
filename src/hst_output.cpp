@@ -24,11 +24,13 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
 
     cout << "Amount of MiniTrees: " << tree.getMiniTrees().size() << endl;
     cout << "MiniFIDs:  ";
-    printBitvector(tree.getMiniFIDs());
+    cout << splitFIDs(tree.getMiniFIDs(), "  ") << endl;
     cout << "MiniTypeVectors:  ";
     printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
     printBitvector(tree.getMiniDummys());
+    cout << "MiniAncMatrix:  ";
+    printBitvector(tree.getMiniAncMatrix());
 
     pht::MiniTree miniTree = tree.getMiniTree(0);
     for(int index = 0 ; index < tree.getMiniTrees().size(); index++) {
@@ -48,6 +50,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).miniDummyTree);
         cout << "MiniDummyIndex:  ";
         printBitvector(tree.getMiniTree(index).miniDummyIndex);
+        cout << "AncMatrix:  ";
+        printBitvector(tree.getMiniTree(index).ancMatrix);
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
         cout << "LookupTableIndex:   ";

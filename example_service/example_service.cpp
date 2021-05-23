@@ -39,7 +39,7 @@ int main() {
     uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
     #endif
 
-    /*std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
+    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
 
     std::cout << "WARNING: OUTPUT WITHOUT INTERCONNECTIONS" << std::endl;
 
@@ -49,7 +49,7 @@ int main() {
 
         std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
         std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
-        std::cout << "Nodes of MiniTree: " << *fmMiniTree << "\n";
+        std::cout << "Nodes of MiniTree: " << fmMiniTree->toNewickString() << "\n";
 
         std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
 
@@ -58,10 +58,10 @@ int main() {
         for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
             std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
             std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
-            std::cout << "Nodes of MicroTree: " << *fmMicroTree << "\n";
+            std::cout << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << "\n";
         }
         std::cout << std::endl;
-    }*/
+    }
 
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();

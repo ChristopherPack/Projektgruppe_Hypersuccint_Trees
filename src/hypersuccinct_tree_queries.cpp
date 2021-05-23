@@ -10,7 +10,9 @@ using namespace pht;
 bool HypersuccinctTree::isDummyAncestorWithinMiniTree(HstNode node) {
     //assert(std::get<1>(node) <= Bitvector_Utils::getEntryCount(miniTrees.at(std::get<0>(node)).microTrees.cbegin(),miniTrees.at(std::get<0>(node)).microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator}));
     MiniTree mini = getMiniTree(std::get<0>(node));
-    assert(!mini.rootAncestors.empty());
+    if(mini.rootAncestors.empty()) {
+        return false;
+    }
     HstNode dummy = {std::get<0>(node), Bitvector_Utils::decodeNumber(mini.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) , Bitvector_Utils::decodeNumber(mini.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY)};
     Bitvector micro = getMicroTree(mini,std::get<1>(dummy));
     assert(std::get<2>(dummy) <= (getMicroTree(mini, std::get<1>(dummy)).size()/2));
@@ -36,4 +38,45 @@ bool HypersuccinctTree::isDummyAncestorWithinMiniTree(HstNode node) {
         return false;
     }
     return false;
+}
+
+bool HypersuccinctTree::isAncestor(HstNode node, HstNode anc) {
+    if(std::get<0>(node) == std::get<0>(anc))
+    {
+        if(std::get<1>(node)==std::get<1>(anc)) {
+            MiniTree mini = getMiniTree(std::get<0>(anc));
+            Bitvector index = getMicroTree(mini,std::get<1>(anc));
+            return lookupTableMatrixComparison(getLookupTableEntry(index), std::get<2>(anc),std::get<2>(node));
+        }
+        else
+        {
+            if(std::get<1>(node) < std::get<1>(anc)) {
+                return false;
+            }
+            MiniTree mini = getMiniTree(std::get<0>(anc));
+            uint32_t ancMicroDummy = Bitvector_Utils::decodeNumber(getMicroDummys(mini, std::get<1>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
+            if(std::get<2>(anc) != 0 && ancMicroDummy == 0) {
+                return false;
+            }
+            Bitvector index = getMicroTree(mini,std::get<1>(anc));
+            if(!lookupTableMatrixComparison(getLookupTableEntry(index), ancMicroDummy,std::get<2>(anc))) {
+                return false;
+            }
+            return microTreeAncMatrixComparison(mini, std::get<1>(anc), std::get<1>(node));
+        }
+    }
+    else
+    {
+        if(std::get<0>(node) < std::get<0>(anc)) {
+            return false;
+        }
+        uint32_t ancMiniDummy = Bitvector_Utils::decodeNumber(getMiniDummy(std::get<0>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
+        if(std::get<2>(anc) != 0 && ancMiniDummy == 0) {
+                return false;
+        }
+        if(!isDummyAncestorWithinMiniTree(anc) && ancMiniDummy != 0) {
+            return false;
+        }
+        return miniTreeAncMatrixComparison(std::get<0>(anc),std::get<0>(node));
+    }
 }

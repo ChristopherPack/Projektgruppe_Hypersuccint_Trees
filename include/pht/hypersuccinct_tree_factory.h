@@ -59,10 +59,13 @@ namespace pht {
             hypersuccinctTree.miniDummys = miniDummys;
 
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
+            std::vector<std::shared_ptr<pht::Node<T>>> orderedMinis;
 
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
+
+                orderedMinis.push_back(fmMiniTree->getRoot());
 
                 if(fmMiniTree->hasDummy()) {
                     for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
@@ -104,7 +107,12 @@ namespace pht {
                     }
                 }
 
+                std::vector<std::shared_ptr<pht::Node<T>>> orderedMicros;
+
                 for(std::shared_ptr<pht::UnorderedTree<T>> fmMicroTree : fmMicroTrees) {
+
+                    orderedMicros.push_back(fmMicroTree->getRoot());
+
                     Bitvector bp = fmMicroTree->toBalancedParenthesis();
                     if(huffman) {
                         hypersuccinctTree.huffmanFlag = true;
@@ -129,8 +137,22 @@ namespace pht {
                     }
                 }
 
+                ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedMicros, [&fmMiniTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMiniTree->enumerate(a) < fmMiniTree->enumerate(b); });
+                for(std::shared_ptr<pht::Node<T>> node1 : orderedMicros) {
+                    for(std::shared_ptr<pht::Node<T>> node2 : orderedMicros) {
+                        miniTree.ancMatrix.push_back(fmMiniTree->isAncestor(node2, node1));
+                    }
+                }
+
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
+            }
+
+            ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedMinis, [&tree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return tree->enumerate(a) < tree->enumerate(b); });
+            for(std::shared_ptr<pht::Node<T>> node1 : orderedMinis) {
+                for(std::shared_ptr<pht::Node<T>> node2 : orderedMinis) {
+                    hypersuccinctTree.miniAncMatrix.push_back(tree->isAncestor(node2, node1));
+                }
             }
 
             if(huffman) {
@@ -293,10 +315,10 @@ namespace pht {
             for(MiniTree& x : tree.miniTrees) {
                 std::vector<bool> oldEncodedMicros = x.microTrees;
                 x.microTrees.clear();
-                uint32_t entryCount = Bitvector_Utils::getEntryCount(oldEncodedMicros.cbegin(), oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+                uint32_t entryCount = Bitvector_Utils::getEntryCount(oldEncodedMicros.cbegin(), oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 2, 0});
                 for(uint32_t i = 0; i < entryCount; i++) {
                     auto iter = oldEncodedMicros.cbegin();
-                    std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator});
+                    std::vector<bool> bp = Bitvector_Utils::getEntry(iter, i, oldEncodedMicros.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 2, 0});
                     ListUtils::combine(x.microTrees, huffmanTable.at(bp));
                 }
                 HypersuccinctTreeOutput::printBitvector(x.microTrees);
