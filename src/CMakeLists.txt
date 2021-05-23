@@ -1,9 +1,11 @@
 set(PHT_LIB_SOURCES
-   xml_reader.cpp
-   hst_output.cpp
-        hypersuccinct_tree.cpp
-        bitvector_utils.cpp
-        hypersuccinct_tree_queries.cpp
+    xml_reader.cpp
+    hst_output.cpp
+    hypersuccinct_tree.cpp
+    bitvector_utils.cpp
+    hypersuccinct_tree_queries.cpp
+    logger.cpp
+    timer.cpp
 )
 list(TRANSFORM PHT_LIB_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_library(pht_lib STATIC)
