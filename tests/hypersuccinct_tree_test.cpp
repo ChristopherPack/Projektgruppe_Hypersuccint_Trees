@@ -285,3 +285,22 @@ TEST_F(HypersuccinctTreeTest, isAncestorTest) {
     anc = {1,1,0};
     EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
 }
+
+TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
+    std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getFIDforMiniTree(1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hyperNath.getFIDforMiniTree(2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getFIDforMiniTree(3);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getFIDforMiniTree(4);
+    EXPECT_THAT(res, ::testing::ElementsAre(1));
+    res = hyperNath.getFIDforMiniTree(5);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hyperNath.getFIDforMiniTree(6);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+    res = hyperNath.getFIDforMiniTree(7);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+}

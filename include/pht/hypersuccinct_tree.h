@@ -217,9 +217,18 @@ namespace pht {
 
         bool isAncestor(HstNode node, HstNode anc);
 
+        HstNode levelAncestor(uint32_t level, HstNode node);
+
+        Bitvector getFIDforMiniTree(uint32_t treeNum);
+
+        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
+
+        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
+
     private:
         HypersuccinctTree() = default;
         bool huffmanFlag;
+        std::vector<bool> size;
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;

@@ -80,3 +80,25 @@ bool HypersuccinctTree::isAncestor(HstNode node, HstNode anc) {
         return miniTreeAncMatrixComparison(std::get<0>(anc),std::get<0>(node));
     }
 }
+
+HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
+    if(std::get<2>(node) > 0) {
+        //depth via lookputable
+        uint32_t depth = 0;
+        if(level <= depth) {
+            //ancestormatrix oder so
+            return {std::get<0>(node),std::get<1>(node),0};
+        }
+        return levelAncestor(level-depth, {std::get<0>(node),std::get<1>(node),0});
+    }
+    if(std::get<1>(node) > 0) {
+        uint32_t delta = ceil(sqrt(log2(Bitvector_Utils::decodeNumber(this->size, Bitvector_Utils::NumberEncoding::BINARY))));
+        uint32_t depth = 0; //depth of MicroTree in MiniTree
+        if(level > depth) {
+            return levelAncestor(level-depth, {std::get<0>(node),0,0});
+        }
+        //???
+    }
+    //uint32_t delta =
+    return {};
+}

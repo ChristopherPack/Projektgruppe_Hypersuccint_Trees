@@ -31,37 +31,6 @@ int main() {
     std::cout << std::endl;
     std::cout << tree->toNewickString() << std::endl;*/
 
-    #ifdef PHT_TEST
-    uint32_t sizeMini = 12;
-    uint32_t sizeMicro = 4;
-    #else
-    uint32_t sizeMini = ceil(pow(log2(tree->getSize()), 2.0));
-    uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
-    #endif
-
-    std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
-
-    /*std::cout << "WARNING: OUTPUT WITHOUT INTERCONNECTIONS" << std::endl;
-
-    std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
-
-    for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMiniTree : fmMiniTrees) {
-
-        std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
-        std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
-        std::cout << "Nodes of MiniTree: " << fmMiniTree->toNewickString() << "\n";
-
-        std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMicroTrees = pht::FarzanMunro<std::string>::decompose(fmMiniTree, sizeMicro);
-
-        std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
-
-        for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
-            std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
-            std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
-            std::cout << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << "\n";
-        }
-        std::cout << std::endl;
-    }*/
 
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();

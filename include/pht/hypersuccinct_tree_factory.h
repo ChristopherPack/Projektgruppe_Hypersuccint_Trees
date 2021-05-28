@@ -39,6 +39,7 @@ namespace pht {
             uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
             #endif
 
+            pht::Bitvector_Utils::encodeNumber(std::inserter(hypersuccinctTree.size,hypersuccinctTree.size.begin()),tree->getSize(),Bitvector_Utils::NumberEncoding::BINARY);
             pht::Bitvector_Utils::encodeNumber(std::inserter(hypersuccinctTree.miniSize, hypersuccinctTree.miniSize.begin()), sizeMini,Bitvector_Utils::NumberEncoding::BINARY);
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMiniTrees = pht::FarzanMunro<T>::decompose(tree, sizeMini);
 
@@ -363,6 +364,11 @@ namespace pht {
             //FIDs und TypeVectors
             for(std::shared_ptr<pht::Node<T>> rootNode : distinctRootNodes) {
                 std::vector<std::shared_ptr<pht::Node<T>>> children = baseTree->getDirectDescendants(rootNode);
+                /*std::vector<std::pair<uint32_t,std::shared_ptr<pht::Node<T>>>> enumResult;
+                enumResult = ListUtils::mapped<std::shared_ptr<pht::Node<T>>, std::pair<uint32_t,std::shared_ptr<pht::Node<T>>>>(children, [&baseTree](std::shared_ptr<pht::Node<T>> node){return std::pair<uint32_t,std::shared_ptr<pht::Node<T>>>(baseTree->enumerate(node),node);});
+                ListUtils::sort<std::pair<uint32_t,std::shared_ptr<pht::Node<T>>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::Node<T>>> nodeA, std::pair<uint32_t,std::shared_ptr<pht::Node<T>>> nodeB){return nodeA.first<nodeB.first;});
+                children.clear();
+                children = ListUtils::mapped<std::pair<uint32_t,std::shared_ptr<pht::Node<T>>>, std::shared_ptr<pht::Node<T>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::Node<T>>> nodeB){return nodeB.second;});*/
                 pht::Bitvector_Utils::encodeNumber(std::inserter(FIDs, FIDs.end()), children.size(),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 for(std::shared_ptr<pht::Node<T>> node : children) {
                     if(ListUtils::containsAny(rootNodes,{node})) {
