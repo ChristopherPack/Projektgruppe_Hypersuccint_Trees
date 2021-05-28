@@ -7,6 +7,8 @@
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 
+#include "pht/logger.h"
+
 using namespace pht;
 
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
@@ -14,10 +16,15 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-
-    std::cout << "Reading File... \n";
+    pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
+    pht::Logger::setStdOutEnabled(false);
+    PHT_LOGGER_INFO("MAIN", "Executing example service");
+    pht::Timer globalTimer;
+    PHT_LOGGER_INFO("MAIN", "Reading File...");
+    pht::Timer localTimer;
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath");
-    std::cout << "File Read. \n\n";
+    localTimer.stop();
+    PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
 
     //Couts are necessary like this
     /*std::cout << "Original tree:\n" << *tree << "\n\n";
@@ -56,18 +63,27 @@ int main() {
         std::cout << std::endl;
     }
 
+    PHT_LOGGER_INFO("MAIN", "Creating HST...");
+    localTimer.start();
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);
+    localTimer.stop();
+    PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
+    PHT_LOGGER_INFO("MAIN", "Saving tree to file...");
+    localTimer.start();
     HypersuccinctTreeOutput::writeToFile(hst);
+    localTimer.stop();
+    PHT_LOGGER_INFO("MAIN", std::string("Tree saved in ")+localTimer.toString());
 
-    std::cout << "Original Tree data:" << std::endl;
+    PHT_LOGGER_DEBUG("MAIN", "Printing original Tree data:");
     std::cout << tree->getSize() << std::endl;
     std::cout << tree->toNewickString() << std::endl;
-
     HypersuccinctTreeOutput::printTree(hst);
     pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
     std::cout << std::endl << "FileTree:" << std::endl;
     HypersuccinctTreeOutput::printTree(fileHst);
 
+    globalTimer.stop();
+    PHT_LOGGER_INFO("MAIN", std::string("Example service executed in ")+globalTimer.toString());
     return 0;
 }
 
