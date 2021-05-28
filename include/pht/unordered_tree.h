@@ -97,6 +97,26 @@ namespace pht {
             }
         }
 
+        void insertBetween(const std::shared_ptr<pht::Node<T>> node, const std::shared_ptr<pht::Node<T>> child, const std::shared_ptr<pht::Node<T>> ancestor) {
+            ASSERT(node, "Invalid node");
+            ASSERT(ancestor, "Invalid ancestor");
+            ASSERT(std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
+            ASSERT(std::find(nodes.begin(), nodes.end(), child) != nodes.end(), "Child not found");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
+            ASSERT(std::find(descendants.at(ancestor).begin(), descendants.at(ancestor).end(), child) != descendants.at(ancestor).end(), "Ancestor - child mismatch");
+
+            refreshEnumerate = true;
+            nodes.push_back(node);
+            descendants.insert({node, {child}});
+            if(child == nullptr) {
+                add(node, ancestor);
+            } else {
+                ancestors.insert({node, ancestor});
+                ancestors.at(child) = node;
+                std::replace(descendants.at(ancestor).begin(), descendants.at(ancestor).end(), child, node);
+            }
+        }
+
         /**
          * Adds a subtree to the tree. 
          * 

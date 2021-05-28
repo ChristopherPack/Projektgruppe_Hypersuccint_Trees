@@ -17,7 +17,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 int main() {
     pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
-    pht::Logger::setStdOutEnabled(false);
+    pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");
     pht::Timer globalTimer;
     PHT_LOGGER_INFO("MAIN", "Reading File...");
@@ -41,7 +41,7 @@ int main() {
 
     std::vector<std::shared_ptr<pht::UnorderedTree<std::string>>> fmMiniTrees = pht::FarzanMunro<std::string>::decompose(tree, sizeMini);
 
-    std::cout << "WARNING: OUTPUT WITHOUT INTERCONNECTIONS" << std::endl;
+    /*std::cout << "WARNING: OUTPUT WITHOUT INTERCONNECTIONS" << std::endl;
 
     std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
@@ -61,7 +61,7 @@ int main() {
             std::cout << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << "\n";
         }
         std::cout << std::endl;
-    }
+    }*/
 
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();

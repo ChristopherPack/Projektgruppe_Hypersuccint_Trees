@@ -61,6 +61,9 @@ namespace pht {
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
             std::vector<std::shared_ptr<pht::Node<T>>> orderedMinis;
 
+            std::cout << "Output of Factory:  " << fmMiniTrees.size() << "\n";
+            std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
+
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
@@ -146,6 +149,19 @@ namespace pht {
 
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
                 hypersuccinctTree.miniTrees.push_back(miniTree);
+
+                std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
+                std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
+                std::cout << "Nodes of MiniTree: " << fmMiniTree->toNewickString() << "\n";
+
+                std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
+
+                for(std::shared_ptr<pht::UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
+                    std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
+                    std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
+                    std::cout << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << "\n";
+                }
+                std::cout << std::endl;
             }
 
             ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedMinis, [&tree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return tree->enumerate(a) < tree->enumerate(b); });
@@ -392,7 +408,7 @@ namespace pht {
                                 //Index für Tree order
                                 fmMicroTree->insert(dummyNode, ind, node);
                                 fmMicroTree->setDummy(dummyNode);
-                                baseTree->insert(dummyNode, ind, node);
+                                baseTree->insertBetween(dummyNode, children.at(ind), node);
                                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                                 Bitvector num;
                                 pht::Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), fmMicroTree->enumerate(dummyNode),Bitvector_Utils::NumberEncoding::BINARY);
