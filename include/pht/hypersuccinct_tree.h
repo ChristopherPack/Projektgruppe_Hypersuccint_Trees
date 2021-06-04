@@ -215,15 +215,27 @@ namespace pht {
          */
         bool isDummyAncestorWithinMiniTree(HstNode node);
 
+        /**
+         * TODO: Most likely unnecessary
+         * @param node
+         * @param anc
+         * @return
+         */
         bool isAncestor(HstNode node, HstNode anc);
 
         HstNode levelAncestor(uint32_t level, HstNode node);
+
+        uint32_t childRank(HstNode node);
 
         Bitvector getFIDforMiniTree(uint32_t treeNum);
 
         Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
 
         Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
+
+        Bitvector getParentFIDMiniTree(uint32_t treeNum);
+
+        uint32_t getParentMiniTree(uint32_t treeNum);
 
     private:
         HypersuccinctTree() = default;

@@ -92,7 +92,8 @@ HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
         return levelAncestor(level-depth, {std::get<0>(node),std::get<1>(node),0});
     }
     if(std::get<1>(node) > 0) {
-        uint32_t delta = ceil(sqrt(log2(Bitvector_Utils::decodeNumber(this->size, Bitvector_Utils::NumberEncoding::BINARY))));
+        //TreeSize or microTreeSize???
+        uint32_t delta = ceil(sqrt(log2(Bitvector_Utils::decodeNumber(size, Bitvector_Utils::NumberEncoding::BINARY))));
         uint32_t depth = 0; //depth of MicroTree in MiniTree
         if(level > depth) {
             return levelAncestor(level-depth, {std::get<0>(node),0,0});
@@ -100,5 +101,22 @@ HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
         //???
     }
     //uint32_t delta =
+    //M is miniTree Size?
+    uint32_t delta = ceil(sqrt(Bitvector_Utils::decodeNumber(miniSize,Bitvector_Utils::NumberEncoding::BINARY)));
     return {};
+}
+
+HstNode findParent(HstNode node) {
+    assert(std::get<0>(node) != 0);
+    if(std::get<2>(node) != 0) {
+
+    }
+    if(std::get<1>(node) != 0) {
+
+    }
+    for(uint32_t i=0, i < )
+}
+
+uint32_t HypersuccinctTree::childRank(HstNode node) {
+    //TODO: find Parent
 }
