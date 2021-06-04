@@ -15,6 +15,10 @@ namespace pht {
     //node identification by: Minitree, MicroTree, NodeInMicroTree
     typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
+    enum class TreeTypes {
+        MINI, MICRO
+    };
+
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
@@ -36,8 +40,19 @@ namespace pht {
         Bitvector miniDummyTree;
         //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
         Bitvector miniDummyIndex;
+        //If MiniTree has Dummy: To which Tree does the pointer lead?
+        Bitvector miniDummyPointer;
         //Ancestor matrix for MicroTrees
+        //TODO: Remove
         Bitvector ancMatrix;
+        //Ancestor of MiniTreeRoot
+        Bitvector miniAnc;
+        //SubTree Size MiniTree
+        Bitvector subTree;
+        //SubTree Size for MicroTree roots
+        Bitvector microSubTrees;
+        //MicroTree Dummy Pointer
+        Bitvector microDummyPointers;
     };
 
     /**
@@ -52,10 +67,15 @@ namespace pht {
         Bitvector bp;
         //Ancestor matrix
         Bitvector matrix;
+        //degree for every node +1
+        Bitvector degree;
+        //subTree for every node within MicroTree
+        Bitvector subTrees;
+
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
         LookupTableEntry(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
-        //TODO: Extend construcor as more fields are added!
+        //TODO: Extend constructor as more fields are added!
         LookupTableEntry(const Bitvector& index, const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
         bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
@@ -208,6 +228,25 @@ namespace pht {
         bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
 
         /**
+         * TODO: This method call the others (like in bitvector utils)
+         * @param type
+         * @param ancestor
+         * @param treeNum
+         * @return
+         */
+        Bitvector getFidforTree(TreeTypes type, bool ancestor, uint32_t treeNum);
+
+        Bitvector getFIDforMiniTree(uint32_t treeNum);
+
+        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
+
+        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
+
+        Bitvector getParentFIDMiniTree(uint32_t treeNum);
+
+        uint32_t getParentMiniTree(uint32_t treeNum);
+
+        /**
          * Returns of given Node is ancestor of Dummy within the Node's MiniTree
          *
          * @param node The Node as HstNode
@@ -215,11 +254,28 @@ namespace pht {
          */
         bool isDummyAncestorWithinMiniTree(HstNode node);
 
+        bool isDummyAncestorWithinMicroTree(HstNode node);
+
+        /**
+         * TODO: Most likely unnecessary
+         * @param node
+         * @param anc
+         * @return
+         */
         bool isAncestor(HstNode node, HstNode anc);
+
+        uint32_t degree(HstNode node);
+
+        uint32_t subtree_size(HstNode node);
+
+        HstNode levelAncestor(uint32_t level, HstNode node);
+
+        uint32_t childRank(HstNode node);
 
     private:
         HypersuccinctTree() = default;
         bool huffmanFlag;
+        std::vector<bool> size;
         //sizes
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
@@ -228,6 +284,7 @@ namespace pht {
         std::vector<bool> miniFIDs;
         std::vector<bool> miniTypeVectors;
         std::vector<bool> miniDummys;
+        //TODO: Remove
         std::vector<bool> miniAncMatrix;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;

@@ -11,7 +11,7 @@ bool Bitvector_Utils::HuffmanComparator::operator()(const Bitvector &a, const Bi
 }
 
 uint32_t Bitvector_Utils::encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding) {
-    return encodeNumber(std::inserter(bitvector, bitvector.begin()), num, encoding);
+    return encodeNumber(std::inserter(bitvector, bitvector.end()), num, encoding);
 }
 
 uint32_t Bitvector_Utils::encodeNumber(std::insert_iterator<Bitvector> iterator, uint32_t num, NumberEncoding encoding) {
@@ -55,6 +55,8 @@ Bitvector Bitvector_Utils::getEntry(Bitvector::const_iterator& iterator, uint32_
             return getEntryAtStatic(iterator, offset, end, information.staticSize);
         case BitvectorEncoding::HUFFMAN:
             return getEntryAtHuffman(iterator, offset, end, information.huffmanTable);
+        case BitvectorEncoding::PURE_ELIAS_GAMMA:
+            return getEntryAtPureEliasGamma(iterator, offset, end);
         default:
             assert(false);
             return {};
@@ -266,6 +268,41 @@ Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator
         }
     }
     return Bitvector(temp, iterator);
+}
+
+Bitvector Bitvector_Utils::getEntryAtPureEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end) {
+    for(uint32_t i = 0; i < offset; i++) {
+        decodeEliasGamma(iterator, end);
+    }
+    return readEliasGamma(iterator, end);
+}
+
+Bitvector Bitvector_Utils::readEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
+    if(iterator == end) {
+        return {false};
+    } else if(*iterator) {
+        iterator++;
+        return {true};
+    }
+
+    uint32_t size = 0;
+    for(; !*iterator && iterator <= end; iterator++, size++);
+    if(iterator == end) {
+        throw std::runtime_error("Invalid Elias Gamma Code");
+    }
+    size++;
+
+    Bitvector res;
+    for(uint32_t i = 0; i < size; i++, iterator++) {
+        res.push_back(*iterator);
+        if(iterator == end) {
+            if(i < size-1) {
+                throw std::runtime_error("Invalid Elias Gamma Code");
+            }
+            break;
+        }
+    }
+    return res;
 }
 
 uint32_t Bitvector_Utils::getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier) {

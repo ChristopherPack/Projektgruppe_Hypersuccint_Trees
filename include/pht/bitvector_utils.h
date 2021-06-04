@@ -25,7 +25,7 @@ namespace pht{
             BINARY, ELIAS_GAMMA
         };
         enum class BitvectorEncoding {
-            ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN
+            ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN, PURE_ELIAS_GAMMA
         };
 
         struct HuffmanComparator {
@@ -76,6 +76,8 @@ namespace pht{
          */
         static Bitvector convertToBitvector(const std::string& input);
 
+        static uint32_t countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros = false);
+
     private:
         static uint32_t decodeEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end);
 
@@ -89,11 +91,13 @@ namespace pht{
 
         static Bitvector getEntryAtVectorIndex(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd);
 
-        static uint32_t countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros = false);
-
         static Bitvector getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size);
 
         static Bitvector getEntryAtHuffman(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes);
+
+        static Bitvector getEntryAtPureEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end);
+
+        static Bitvector readEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end);
 
         static uint32_t getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier);
 

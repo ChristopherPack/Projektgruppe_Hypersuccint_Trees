@@ -285,3 +285,80 @@ TEST_F(HypersuccinctTreeTest, isAncestorTest) {
     anc = {1,1,0};
     EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
 }
+
+TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
+    std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getFIDforMiniTree(1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hyperNath.getFIDforMiniTree(2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getFIDforMiniTree(3);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getFIDforMiniTree(4);
+    EXPECT_THAT(res, ::testing::ElementsAre(1));
+    res = hyperNath.getFIDforMiniTree(5);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hyperNath.getFIDforMiniTree(6);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+    res = hyperNath.getFIDforMiniTree(7);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+}
+
+TEST_F(HypersuccinctTreeTest, degreeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {2,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {7,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {4,1,1};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,1,2};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(1, res);
+
+    node = {4,1,4};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(1, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, subtree_sizeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.subtree_size(node);
+    EXPECT_EQ(77, res);
+
+    node = {1,1,0};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(8, res);
+
+    node = {0,1,0};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(7, res);
+
+    node = {4,1,4};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(23, res);
+
+    node = {1,1,2};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,1,1};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(7, res);
+
+}
