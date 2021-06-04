@@ -60,6 +60,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).bp);
         cout << "AncestorMap:   ";
         printBitvector(tree.getLookupTableEntry(index).matrix);
+        cout << "Degrees:   ";
+        printBitvector(tree.getLookupTableEntry(index).degree);
     }
 }
 

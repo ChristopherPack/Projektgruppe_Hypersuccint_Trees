@@ -127,15 +127,20 @@ namespace pht {
                     }
 
                     Bitvector matrix;
+                    Bitvector degree;
                     std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
                     ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
                     for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
                         for(std::shared_ptr<pht::Node<T>> node2 : orderedNodes) {
                             matrix.push_back(fmMicroTree->isAncestor(node2, node1));
                         }
+
+                        uint32_t degreeNum = fmMicroTree->getDegree(node1)+1;
+                        Bitvector_Utils::encodeNumber(degree, degreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     }
 
                     LookupTableEntry microTreeData(bp, matrix);
+                    microTreeData.degree = degree;
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
