@@ -54,9 +54,27 @@ namespace pht {
             miniDummy = val;
         }
 
+        void setMiniTree(uint32_t val = -1) {
+            miniTree = val;
+        }
+
+        uint32_t getMiniTree() {
+            return miniTree;
+        }
+
+        void setMicroTree(uint32_t val = -1) {
+            microTree = val;
+        }
+
+        uint32_t getMicroTree() {
+            return microTree;
+        }
+
     private:
         T value;///The stored value of the node 
-        bool miniDummy;
+        bool miniDummy = false;
+        uint32_t miniTree;
+        uint32_t microTree;
     };
 }
 

@@ -50,8 +50,16 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).miniDummyTree);
         cout << "MiniDummyIndex:  ";
         printBitvector(tree.getMiniTree(index).miniDummyIndex);
+        cout << "MiniDummyPointer:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyPointer);
+        cout << "MicroDummyPointers:  ";
+        printBitvector(tree.getMiniTree(index).microDummyPointers);
         cout << "AncMatrix:  ";
         printBitvector(tree.getMiniTree(index).ancMatrix);
+        cout << "Subtree Size at MiniTree Root:  ";
+        printBitvector(tree.getMiniTree(index).subTree);
+        cout << "SubTreeSize at MicroTree Roots:  ";
+        printBitvector(tree.getMiniTree(index).microSubTrees);
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
         cout << "LookupTableIndex:   ";
@@ -62,6 +70,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).matrix);
         cout << "Degrees:   ";
         printBitvector(tree.getLookupTableEntry(index).degree);
+        cout << "Subtrees:   ";
+        printBitvector(tree.getLookupTableEntry(index).subTrees);
     }
 }
 

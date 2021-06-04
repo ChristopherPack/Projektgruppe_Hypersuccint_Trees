@@ -40,6 +40,16 @@ bool HypersuccinctTree::isDummyAncestorWithinMiniTree(HstNode node) {
     return false;
 }
 
+bool HypersuccinctTree::isDummyAncestorWithinMicroTree(HstNode node) {
+    MiniTree mini = getMiniTree(std::get<0>(node));
+    Bitvector dummy = getMicroDummys(mini,std::get<1>(node));
+    uint32_t dummyNum = Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY);
+    if(dummyNum == 0) {
+        return false;
+    }
+    return lookupTableMatrixComparison(getLookupTableEntry(getMicroTree(mini,std::get<1>(node))), std::get<2>(node),dummyNum);
+}
+
 bool HypersuccinctTree::isAncestor(HstNode node, HstNode anc) {
     if(std::get<0>(node) == std::get<0>(anc))
     {
@@ -104,6 +114,59 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
     }
     Bitvector fid = getFIDforMiniTree(std::get<0>(node));
     return fid.size();
+}
+
+uint32_t HypersuccinctTree::subtree_size(HstNode node) {
+    if(std::get<2>(node) > 0) {
+        MiniTree miniTree = getMiniTree(std::get<0>(node));
+        uint32_t miniTreeSize = 0;
+        uint32_t microTreeSize = 0;
+        uint32_t isDummyAncestor = 0;
+        if(isDummyAncestorWithinMicroTree(node)) {
+            auto dummyIter = miniTree.dummys.cbegin();
+            uint32_t dummyIndex = 0;
+            for(int i=0; i<std::get<1>(node);i++) {
+                Bitvector dummy = getMicroDummys(miniTree, 0);
+                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+                    dummyIndex++;
+                }
+            }
+            auto iter = miniTree.microDummyPointers.cbegin();
+            Bitvector subTreeB = Bitvector_Utils::getEntry(iter,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            uint32_t dummyPointer = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
+            auto iter2 = miniTree.microSubTrees.cbegin();
+            Bitvector subtreeSize = Bitvector_Utils::getEntry(iter2,dummyPointer,miniTree.microSubTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            microTreeSize = Bitvector_Utils::decodeNumber(subtreeSize, Bitvector_Utils::NumberEncoding::BINARY);
+            isDummyAncestor = 1;
+        }
+        if(isDummyAncestorWithinMiniTree(node)) {
+            auto iter = miniTree.microSubTrees.cbegin();
+            uint32_t dummyPointer = Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY);
+            miniTreeSize = Bitvector_Utils::decodeNumber(getMiniTree(dummyPointer).subTree, Bitvector_Utils::NumberEncoding::BINARY);
+            isDummyAncestor = 1;
+        }
+
+        LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
+        auto iter = entry.subTrees.cbegin();
+        Bitvector degreeB = Bitvector_Utils::getEntry(iter,std::get<2>(node),entry.subTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+        return Bitvector_Utils::decodeNumber(degreeB,Bitvector_Utils::NumberEncoding::BINARY) - 1 - isDummyAncestor + miniTreeSize + microTreeSize;
+    }
+    if(std::get<1>(node) > 0) {
+        if(isDummyAncestorWithinMiniTree(node)) {
+            MiniTree miniTree = getMiniTree(std::get<0>(node));
+            auto iter = miniTree.microSubTrees.cbegin();
+            Bitvector subTreeB = Bitvector_Utils::getEntry(iter,std::get<2>(node),miniTree.microSubTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            uint32_t res = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
+            uint32_t dummyPointer = Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY);
+            return res + Bitvector_Utils::decodeNumber(getMiniTree(dummyPointer).subTree, Bitvector_Utils::NumberEncoding::BINARY);
+        }
+        MiniTree miniTree = getMiniTree(std::get<0>(node));
+        auto iter = miniTree.microSubTrees.cbegin();
+        Bitvector subTreeB = Bitvector_Utils::getEntry(iter,std::get<1>(node),miniTree.microSubTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+        return Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
+    }
+    MiniTree miniTree = getMiniTree(std::get<0>(node));
+    return Bitvector_Utils::decodeNumber(miniTree.subTree,Bitvector_Utils::NumberEncoding::BINARY);
 }
 
 HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {

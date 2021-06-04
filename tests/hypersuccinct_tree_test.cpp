@@ -335,3 +335,30 @@ TEST_F(HypersuccinctTreeTest, degreeTest) {
     EXPECT_EQ(1, res);
 
 }
+
+TEST_F(HypersuccinctTreeTest, subtree_sizeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.subtree_size(node);
+    EXPECT_EQ(77, res);
+
+    node = {1,1,0};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(8, res);
+
+    node = {0,1,0};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(7, res);
+
+    node = {4,1,4};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(23, res);
+
+    node = {1,1,2};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,1,1};
+    res = hyperNath.subtree_size(node);
+    EXPECT_EQ(7, res);
+
+}

@@ -40,11 +40,19 @@ namespace pht {
         Bitvector miniDummyTree;
         //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
         Bitvector miniDummyIndex;
+        //If MiniTree has Dummy: To which Tree does the pointer lead?
+        Bitvector miniDummyPointer;
         //Ancestor matrix for MicroTrees
         //TODO: Remove
         Bitvector ancMatrix;
-        //Ancstor of MiniTreeRoot
+        //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
+        //SubTree Size MiniTree
+        Bitvector subTree;
+        //SubTree Size for MicroTree roots
+        Bitvector microSubTrees;
+        //MicroTree Dummy Pointer
+        Bitvector microDummyPointers;
     };
 
     /**
@@ -61,6 +69,8 @@ namespace pht {
         Bitvector matrix;
         //degree for every node +1
         Bitvector degree;
+        //subTree for every node within MicroTree
+        Bitvector subTrees;
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -244,6 +254,8 @@ namespace pht {
          */
         bool isDummyAncestorWithinMiniTree(HstNode node);
 
+        bool isDummyAncestorWithinMicroTree(HstNode node);
+
         /**
          * TODO: Most likely unnecessary
          * @param node
@@ -253,6 +265,8 @@ namespace pht {
         bool isAncestor(HstNode node, HstNode anc);
 
         uint32_t degree(HstNode node);
+
+        uint32_t subtree_size(HstNode node);
 
         HstNode levelAncestor(uint32_t level, HstNode node);
 

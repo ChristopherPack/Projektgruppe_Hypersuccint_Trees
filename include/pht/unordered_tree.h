@@ -554,10 +554,10 @@ namespace pht {
          * @param[in] node A pointer to the root node of a subtree to calculate the size of.
          * @return The size of the subtree.
          */
-        uint32_t getSize(std::shared_ptr<pht::Node<T>> node) const {
-            uint32_t size = 1;
+        uint32_t getSize(std::shared_ptr<pht::Node<T>> node, bool countDummies = true) const {
+            uint32_t size = ((!countDummies) && node->isMiniDummy()) ? 0 : 1;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                size += getSize(desc);
+                size += getSize(desc,countDummies);
             }
             return size;
         }

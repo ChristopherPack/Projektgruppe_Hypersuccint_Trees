@@ -65,6 +65,13 @@ namespace pht {
             std::cout << "Output of Factory:  " << fmMiniTrees.size() << "\n";
             std::cout << "Amount of MiniTrees: " << fmMiniTrees.size() << "\n";
 
+            uint32_t miniTreeNum = 0;
+
+            for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
+                fmMiniTree->getRoot()->setMiniTree(miniTreeNum);
+                miniTreeNum++;
+            }
+
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> fmMicroTrees = pht::FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
@@ -87,6 +94,7 @@ namespace pht {
                 Bitvector miniDummyTree;
                 Bitvector miniDummyIndex;
 
+                uint32_t microTreeNum = 0;
                 for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
                     if(fmMicroTree->contains(fmMiniTree->getDummy())) {
                         auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
@@ -99,6 +107,8 @@ namespace pht {
                         Bitvector_Utils::encodeNumber(miniDummyIndex,dist,Bitvector_Utils::NumberEncoding::BINARY);
                         miniTree.miniDummyIndex = miniDummyIndex;
                     }
+                    fmMicroTree->getRoot()->setMicroTree(microTreeNum);
+                    microTreeNum++;
                 }
 
                 if(fmMiniTree->hasDummy()) {
@@ -109,6 +119,11 @@ namespace pht {
                             miniTree.dummyAncestors.push_back(false);
                         }
                     }
+
+                    std::shared_ptr<pht::Node<T>> dummyPoint = tree->getDirectDescendants(fmMiniTree->getDummy()).at(0);
+                    uint32_t miniTreePointer = dummyPoint->getMiniTree();
+                    Bitvector_Utils::encodeNumber(miniTree.miniDummyPointer, miniTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
+
                 }
 
                 std::vector<std::shared_ptr<pht::Node<T>>> orderedMicros;
@@ -128,6 +143,7 @@ namespace pht {
 
                     Bitvector matrix;
                     Bitvector degree;
+                    Bitvector subTree;
                     std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
                     ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
                     for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
@@ -137,14 +153,28 @@ namespace pht {
 
                         uint32_t degreeNum = fmMicroTree->getDegree(node1)+1;
                         Bitvector_Utils::encodeNumber(degree, degreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+                        uint32_t subTreeNum = fmMicroTree->getSize(node1,true)+1;
+                        Bitvector_Utils::encodeNumber(subTree,subTreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    }
+
+                    if(fmMicroTree->hasDummy()) {
+                        std::shared_ptr<pht::Node<T>> dummyPoint = fmMiniTree->getDirectDescendants(fmMicroTree->getDummy()).at(0);
+                        uint32_t microTreePointer = dummyPoint->getMicroTree();
+                        Bitvector_Utils::encodeNumber(miniTree.microDummyPointers, microTreePointer, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     }
 
                     LookupTableEntry microTreeData(bp, matrix);
                     microTreeData.degree = degree;
+                    microTreeData.subTrees = subTree;
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
+
+                    Bitvector_Utils::encodeNumber(miniTree.microSubTrees, fmMiniTree->getSize(fmMicroTree->getRoot(),false),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 }
+
+                Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSize(fmMiniTree->getRoot(),false),Bitvector_Utils::NumberEncoding::BINARY);
 
                 ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedMicros, [&fmMiniTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMiniTree->enumerate(a) < fmMiniTree->enumerate(b); });
                 for(std::shared_ptr<pht::Node<T>> node1 : orderedMicros) {
