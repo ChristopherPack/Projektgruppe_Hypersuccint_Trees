@@ -43,16 +43,16 @@ namespace pht {
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
         //Ancestor matrix for MicroTrees
-        //TODO: Remove
-        Bitvector ancMatrix;
+        //MicroTree Dummy Pointer
+        Bitvector microDummyPointers;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
         //SubTree Size MiniTree
         Bitvector subTree;
         //SubTree Size for MicroTree roots
         Bitvector microSubTrees;
-        //MicroTree Dummy Pointer
-        Bitvector microDummyPointers;
+        //TODO: Remove
+        Bitvector ancMatrix;
     };
 
     /**
@@ -115,6 +115,10 @@ namespace pht {
 
         bool isHuffman() {
             return huffmanFlag;
+        }
+
+        Bitvector getSize() {
+            return size;
         }
 
         Bitvector getMicroSize() {
@@ -228,7 +232,7 @@ namespace pht {
         bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
 
         /**
-         * TODO: This method call the others (like in bitvector utils)
+         * TODO: This method calls the others (like in bitvector utils)
          * @param type
          * @param ancestor
          * @param treeNum
@@ -275,8 +279,8 @@ namespace pht {
     private:
         HypersuccinctTree() = default;
         bool huffmanFlag;
-        std::vector<bool> size;
         //sizes
+        std::vector<bool> size;
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
         //miniTrees
