@@ -51,6 +51,35 @@ namespace pht {
         Bitvector subTree;
         //SubTree Size for MicroTree roots
         Bitvector microSubTrees;
+        //Depth of the MiniTree root
+        Bitvector miniDepth;
+        //Height of the MiniTree root
+        Bitvector miniHeight;
+        //Depth of the MiniTree Dummy
+        Bitvector miniDummyDepth;
+        //Height of the MiniTree Dummy
+        Bitvector miniDummyHeight;
+        //Depths for MicroTree roots + 1
+        Bitvector rootDepths;
+        //Heights for MicroTree roots + 1
+        Bitvector rootHeights;
+
+        //TODO:
+        //Leftmost Leaf Pointer for MiniTree
+        Bitvector miniTreeLeftmostPointer;
+        //Rightmost Leaf Pointer for MiniTree
+        Bitvector miniTreeRightmostPointer;
+        //Leftmost Leaf Pointers for MicroTrees
+        Bitvector microTreeLeftmostPointers;
+        //Rightmost Leaf Pointers for MicroTrees
+        Bitvector microTreeRightmostPointers;
+
+        //Amount of Leaves in MiniTree
+        Bitvector miniLeaves;
+        //Amount of Leaves within MicroTrees
+        Bitvector microLeaves;
+
+
         //TODO: Remove
         Bitvector ancMatrix;
     };
@@ -67,10 +96,16 @@ namespace pht {
         Bitvector bp;
         //Ancestor matrix
         Bitvector matrix;
-        //degree for every node +1
+        //degree for every node + 1
         Bitvector degree;
-        //subTree for every node within MicroTree
+        //subTree for every node within MicroTree (at least 1)
         Bitvector subTrees;
+        //Depths of nodes + 1
+        Bitvector nodeDepths;
+        //Heights of nodes + 1
+        Bitvector nodeHeights;
+        //Amount of Leaves for every node within MicroTree (at least 1)
+        Bitvector leaves;
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -321,6 +356,24 @@ namespace pht {
          * @return Subtree size as int
          */
         uint32_t subtree_size(HstNode node);
+
+        /**
+         * Returns the Depth of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The Depth as uint32_t
+         */
+        uint32_t depth(HstNode node);
+
+        /**
+         * Returns the Depth of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The Depth as uint32_t
+         */
+        uint32_t height(HstNode node);
+
+        uint32_t leaf_size(HstNode node);
 
         /**
          * TODO: Unfinished
