@@ -91,6 +91,9 @@ namespace pht {
                 Bitvector dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
                 miniTree.dummys = dummys;
 
+                Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
+
                 Bitvector miniDummyTree;
                 Bitvector miniDummyIndex;
 
@@ -124,6 +127,9 @@ namespace pht {
                     uint32_t miniTreePointer = dummyPoint->getMiniTree();
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyPointer, miniTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
 
+                    Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepth(dummyPoint), Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeight(dummyPoint), Bitvector_Utils::NumberEncoding::BINARY);
+
                 }
 
                 std::vector<std::shared_ptr<pht::Node<T>>> orderedMicros;
@@ -141,13 +147,18 @@ namespace pht {
                         bpsAndOccurrences.at(bp)++;
                     }
 
+                    Bitvector_Utils::encodeNumber(miniTree.rootDepths, fmMiniTree->getDepth(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    Bitvector_Utils::encodeNumber(miniTree.rootHeights, fmMiniTree->getHeight(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
                     Bitvector matrix;
                     Bitvector degree;
                     Bitvector subTree;
-                    std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
-                    ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
-                    for(std::shared_ptr<pht::Node<T>> node1 : orderedNodes) {
-                        for(std::shared_ptr<pht::Node<T>> node2 : orderedNodes) {
+                    Bitvector nodeDepth;
+                    Bitvector nodeHeight;
+                    //std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
+                    //ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
+                    for(std::shared_ptr<pht::Node<T>> node1 : fmMicroTree->getNodes()) {
+                        for(std::shared_ptr<pht::Node<T>> node2 : fmMicroTree->getNodes()) {
                             matrix.push_back(fmMicroTree->isAncestor(node2, node1));
                         }
 
@@ -156,6 +167,12 @@ namespace pht {
 
                         uint32_t subTreeNum = fmMicroTree->getSize(node1,true)+1;
                         Bitvector_Utils::encodeNumber(subTree,subTreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+                        uint32_t nodeDepthNum = fmMicroTree->getDepth(node1, true) +1;
+                        Bitvector_Utils::encodeNumber(nodeDepth,nodeDepthNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+                        uint32_t nodeHeightNum = fmMicroTree->getHeight(node1, true) +1;
+                        Bitvector_Utils::encodeNumber(nodeHeight,nodeDepthNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     }
 
                     if(fmMicroTree->hasDummy()) {
@@ -167,6 +184,8 @@ namespace pht {
                     LookupTableEntry microTreeData(bp, matrix);
                     microTreeData.degree = degree;
                     microTreeData.subTrees = subTree;
+                    microTreeData.nodeDepths = nodeDepth;
+                    microTreeData.nodeHeights = nodeHeight;
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }

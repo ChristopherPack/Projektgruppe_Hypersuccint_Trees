@@ -60,6 +60,18 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).subTree);
         cout << "SubTreeSize at MicroTree Roots:  ";
         printBitvector(tree.getMiniTree(index).microSubTrees);
+        cout << "Depth at MiniTree Root:  ";
+        printBitvector(tree.getMiniTree(index).miniDepth);
+        cout << "Height at MiniTree Root:  ";
+        printBitvector(tree.getMiniTree(index).miniHeight);
+        cout << "Depth at MiniTree Dummy:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyDepth);
+        cout << "Height at MiniTree Dummy:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyHeight);
+        cout << "Depth at MicroTree Roots:  ";
+        printBitvector(tree.getMiniTree(index).rootDepths);
+        cout << "Height at MicroTree Roots:  ";
+        printBitvector(tree.getMiniTree(index).rootHeights);
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
         cout << "LookupTableIndex:   ";
@@ -72,6 +84,10 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).degree);
         cout << "Subtrees:   ";
         printBitvector(tree.getLookupTableEntry(index).subTrees);
+        cout << "Depths:   ";
+        printBitvector(tree.getLookupTableEntry(index).nodeDepths);
+        cout << "Heights:   ";
+        printBitvector(tree.getLookupTableEntry(index).nodeHeights);
     }
 }
 

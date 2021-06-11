@@ -430,7 +430,7 @@ namespace pht {
          * @param[in] node A pointer to the node. Cannot be nullptr. Has to be in the tree. 
          * @return The count of edges in the longest path to a leaf. 
          */
-        uint32_t getHeight(const std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getHeight(const std::shared_ptr<pht::Node<T>> node, bool countDummies = false) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
@@ -439,7 +439,12 @@ namespace pht {
             }
             uint32_t max = 0;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                max = std::max(max, getHeight(desc)+1);
+                if(desc->isMiniDummy() && !countDummies) {
+                    max = std::max(max, getHeight(desc));
+                }
+                else {
+                    max = std::max(max, getHeight(desc) + 1);
+                }
             }
             return max;
         }
@@ -450,7 +455,7 @@ namespace pht {
          * @param[in] node A pointer to the node. Cannot be nullptr. Has to be in the tree. 
          * @return The count of edges in the path to the root. 
          */
-        uint32_t getDepth(const std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getDepth(const std::shared_ptr<pht::Node<T>> node, bool countDummies = false) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
@@ -461,7 +466,9 @@ namespace pht {
             uint32_t depth = 0;
             while(current != root) {
                 current = ancestors.at(current);
-                depth++;
+                if(!current->isMiniDummy() || countDummies) {
+                    depth++;
+                }
             }
             return depth;
         }
