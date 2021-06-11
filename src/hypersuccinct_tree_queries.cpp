@@ -219,6 +219,38 @@ uint32_t HypersuccinctTree::height(HstNode node) {
     return res + Bitvector_Utils::decodeNumber(miniTree.miniHeight, Bitvector_Utils::NumberEncoding::BINARY);
 }
 
+uint32_t HypersuccinctTree::leaf_size(HstNode node) {
+    uint32_t res = 0;
+    MiniTree miniTree = getMiniTree(std::get<0>(node));
+    if(std::get<2>(node) > 0) {
+        if (isDummyAncestorWithinMiniTree(node)) {
+            LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
+            auto iter = entry.leaves.cbegin();
+            Bitvector entryLeafSize = Bitvector_Utils::getEntry(iter, std::get<2>(node), entry.leaves.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            res += (Bitvector_Utils::decodeNumber(entryLeafSize, Bitvector_Utils::NumberEncoding::BINARY));
+        }
+        else if (!isDummyAncestorWithinMicroTree(node)){
+            LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
+            auto iter = entry.leaves.cbegin();
+            Bitvector entryLeafSize = Bitvector_Utils::getEntry(iter, std::get<2>(node), entry.leaves.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            return res + Bitvector_Utils::decodeNumber(entryLeafSize, Bitvector_Utils::NumberEncoding::BINARY);
+        }
+    }
+    if(std::get<1>(node) > 0) {
+        if(isDummyAncestorWithinMiniTree({std::get<0>(node),std::get<1>(node),0})) {
+            auto iter = miniTree.microLeaves.cbegin();
+            Bitvector microLeafSize = Bitvector_Utils::getEntry(iter,std::get<1>(node),miniTree.microLeaves.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            res -= (Bitvector_Utils::decodeNumber(microLeafSize, Bitvector_Utils::NumberEncoding::BINARY));
+        }
+        else {
+            auto iter = miniTree.microLeaves.cbegin();
+            Bitvector microLeafSize = Bitvector_Utils::getEntry(iter,std::get<1>(node),miniTree.microLeaves.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            return res + Bitvector_Utils::decodeNumber(microLeafSize, Bitvector_Utils::NumberEncoding::BINARY);
+        }
+    }
+    return res + Bitvector_Utils::decodeNumber(miniTree.miniLeaves, Bitvector_Utils::NumberEncoding::BINARY);
+}
+
 HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
     if(std::get<2>(node) > 0) {
         //depth via lookputable

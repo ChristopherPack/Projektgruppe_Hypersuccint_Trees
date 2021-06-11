@@ -416,3 +416,34 @@ TEST_F(HypersuccinctTreeTest, heightTest) {
     EXPECT_EQ(3, res);
 
 }
+
+TEST_F(HypersuccinctTreeTest, leaf_sizeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.leaf_size(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,0};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(3, res);
+
+    node = {0,1,0};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,4};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(14, res);
+
+    node = {4,2,3};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(1, res);
+
+    node = {1,1,2};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,1,1};
+    res = hyperNath.leaf_size(node);
+    EXPECT_EQ(3, res);
+
+}

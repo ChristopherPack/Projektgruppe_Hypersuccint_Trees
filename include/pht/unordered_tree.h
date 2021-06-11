@@ -473,6 +473,20 @@ namespace pht {
             return depth;
         }
 
+        uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+
+            if(descendants.at(node).empty()) {
+                return 1;
+            }
+            uint32_t res = 0;
+            for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
+                res += getLeafSize(desc);
+            }
+            return res;
+        }
+
         /**
          * Checks if the given node is the root. 
          * 

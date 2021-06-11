@@ -93,6 +93,7 @@ namespace pht {
 
                 Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(fmMiniTree->getRoot()),Bitvector_Utils::NumberEncoding::BINARY);
 
                 Bitvector miniDummyTree;
                 Bitvector miniDummyIndex;
@@ -149,12 +150,14 @@ namespace pht {
 
                     Bitvector_Utils::encodeNumber(miniTree.rootDepths, fmMiniTree->getDepth(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     Bitvector_Utils::encodeNumber(miniTree.rootHeights, fmMiniTree->getHeight(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    Bitvector_Utils::encodeNumber(miniTree.microLeaves, fmMiniTree->getLeafSize(fmMicroTree->getRoot()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
                     Bitvector matrix;
                     Bitvector degree;
                     Bitvector subTree;
                     Bitvector nodeDepth;
                     Bitvector nodeHeight;
+                    Bitvector leave;
                     //std::vector<std::shared_ptr<pht::Node<T>>> orderedNodes = fmMicroTree->getNodes();
                     //ListUtils::sort<std::shared_ptr<pht::Node<T>>>(orderedNodes, [&fmMicroTree](std::shared_ptr<pht::Node<T>> a, std::shared_ptr<pht::Node<T>> b){ return fmMicroTree->enumerate(a) < fmMicroTree->enumerate(b); });
                     for(std::shared_ptr<pht::Node<T>> node1 : fmMicroTree->getNodes()) {
@@ -173,6 +176,9 @@ namespace pht {
 
                         uint32_t nodeHeightNum = fmMicroTree->getHeight(node1, true) +1;
                         Bitvector_Utils::encodeNumber(nodeHeight,nodeDepthNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+                        uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
+                        Bitvector_Utils::encodeNumber(leave,leaveNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     }
 
                     if(fmMicroTree->hasDummy()) {
@@ -186,6 +192,7 @@ namespace pht {
                     microTreeData.subTrees = subTree;
                     microTreeData.nodeDepths = nodeDepth;
                     microTreeData.nodeHeights = nodeHeight;
+                    microTreeData.leaves = leave;
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
