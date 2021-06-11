@@ -43,16 +43,16 @@ namespace pht {
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
         //Ancestor matrix for MicroTrees
-        //TODO: Remove
-        Bitvector ancMatrix;
+        //MicroTree Dummy Pointer
+        Bitvector microDummyPointers;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
         //SubTree Size MiniTree
         Bitvector subTree;
         //SubTree Size for MicroTree roots
         Bitvector microSubTrees;
-        //MicroTree Dummy Pointer
-        Bitvector microDummyPointers;
+        //TODO: Remove
+        Bitvector ancMatrix;
     };
 
     /**
@@ -115,6 +115,10 @@ namespace pht {
 
         bool isHuffman() {
             return huffmanFlag;
+        }
+
+        Bitvector getSize() {
+            return size;
         }
 
         Bitvector getMicroSize() {
@@ -212,10 +216,6 @@ namespace pht {
          */
         LookupTableEntry getLookupTableEntry(Bitvector indexV);
 
-        bool miniTreeAncMatrixComparison(uint32_t ancTree, uint32_t treeIndex2);
-
-        bool microTreeAncMatrixComparison(const MiniTree& miniTree, uint32_t ancTree, uint32_t treeIndex2);
-
         /**
          * Returns if node1 is ancestor of node2 with the given LookupTable Entry
          * Both nodes only need their index inside the MicroTree (HstNode index 2)
@@ -228,7 +228,43 @@ namespace pht {
         bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
 
         /**
-         * TODO: This method call the others (like in bitvector utils)
+         * Returns the FID for a given MiniTree
+         *
+         * @param treeNum Number of the Tree as int
+         * @return FID as Bitvector
+         */
+        Bitvector getFIDforMiniTree(uint32_t treeNum);
+
+        /**
+         * Returns the FID for a given MicroTree within a MiniTree
+         *
+         * @param miniTree The Minitree as Minitree
+         * @param treeNum the Microtree number as int
+         * @return FID as Bitvector
+         */
+        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
+
+        /**
+         * Returns the FID for a given MicroTree within a MiniTree
+         *
+         * @param miniTree The Minitree number as int
+         * @param treeNum the Microtree number as int
+         * @return FID as Bitvector
+         */
+        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
+
+        ////////////////////////////////////////////////////////////////////////////
+        // Test Methods in this Block
+        //
+        //
+        ////////////////////////////////////////////////////////////////////////////
+
+        bool miniTreeAncMatrixComparison(uint32_t ancTree, uint32_t treeIndex2);
+
+        bool microTreeAncMatrixComparison(const MiniTree& miniTree, uint32_t ancTree, uint32_t treeIndex2);
+
+        /**
+         * TODO: This method calls the others (like in bitvector utils)
          * @param type
          * @param ancestor
          * @param treeNum
@@ -236,25 +272,9 @@ namespace pht {
          */
         Bitvector getFidforTree(TreeTypes type, bool ancestor, uint32_t treeNum);
 
-        Bitvector getFIDforMiniTree(uint32_t treeNum);
-
-        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
-
-        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
-
         Bitvector getParentFIDMiniTree(uint32_t treeNum);
 
         uint32_t getParentMiniTree(uint32_t treeNum);
-
-        /**
-         * Returns of given Node is ancestor of Dummy within the Node's MiniTree
-         *
-         * @param node The Node as HstNode
-         * @return if Node is ancestor of MiniDummy as bool
-         */
-        bool isDummyAncestorWithinMiniTree(HstNode node);
-
-        bool isDummyAncestorWithinMicroTree(HstNode node);
 
         /**
          * TODO: Most likely unnecessary
@@ -264,19 +284,65 @@ namespace pht {
          */
         bool isAncestor(HstNode node, HstNode anc);
 
+        ////////////////////////////////////////////////////////////////////////////
+        //
+        //
+        //End Test Method Block
+        ////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * Returns if given Node is ancestor of Dummy within the Node's MiniTree
+         *
+         * @param node The Node as HstNode
+         * @return if Node is ancestor of MiniDummy as bool
+         */
+        bool isDummyAncestorWithinMiniTree(HstNode node);
+
+        /**
+         * Returns if  given Node is ancestor of Dummy within the Node's MicroTree
+         *
+         * @param node  The Node as HstNode
+         * @return if Node is ancestor of MicroDummy as bool
+         */
+        bool isDummyAncestorWithinMicroTree(HstNode node);
+
+        /**
+         * Returns the degree of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return the degree as int
+         */
         uint32_t degree(HstNode node);
 
+        /**
+         * Returns the Subtree size of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return Subtree size as int
+         */
         uint32_t subtree_size(HstNode node);
 
+        /**
+         * TODO: Unfinished
+         *
+         * @param level
+         * @param node
+         * @return
+         */
         HstNode levelAncestor(uint32_t level, HstNode node);
 
+        /**
+         * TODO: unfinished
+         * @param node
+         * @return
+         */
         uint32_t childRank(HstNode node);
 
     private:
         HypersuccinctTree() = default;
         bool huffmanFlag;
-        std::vector<bool> size;
         //sizes
+        std::vector<bool> size;
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
         //miniTrees
