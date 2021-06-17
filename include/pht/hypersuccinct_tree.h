@@ -24,14 +24,14 @@ namespace pht {
      * It contains all information needed to query a single MiniTree.
      */
     struct MiniTree {
-        //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
-        Bitvector microTrees;
         //MicroFIDs
         Bitvector FIDs;
         //MicroTypeVectors
         Bitvector typeVectors;
         //MicroDummys
         Bitvector dummys;
+        //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
+        Bitvector microTrees;
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
         Bitvector rootAncestors;
         //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
@@ -42,7 +42,6 @@ namespace pht {
         Bitvector miniDummyIndex;
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
-        //Ancestor matrix for MicroTrees
         //MicroTree Dummy Pointer
         Bitvector microDummyPointers;
         //Ancestor of MiniTreeRoot
@@ -63,6 +62,10 @@ namespace pht {
         Bitvector rootDepths;
         //Heights for MicroTree roots + 1
         Bitvector rootHeights;
+        //Amount of Leaves in MiniTree
+        Bitvector miniLeaves;
+        //Amount of Leaves within MicroTrees
+        Bitvector microLeaves;
 
         //TODO:
         //Leftmost Leaf Pointer for MiniTree
@@ -74,10 +77,7 @@ namespace pht {
         //Rightmost Leaf Pointers for MicroTrees
         Bitvector microTreeRightmostPointers;
 
-        //Amount of Leaves in MiniTree
-        Bitvector miniLeaves;
-        //Amount of Leaves within MicroTrees
-        Bitvector microLeaves;
+
 
 
         //TODO: Remove
@@ -141,6 +141,7 @@ namespace pht {
 
         /**
          * Returns the MiniTree at the given index
+         * O(1)
          *
          * @param index The Index of the MiniTree as integer
          * @return MiniTree as MiniTree
@@ -149,6 +150,12 @@ namespace pht {
             return miniTrees.at(index);
         }
 
+        /**
+         * Checks if the Tree is encoded with Huffman encoding
+         * O(1)
+         *
+         * @return value of huffmanFlag
+         */
         bool isHuffman() {
             return huffmanFlag;
         }

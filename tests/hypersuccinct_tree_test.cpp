@@ -259,7 +259,7 @@ TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
     EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
 }
 
-TEST_F(HypersuccinctTreeTest, isAncestorTest) {
+/*TEST_F(HypersuccinctTreeTest, isAncestorTest) {
     pht::HstNode node1 = {4,1,4};
     pht::HstNode anc = {4,1,4};
     EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
@@ -284,7 +284,7 @@ TEST_F(HypersuccinctTreeTest, isAncestorTest) {
     EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
     anc = {1,1,0};
     EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-}
+}*/
 
 TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
     std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
