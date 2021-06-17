@@ -123,6 +123,7 @@ namespace pht {
      * as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro.
      * All code is represented as Bitvectors
      * It can be encoded with huffman encoding for MicroTrees
+     * TODO: Need Complexity for all functions
      *
      * It contains:
      * The FarzanMunro Algorithm Sizes of MiniTrees and MicroTrees
@@ -373,6 +374,12 @@ namespace pht {
          */
         uint32_t height(HstNode node);
 
+        /**
+         * Returns the Leaf size of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return the Leaf Size as uint32_t
+         */
         uint32_t leaf_size(HstNode node);
 
         /**
