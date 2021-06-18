@@ -69,13 +69,13 @@ namespace pht {
 
         //TODO:
         //Leftmost Leaf Pointer for MiniTree
-        Bitvector miniTreeLeftmostPointer;
+        Bitvector miniTreeLeftmostLeafPointer;
         //Rightmost Leaf Pointer for MiniTree
-        Bitvector miniTreeRightmostPointer;
+        Bitvector miniTreeRightmostLeafPointer;
         //Leftmost Leaf Pointers for MicroTrees
-        Bitvector microTreeLeftmostPointers;
+        Bitvector microTreeLeftmostLeafPointers;
         //Rightmost Leaf Pointers for MicroTrees
-        Bitvector microTreeRightmostPointers;
+        Bitvector microTreeRightmostLeafPointers;
 
 
 
@@ -106,6 +106,10 @@ namespace pht {
         Bitvector nodeHeights;
         //Amount of Leaves for every node within MicroTree (at least 1)
         Bitvector leaves;
+        //Rightmost leaves for every node within MicroTree
+        Bitvector leftmost_leaf;
+        //Leftmose leaves for every node within MicroTree
+        Bitvector rightmost_leaf;
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -380,6 +384,10 @@ namespace pht {
          * @return The Depth as uint32_t
          */
         uint32_t height(HstNode node);
+
+        HstNode leftmost_leaf(HstNode node);
+
+        HstNode rightmost_leaf(HstNode node);
 
         /**
          * Returns the Leaf size of a given Node

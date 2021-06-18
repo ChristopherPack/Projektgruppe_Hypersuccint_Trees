@@ -64,7 +64,10 @@ namespace pht {
             //This has to be done before the actual MiniTree Loop
             uint32_t miniTreeNum = 0;
             for(std::shared_ptr<pht::UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
-                fmMiniTree->getRoot()->setMiniTree(miniTreeNum);
+                //fmMiniTree->getRoot()->setMiniTree(miniTreeNum);
+                for(const std::shared_ptr<pht::Node<T>>& node : fmMiniTree->getNodes()) {
+                    node->setMiniTree(miniTreeNum);
+                }
                 miniTreeNum++;
             }
             //Declarations for MiniTree Loop
@@ -89,12 +92,17 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(fmMiniTree->getRoot()), Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(fmMiniTree->getRoot()),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer, tree->getLeftmostLeaf(fmMiniTree->getRoot())->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer, tree->getRightmostLeaf(fmMiniTree->getRoot())->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
 
                 //Counting MicroTrees for Dummy Identification and Pointers
                 //This has to be done before the actual MicroTree Loop
                 uint32_t microTreeNum = 0;
                 for(const std::shared_ptr<pht::UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
-                    fmMicroTree->getRoot()->setMicroTree(microTreeNum);
+                    //fmMicroTree->getRoot()->setMicroTree(microTreeNum);
+                    for(const std::shared_ptr<pht::Node<T>>& node : fmMicroTree->getNodes()) {
+                        node->setMicroTree(microTreeNum);
+                    }
                     microTreeNum++;
                 }
 
@@ -150,6 +158,8 @@ namespace pht {
                     Bitvector_Utils::encodeNumber(miniTree.rootDepths, fmMiniTree->getDepth(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     Bitvector_Utils::encodeNumber(miniTree.rootHeights, fmMiniTree->getHeight(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     Bitvector_Utils::encodeNumber(miniTree.microLeaves, fmMiniTree->getLeafSize(fmMicroTree->getRoot()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    Bitvector_Utils::encodeNumber(miniTree.microTreeLeftmostLeafPointers, fmMiniTree->getLeftmostLeaf(fmMicroTree->getRoot())->getMicroTree(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    Bitvector_Utils::encodeNumber(miniTree.microTreeRightmostLeafPointers, fmMiniTree->getRightmostLeaf(fmMicroTree->getRoot())->getMicroTree(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
                     //Declarations for LookupTable Entries
                     Bitvector bp = fmMicroTree->toBalancedParenthesis();
@@ -159,6 +169,9 @@ namespace pht {
                     Bitvector nodeDepth;
                     Bitvector nodeHeight;
                     Bitvector leave;
+                    Bitvector leftmost_leaf;
+                    Bitvector rightmost_leaf;
+                    std::vector<std::shared_ptr<pht::Node<T>>> nodes = fmMicroTree->getNodes();
 
                     //Huffman replacing BP if true
                     if(huffman) {
@@ -191,6 +204,13 @@ namespace pht {
 
                         uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
                         Bitvector_Utils::encodeNumber(leave,leaveNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+
+                        uint32_t leftmost_leafNum =  std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeaf(node1)));
+                        Bitvector_Utils::encodeNumber(leftmost_leaf,leftmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+
+                        uint32_t rightmost_leafNum = std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeaf(node1)));
+                        Bitvector_Utils::encodeNumber(rightmost_leaf,rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                     }
 
                     //Create LookupTable Entry
@@ -200,6 +220,8 @@ namespace pht {
                     microTreeData.nodeDepths = nodeDepth;
                     microTreeData.nodeHeights = nodeHeight;
                     microTreeData.leaves = leave;
+                    microTreeData.leftmost_leaf = leftmost_leaf;
+                    microTreeData.rightmost_leaf = rightmost_leaf;
                     if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                         hypersuccinctTree.lookupTable.push_back(microTreeData);
                     }
