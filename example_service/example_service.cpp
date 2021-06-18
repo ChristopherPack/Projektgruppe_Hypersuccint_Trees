@@ -48,7 +48,7 @@ int main() {
     std::cout << tree->toNewickString() << std::endl;
     HypersuccinctTreeOutput::printTree(hst);
     pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
-    std::cout << std::endl << "FileTree:" << std::endl;
+    std::cout << std::endl << std::endl << std::endl << "FileTree:" << std::endl;
     HypersuccinctTreeOutput::printTree(fileHst);
 
     globalTimer.stop();
