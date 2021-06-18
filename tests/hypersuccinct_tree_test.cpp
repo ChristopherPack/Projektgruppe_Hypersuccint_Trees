@@ -447,3 +447,90 @@ TEST_F(HypersuccinctTreeTest, leaf_sizeTest) {
     EXPECT_EQ(3, res);
 
 }
+
+TEST_F(HypersuccinctTreeTest, rightmost_leafTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,6), res);
+    //EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
+
+    node = {1,1,0};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {0,1,0};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,6), res);
+
+    node = {4,1,4};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(7,0,2), res);
+
+    node = {4,2,3};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,3), res);
+
+    node = {4,1,0};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(7,0,2), res);
+
+    node = {1,1,2};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {1,1,1};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {1,2,0};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {1,2,1};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+}
+
+TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,1,0};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {0,1,0};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,2), res);
+
+    node = {4,1,4};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(6,3,1), res);
+
+    node = {4,2,3};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,3), res);
+
+    node = {4,1,0};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,1), res);
+
+    node = {1,1,2};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,1,1};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,2,0};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,3,2), res);
+
+    node = {1,2,1};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+}

@@ -473,6 +473,26 @@ namespace pht {
             return depth;
         }
 
+        std::shared_ptr<pht::Node<T>> getLeftmostLeaf(const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+
+            if(descendants.at(node).empty()) {
+                return node;
+            }
+            return getLeftmostLeaf(descendants.at(node).front());
+        }
+
+        std::shared_ptr<pht::Node<T>> getRightmostLeaf(const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+
+            if(descendants.at(node).empty()) {
+                return node;
+            }
+            return getRightmostLeaf(descendants.at(node).back());
+        }
+
         uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
