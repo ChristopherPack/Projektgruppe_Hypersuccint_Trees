@@ -16,8 +16,6 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    //0111011011
-    //0111011011
     pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");
