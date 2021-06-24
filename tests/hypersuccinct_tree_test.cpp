@@ -490,6 +490,10 @@ TEST_F(HypersuccinctTreeTest, rightmost_leafTest) {
     res = hyperNath.rightmost_leaf(node);
     EXPECT_EQ(pht::HstNode(1,2,1), res);
 
+    node = {3,0,1};
+    res = hyperNath.rightmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(3,0,3), res);
+
 }
 
 TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
@@ -532,5 +536,9 @@ TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
     node = {1,2,1};
     res = hyperNath.leftmost_leaf(node);
     EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {3,0,1};
+    res = hyperNath.leftmost_leaf(node);
+    EXPECT_EQ(pht::HstNode(3,0,2), res);
 
 }
