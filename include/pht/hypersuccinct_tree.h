@@ -111,9 +111,9 @@ namespace pht {
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
-        LookupTableEntry(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
+        LookupTableEntry(const Bitvector& index) : index(index) {}
         //TODO: Extend constructor as more fields are added!
-        LookupTableEntry(const Bitvector& index, const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
+        LookupTableEntry(const Bitvector& index, const Bitvector& bp) : index(index), bp(bp) {}
         bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
         }
