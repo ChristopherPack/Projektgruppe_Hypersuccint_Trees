@@ -383,8 +383,20 @@ namespace pht {
          */
         uint32_t height(HstNode node);
 
+        /**
+         * Returns the leftmost leaf of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The leftmost leaf as HstNode
+         */
         HstNode leftmost_leaf(HstNode node);
 
+        /**
+         * Returns the rightmost leaf of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The rightmost leaf as HstNode
+         */
         HstNode rightmost_leaf(HstNode node);
 
         /**
