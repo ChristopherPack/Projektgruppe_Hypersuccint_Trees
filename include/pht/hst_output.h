@@ -56,6 +56,14 @@ namespace pht {
         static void writeBitvectorToFile(std::ofstream &file, Bitvector& bitvector);
 
         /**
+         * Writes Content of a small Bitvector into a larger Bitvector
+         * Encodes small Bitvector with Elias Gamma
+         * @param bitvector The Bitvector to write
+         * @param target The Bitvector to write into
+         */
+        static void createFileBitvector(Bitvector bitvector, Bitvector& target);
+
+        /**
          * Reads a space efficient Bitvector from a file
          *
          * @param file the file to read from
