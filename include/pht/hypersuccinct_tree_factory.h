@@ -401,10 +401,27 @@ namespace pht {
                     mini.microLeaves.push_back(*iter);
                     iter++;
                 }
-                /*uint32_t miniDummyTreeNum = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-                uint32_t miniDummyIndexNum = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-                Bitvector_Utils::encodeNumber(mini.miniDummyTree, miniDummyTreeNum, Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(mini.miniDummyIndex, miniDummyIndexNum, Bitvector_Utils::NumberEncoding::BINARY);*/
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.miniTreeLeftmostLeafPointer.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.miniTreeRightmostLeafPointer.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.microTreeLeftmostLeafPointers.push_back(*iter);
+                    iter++;
+                }
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    mini.microTreeRightmostLeafPointers.push_back(*iter);
+                    iter++;
+                }
+
                 hst.miniTrees.push_back(mini);
             }
 
@@ -457,7 +474,20 @@ namespace pht {
                     leaves.push_back(*iter);
                     iter++;
                 }
+                Bitvector leftmost_leaf;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    leftmost_leaf.push_back(*iter);
+                    iter++;
+                }
+                Bitvector rightmost_leaf;
+                tempSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                for(uint32_t i=0; i<tempSize; i++) {
+                    rightmost_leaf.push_back(*iter);
+                    iter++;
+                }
                 //TODO: Last Bit is SOMETIMES 0, should be 1; seems to be an encoding issue
+                //TODO: Last Bit seems to ignore trailing 1s
                 /**
                  * On TreeAlex:
                  * 1111111010110000100110001000000010000000100000001 correct bitvector
@@ -465,8 +495,6 @@ namespace pht {
                  * 1111111010110000100110001000000010000000100000001 fileoutput
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
                  *
-                 * HOWEVER:
-                 * Behaves correctly on TreeNath!
                  */
                 LookupTableEntry microTreeData(index, bp, matrix);
                 microTreeData.degree = degree;
@@ -474,6 +502,8 @@ namespace pht {
                 microTreeData.nodeDepths = nodeDepths;
                 microTreeData.nodeHeights = nodeHeights;
                 microTreeData.leaves = leaves;
+                microTreeData.leftmost_leaf = leftmost_leaf;
+                microTreeData.rightmost_leaf = rightmost_leaf;
                 hst.lookupTable.push_back(microTreeData);
             }
             return hst;

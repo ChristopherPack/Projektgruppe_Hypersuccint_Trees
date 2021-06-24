@@ -66,8 +66,6 @@ namespace pht {
         Bitvector miniLeaves;
         //Amount of Leaves within MicroTrees
         Bitvector microLeaves;
-
-        //TODO:
         //Leftmost Leaf Pointer for MiniTree
         Bitvector miniTreeLeftmostLeafPointer;
         //Rightmost Leaf Pointer for MiniTree
