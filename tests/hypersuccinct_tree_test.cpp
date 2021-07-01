@@ -546,15 +546,15 @@ TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
 TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
     pht::HstNode node = {0,0,0};
     uint32_t res = hyperNath.leaf_rank(node);
-    EXPECT_EQ(39, res);
+    EXPECT_EQ(0, res);
 
     node = {1,1,0};
     res = hyperNath.leaf_rank(node);
-    EXPECT_EQ(39, res);
+    EXPECT_EQ(0, res);
 
     node = {0,1,0};
     res = hyperNath.leaf_rank(node);
-    EXPECT_EQ(39, res);
+    EXPECT_EQ(35, res);
 
     node = {4,1,4};
     res = hyperNath.leaf_rank(node);

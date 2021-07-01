@@ -349,7 +349,7 @@ uint32_t HypersuccinctTree::leaf_size(HstNode node) {
             auto dummyIter = miniTree.dummys.cbegin();
             uint32_t dummyIndex = 0;
             for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, 0);
+                Bitvector dummy = getMicroDummys(miniTree, i);
                 if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
                     dummyIndex++;
                 }
@@ -390,21 +390,51 @@ uint32_t HypersuccinctTree::leaf_size(HstNode node) {
 }
 
 uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
+    //TODO: FID Check for Child Rank (See 0,1,0)
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
     if(std::get<2>(node) > 0) {
-
+        if(isDummyAncestorWithinMicroTree({std::get<0>(node),std::get<1>(node),0})) {
+            Bitvector dummy = getMicroDummys(miniTree,std::get<1>(node));
+            uint32_t dummyNum = Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY);
+            if(dummyNum < std::get<2>(node)) {
+                //isDummyAncestor = 1;
+                auto dummyIter = miniTree.dummys.cbegin();
+                uint32_t dummyIndex = 0;
+                for (int i = 0; i < std::get<1>(node); i++) {
+                    Bitvector dummyS = getMicroDummys(miniTree, i);
+                    if (Bitvector_Utils::decodeNumber(dummyS, Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+                        dummyIndex++;
+                    }
+                }
+                auto iterDummy = miniTree.microDummyPointers.cbegin();
+                Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy, dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+                uint32_t newMicro = Bitvector_Utils::decodeNumber(newMicroBit, Bitvector_Utils::NumberEncoding::BINARY);
+                auto iterm = miniTree.microRootLeafRanks.cbegin();
+                Bitvector leaf_rank_node = Bitvector_Utils::getEntry(iterm, newMicro,miniTree.microRootLeafRanks.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+                res += Bitvector_Utils::decodeNumber(leaf_rank_node, Bitvector_Utils::NumberEncoding::BINARY) - 1;
+            }
+        }
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
         auto iter = entry.leafRank.cbegin();
         Bitvector leaf_rank_node = Bitvector_Utils::getEntry(iter,std::get<2>(node),entry.leafRank.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
         res += Bitvector_Utils::decodeNumber(leaf_rank_node, Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
-    if(std::get<1>(node) > 0) {
+    //if(std::get<1>(node) > 0) {
+        if(isDummyAncestorWithinMiniTree({std::get<0>(node),0,0})) {
+            uint32_t dummyTree = Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY);
+            uint32_t dummyIndex = Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY);
+            if(dummyTree < std::get<1>(node) || (dummyTree == std::get<1>(node)&&dummyIndex < std::get<2>(node))) {
+                uint32_t newMini = Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY);
+                MiniTree newMiniTree = getMiniTree(newMini);
+                res += Bitvector_Utils::decodeNumber(newMiniTree.miniDummyLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
+            }
+        }
 
         auto iter = miniTree.microRootLeafRanks.cbegin();
         Bitvector leaf_rank_micro = Bitvector_Utils::getEntry(iter,std::get<1>(node),miniTree.microRootLeafRanks.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
         res += (Bitvector_Utils::decodeNumber(leaf_rank_micro, Bitvector_Utils::NumberEncoding::BINARY) - 1);
-    }
+    //}
     return res + Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
 }
 
