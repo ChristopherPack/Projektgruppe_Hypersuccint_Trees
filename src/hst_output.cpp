@@ -84,6 +84,13 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).microTreeLeftmostLeafPointers);
         cout << "Rightmost MicroTree within MiniTree:  ";
         printBitvector(tree.getMiniTree(index).microTreeRightmostLeafPointers);
+
+        cout << "LeafRank at MiniTree Root:  ";
+        printBitvector(tree.getMiniTree(index).miniRootLeafRank);
+        cout << "LeafRank at MiniTree Dummy:  ";
+        printBitvector(tree.getMiniTree(index).miniDummyLeafRank);
+        cout << "LeafRank at MicroTree Roots:  ";
+        printBitvector(tree.getMiniTree(index).microRootLeafRanks);
         cout << "\n";
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
@@ -107,6 +114,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).leftmost_leaf);
         cout << "Rightmost Leaves:   ";
         printBitvector(tree.getLookupTableEntry(index).rightmost_leaf);
+        cout << "Leaf Ranks:   ";
+        printBitvector(tree.getLookupTableEntry(index).leafRank);
     }
 }
 

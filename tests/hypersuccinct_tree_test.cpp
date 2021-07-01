@@ -542,3 +542,50 @@ TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
     EXPECT_EQ(pht::HstNode(3,0,2), res);
 
 }
+
+TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {0,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,1,4};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,2,3};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,2};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,2,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,2,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {3,0,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+}
