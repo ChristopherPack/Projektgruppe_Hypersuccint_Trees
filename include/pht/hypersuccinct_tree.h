@@ -308,6 +308,15 @@ namespace pht {
          */
         Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
 
+        /**
+         * For a fiven FID index, finds all Tree Indices that belong to this FID
+         * For MiniTrees
+         *
+         * @param index The index of the FID
+         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
+         */
+        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+
         ////////////////////////////////////////////////////////////////////////////
         // Test Methods in this Block
         //
@@ -330,10 +339,6 @@ namespace pht {
         Bitvector getParentFIDMiniTree(uint32_t treeNum);
 
         uint32_t getParentMiniTree(uint32_t treeNum);
-
-        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
-
-        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFIDH(uint32_t currentIndex, uint32_t topTree, uint32_t offsetLowTrees);
 
         /**
          * TODO: Most likely unnecessary

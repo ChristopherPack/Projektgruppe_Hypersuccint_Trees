@@ -289,6 +289,7 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
             for(int i = 0; i< topTrees; i++) {
                 topTreeIndices.push_back(topTree.at(currentIndex)+i);
             }
+            lowTreeIndices.reserve(lowTrees);
             for(int i = 0; i< lowTrees; i++) {
                 lowTreeIndices.push_back(offset+i);
             }
@@ -318,22 +319,6 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
             tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniFIDs.cend(), 2, 0}));
             dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
         }
-
-        /*Bitvector fid = fids.at(index);
-        uint32_t temp =  Bitvector_Utils::countOccurences(tvs.at(index).cbegin(), tvs.at(index).cend());
-        if(temp == 0) {
-            temp++;
-        }
-        uint32_t ancTemp = tvs.at(index).size();
-        if(treeNum < topTrees + ancTemp) {
-            return fids.at(index);
-        }
-        topTrees += temp;
-        lowTrees = Bitvector_Utils::countOccurences(tvs.at(index).cbegin(), tvs.at(index).cend(),true);*/
         currentIndex++;
     }
-}
-
-std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::getTreesForFIDH(uint32_t currentIndex, uint32_t topTree, uint32_t offsetLowTrees) {
-    return {};
 }
