@@ -393,6 +393,12 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
     //TODO: FID Check for Child Rank (See 0,1,0)
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
+
+    /*Bitvector fid = getFIDforMiniTree(std::get<0>(node));
+    uint32_t fidIndex = 0;
+    std::tuple<std::vector<uint32_t >,std::vector<uint32_t >> trees = getTreesForFID(fidIndex);
+    if()*/
+
     if(std::get<2>(node) > 0) {
         if(isDummyAncestorWithinMicroTree({std::get<0>(node),std::get<1>(node),0})) {
             Bitvector dummy = getMicroDummys(miniTree,std::get<1>(node));
