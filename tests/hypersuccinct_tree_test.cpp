@@ -305,6 +305,56 @@ TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
 }
 
+TEST_F(HypersuccinctTreeTest, getParentFIDMiniTreeTest) {
+    std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getParentFIDMiniTree(1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getParentFIDMiniTree(2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getParentFIDMiniTree(3);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getParentFIDMiniTree(4);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getParentFIDMiniTree(5);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    //For Dummys ParentFID matches Normal FID (since actual parent (dummy) has no FID)
+    res = hyperNath.getParentFIDMiniTree(6);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+    res = hyperNath.getParentFIDMiniTree(7);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+}
+
+TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
+    std::tuple<std::vector<uint32_t >,std::vector<uint32_t >> res = hyperNath.getTreesForFID(0);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(0));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(1,2));
+
+    res = hyperNath.getTreesForFID(1);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(1));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+
+    res = hyperNath.getTreesForFID(2);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(2));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(3,4));
+
+    res = hyperNath.getTreesForFID(3);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(3));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(5));
+
+    res = hyperNath.getTreesForFID(4);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(4));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+
+    res = hyperNath.getTreesForFID(5);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(5));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+
+    res = hyperNath.getTreesForFID(6);
+    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(6,7));
+    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+}
+
 TEST_F(HypersuccinctTreeTest, degreeTest) {
     pht::HstNode node = {0,0,0};
     uint32_t res = hyperNath.degree(node);
@@ -540,5 +590,52 @@ TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
     node = {3,0,1};
     res = hyperNath.leftmost_leaf(node);
     EXPECT_EQ(pht::HstNode(3,0,2), res);
+
+}
+
+TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(0, res);
+
+    node = {1,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(0, res);
+
+    node = {0,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(35, res);
+
+    node = {4,1,4};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,2,3};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,1,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,2};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,2,0};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,2,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
+
+    node = {3,0,1};
+    res = hyperNath.leaf_rank(node);
+    EXPECT_EQ(39, res);
 
 }

@@ -32,6 +32,9 @@ int main() {
     std::cout << tree->toNewickString() << std::endl;*/
 
 
+
+
+
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);

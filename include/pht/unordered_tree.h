@@ -473,6 +473,12 @@ namespace pht {
             return depth;
         }
 
+        /**
+         * Returns the leftmost Leaf of the given node
+         *
+         * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
+         * @return The leftmost Leaf of the node as node
+         */
         std::shared_ptr<pht::Node<T>> getLeftmostLeaf(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
@@ -483,6 +489,12 @@ namespace pht {
             return getLeftmostLeaf(descendants.at(node).front());
         }
 
+        /**
+         * Returns the rightmost Leaf of the given node
+         *
+         * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
+         * @return The rightmost Leaf of the node as node
+         */
         std::shared_ptr<pht::Node<T>> getRightmostLeaf(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
@@ -493,6 +505,13 @@ namespace pht {
             return getRightmostLeaf(descendants.at(node).back());
         }
 
+        /**
+         * Returns the leaf size (Amount of Leaves) of the given node
+         * TODO: This one really needs caching
+         *
+         * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
+         * @return The leaf size of the node
+         */
         uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
@@ -503,6 +522,31 @@ namespace pht {
             uint32_t res = 0;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
                 res += getLeafSize(desc);
+            }
+            return res;
+        }
+
+        /**
+         * Returns the leaf Rank (Amount of leaves before) of the given node
+         *
+         * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
+         * @return The leaf rank of the node
+         */
+        uint32_t getLeafRank(const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+            uint32_t res = 0;
+            if(isLeaf(node)) {
+                res +=1;
+            }
+            std::shared_ptr<pht::Node<T>> anc = getDirectAncestor(node);
+            if(anc != nullptr) {
+                res += getLeafRank(anc);
+                auto it = descendants.at(anc).cbegin();
+                while (*it != node) {
+                    res += getLeafSize(*it);
+                    it++;
+                }
             }
             return res;
         }
