@@ -331,6 +331,10 @@ namespace pht {
 
         uint32_t getParentMiniTree(uint32_t treeNum);
 
+        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+
+        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFIDH(uint32_t currentIndex, uint32_t topTree, uint32_t offsetLowTrees);
+
         /**
          * TODO: Most likely unnecessary
          * @param node
