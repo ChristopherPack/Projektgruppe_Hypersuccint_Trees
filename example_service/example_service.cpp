@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #define PHT_TEST
 #include "pht/unordered_tree.h"
@@ -17,6 +18,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
+    std::cout << std::filesystem::current_path().string() << std::endl;
     pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");

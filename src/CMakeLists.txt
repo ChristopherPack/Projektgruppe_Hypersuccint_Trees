@@ -1,4 +1,5 @@
-find_package(Python COMPONENTS Development.Embed REQUIRED)
+#set(Python_ROOT_DIR "D:/Nutzerdaten/Dokumente/Studium_Informatik/Projektgruppe TheoInf/ProjektSuccinctTrees/venv")
+find_package(Python COMPONENTS Development Interpreter REQUIRED)
 message("Python_FOUND: ${Python_FOUND}")
 message("Python_Interpreter_FOUND: ${Python_Interpreter_FOUND}")
 message("Python_EXECUTABLE: ${Python_EXECUTABLE}")
