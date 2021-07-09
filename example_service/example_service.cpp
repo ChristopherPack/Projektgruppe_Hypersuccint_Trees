@@ -7,7 +7,9 @@
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#ifdef NDEBUG
 #include "pht/visualize.h"
+#endif
 
 #include "pht/logger.h"
 
@@ -29,7 +31,9 @@ int main() {
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
 
+#ifdef NDEBUG
     pht::Visualize::visualize(tree);//Set PYTHONHOME (to python) and PYTHONPATH (to DLLs, Lib and site-packages)
+#endif
 
     //Couts are necessary like this
     /*std::cout << "Original tree:\n" << *tree << "\n\n";

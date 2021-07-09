@@ -15,6 +15,9 @@ namespace pht {
             Py_Initialize();
             PyObject* str = PyUnicode_FromString(file.c_str());
             PyObject* module = PyImport_Import(str);
+            if(PyErr_Occurred()) {
+                PyErr_Print();
+            }
             Py_DECREF(str);
 
             PyObject* func = PyObject_GetAttrString(module, function.c_str());
