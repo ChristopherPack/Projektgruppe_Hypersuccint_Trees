@@ -66,8 +66,6 @@ namespace pht {
         Bitvector miniLeaves;
         //Amount of Leaves within MicroTrees
         Bitvector microLeaves;
-
-        //TODO:
         //Leftmost Leaf Pointer for MiniTree
         Bitvector miniTreeLeftmostLeafPointer;
         //Rightmost Leaf Pointer for MiniTree
@@ -76,6 +74,13 @@ namespace pht {
         Bitvector microTreeLeftmostLeafPointers;
         //Rightmost Leaf Pointers for MicroTrees
         Bitvector microTreeRightmostLeafPointers;
+
+        //Leaf Rank of MiniTree Root
+        Bitvector miniRootLeafRank;
+        //Leaf Rank of MiniTree Dummy
+        Bitvector miniDummyLeafRank;
+        //Leaf Ranks of MicroTree Roots + 1
+        Bitvector microRootLeafRanks;
 
 
 
@@ -111,11 +116,14 @@ namespace pht {
         //Leftmose leaves for every node within MicroTree
         Bitvector rightmost_leaf;
 
+        //Leaf Rank for every node within MicroTree + 1
+        Bitvector leafRank;
+
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
-        LookupTableEntry(const Bitvector& index, const Bitvector& matrix) : index(index), matrix(matrix) {}
+        LookupTableEntry(const Bitvector& index) : index(index) {}
         //TODO: Extend constructor as more fields are added!
-        LookupTableEntry(const Bitvector& index, const Bitvector& bp, const Bitvector& matrix) : index(index), bp(bp), matrix(matrix) {}
+        LookupTableEntry(const Bitvector& index, const Bitvector& bp) : index(index), bp(bp) {}
         bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
         }
@@ -300,6 +308,15 @@ namespace pht {
          */
         Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
 
+        /**
+         * For a fiven FID index, finds all Tree Indices that belong to this FID
+         * For MiniTrees
+         *
+         * @param index The index of the FID
+         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
+         */
+        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+
         ////////////////////////////////////////////////////////////////////////////
         // Test Methods in this Block
         //
@@ -385,8 +402,20 @@ namespace pht {
          */
         uint32_t height(HstNode node);
 
+        /**
+         * Returns the leftmost leaf of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The leftmost leaf as HstNode
+         */
         HstNode leftmost_leaf(HstNode node);
 
+        /**
+         * Returns the rightmost leaf of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The rightmost leaf as HstNode
+         */
         HstNode rightmost_leaf(HstNode node);
 
         /**
@@ -396,6 +425,15 @@ namespace pht {
          * @return the Leaf Size as uint32_t
          */
         uint32_t leaf_size(HstNode node);
+
+        /**
+         * Returns the Leaf Rank of a given Node
+         * Leaf Rank is the amount of Leaves coming before the Node, in node order
+         *
+         * @param node The Node as HstNode
+         * @return the Leaf Size as uint32_t
+         */
+         uint32_t leaf_rank(HstNode node);
 
         /**
          * TODO: Unfinished
