@@ -1,47 +1,62 @@
-//
-// Created by User on 02.07.2021.
-//
+#ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_VISUALIZE_H_
+#define PROJECTGROUP_HYPERSUCCINCT_TREES_VISUALIZE_H_
 
-#ifndef PROJEKTSUCCINCTTREES_VISUALIZE_H
-#define PROJEKTSUCCINCTTREES_VISUALIZE_H
+#include <memory>
+#include <tuple>
 
-#include "pht/hypersuccinct_tree.h"
 #include <Python.h>
 
-void visualize()
-{
-    PyObject *pName, *pModule, *pDict, *pFunc, *pValue;
+#include "pht/unordered_tree.h"
+#include "pht/pyhelper.h"
 
-    // Initialize the Python Interpreter
-    Py_Initialize();
+namespace pht {
+    class Visualize {
+    public:
+        template<class T> static void visualize(std::shared_ptr<pht::UnorderedTree<T>> tree) {
+            PyHelper::pyCall("visualize", "visualize", [&tree](){
+                std::map<std::shared_ptr<Node<T>>, PyObject*> nodeToPyNodeMap;
 
-    // Build the name object
-    pName = PyUnicode_FromString("main");
+                uint32_t i = 0;
+                PyObject* pyNodes = PyHelper::toPyList<std::shared_ptr<Node<T>>>(tree->nodes, [&nodeToPyNodeMap, &i](std::shared_ptr<Node<T>> node){
+                    PyObject* pyNode = PyUnicode_FromString(std::string(1, 65+i++).c_str());
+                    nodeToPyNodeMap.insert({node, pyNode});
+                    return pyNode;
+                });
+                
+                PyObject* pyAncestors = PyHelper::toPyDict<std::shared_ptr<Node<T>>,std::shared_ptr<Node<T>>>(tree->ancestors, [&nodeToPyNodeMap](std::shared_ptr<Node<T>> key, std::shared_ptr<Node<T>> value){
+                    PyObject* pyKey = nodeToPyNodeMap.at(key);
+                    PyObject* pyValue = value==nullptr?Py_None:nodeToPyNodeMap.at(value);
+                    Py_INCREF(pyKey);
+                    Py_INCREF(pyValue);
+                    return std::pair<PyObject*,PyObject*>(pyKey, pyValue);
+                });
+                
+                PyObject* pyDescendants = PyHelper::toPyDict<std::shared_ptr<Node<T>>,std::vector<std::shared_ptr<Node<T>>>>(tree->descendants, [&nodeToPyNodeMap](std::shared_ptr<Node<T>> key, std::vector<std::shared_ptr<Node<T>>> value){
+                    PyObject* pyKey = nodeToPyNodeMap.at(key);
+                    PyObject* pyValue = PyHelper::toPyList<std::shared_ptr<Node<T>>>(value, [&nodeToPyNodeMap](std::shared_ptr<Node<T>> node){
+                        PyObject* pyNode = nodeToPyNodeMap.at(node);
+                        Py_INCREF(pyNode);
+                        return pyNode;
+                    });
+                    Py_INCREF(pyKey);
+                    return std::pair<PyObject*,PyObject*>(pyKey, pyValue);
+                });
 
-    // Load the module object
-    pModule = PyImport_Import(pName);
+                return PyTuple_Pack(4, pyNodes, nodeToPyNodeMap.at(tree->root), pyAncestors, pyDescendants);
+            },[](PyObject* args){
+                PyHelper::deletePyDict(PyTuple_GetItem(args, 3), [](PyObject* key, PyObject* value){
+                    Py_DECREF(key);
+                    PyHelper::deletePyList(value, [](PyObject* entry){Py_DECREF(entry);});
+                });
+                PyHelper::deletePyDict(PyTuple_GetItem(args, 2), [](PyObject* key, PyObject* value){Py_DECREF(key);Py_DECREF(value);});
+                PyHelper::deletePyList(PyTuple_GetItem(args, 0), [](PyObject* entry){Py_DECREF(entry);});
+            });
 
-    // pDict is a borrowed reference
-    pDict = PyModule_GetDict(pModule);
-
-    // pFunc is also a borrowed reference
-    pFunc = PyDict_GetItemString(pDict, "print_hi");
-
-    if (PyCallable_Check(pFunc))
-    {
-        PyObject_CallObject(pFunc, NULL);
-    } else
-    {
-        PyErr_Print();
-    }
-
-    // Clean up
-    Py_DECREF(pModule);
-    Py_DECREF(pName);
-
-    // Finish the Python Interpreter
-    Py_Finalize();
+            //HACK
+            exit(0);//HACK
+            //HACK
+        }
+    };
 }
 
-
-#endif //PROJEKTSUCCINCTTREES_VISUALIZE_H
+#endif//PROJECTGROUP_HYPERSUCCINCT_TREES_VISUALIZE_H_

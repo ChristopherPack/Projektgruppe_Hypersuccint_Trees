@@ -6,6 +6,7 @@
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#include "pht/visualize.h"
 
 #include "pht/logger.h"
 
@@ -25,6 +26,8 @@ int main() {
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath");
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
+
+    pht::Visualize::visualize(tree);//Set PYTHONHOME (to python) and PYTHONPATH (to DLLs, Lib and site-packages)
 
     //Couts are necessary like this
     /*std::cout << "Original tree:\n" << *tree << "\n\n";
