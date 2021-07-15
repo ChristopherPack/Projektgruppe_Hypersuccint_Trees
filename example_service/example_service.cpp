@@ -20,10 +20,10 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    std::cout << std::filesystem::current_path().string() << std::endl;
     pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");
+    PHT_LOGGER_INFO("MAIN", "Current Filesystem:" + std::filesystem::current_path().string());
     pht::Timer globalTimer;
     PHT_LOGGER_INFO("MAIN", "Reading File...");
     pht::Timer localTimer;
@@ -34,11 +34,6 @@ int main() {
 #ifdef NDEBUG
     pht::Visualize::visualize(tree);//Set PYTHONHOME (to python) and PYTHONPATH (to DLLs, Lib and site-packages)
 #endif
-
-    //Couts are necessary like this
-    /*std::cout << "Original tree:\n" << *tree << "\n\n";
-    std::cout << std::endl;
-    std::cout << tree->toNewickString() << std::endl;*/
 
 
 
@@ -56,11 +51,11 @@ int main() {
     PHT_LOGGER_INFO("MAIN", std::string("Tree saved in ")+localTimer.toString());
 
     PHT_LOGGER_DEBUG("MAIN", "Printing original Tree data:");
-    std::cout << tree->getSize() << std::endl;
+    PHT_LOGGER_DEBUG("TREE", "Size: " + to_string(tree->getSize()));
     std::cout << tree->toNewickString() << std::endl;
     HypersuccinctTreeOutput::printTree(hst);
     pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
-    std::cout << std::endl << std::endl << std::endl << "FileTree:" << std::endl;
+    PHT_LOGGER_DEBUG("TREE", "FileTree:");
     HypersuccinctTreeOutput::printTree(fileHst);
 
     globalTimer.stop();
