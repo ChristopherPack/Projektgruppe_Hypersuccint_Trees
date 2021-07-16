@@ -330,6 +330,16 @@ namespace pht {
          */
         std::pair<uint32_t ,uint32_t > TreeToFIDIndexConversion(uint32_t miniTree);
 
+        /**
+         * Index conversion between tree indices and their fid inidces
+         * For MicroTrees
+         *
+         * @param miniTree  the miniTree
+         * @param microTree The index of the microTree
+         * @return The indices of its Top and Low FID (if they exist)
+         */
+        std::pair<uint32_t ,uint32_t > MicroTreeToFIDIndexConversion(MiniTree &miniTree, uint32_t microTree);
+
         ////////////////////////////////////////////////////////////////////////////
         // Test Methods in this Block
         //
@@ -360,6 +370,16 @@ namespace pht {
          * @return
          */
         bool isAncestor(HstNode node, HstNode anc);
+
+        /**
+         * Index conversion between tree indices and their fid inidces
+         * For MicroTrees
+         *
+         * @param miniTree  The index of the miniTree
+         * @param microTree The Index of the microTree
+         * @return The indices of its Top and Low FID (if they exist)
+         */
+        //std::pair<uint32_t ,uint32_t > MicroTreeToFIDIndexConversion(uint32_t miniTree, uint32_t microTree);
 
         ////////////////////////////////////////////////////////////////////////////
         //

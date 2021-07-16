@@ -393,3 +393,73 @@ std::pair<uint32_t ,uint32_t > HypersuccinctTree::TreeToFIDIndexConversion(uint3
     }
     return {-1,-1};
 }
+
+std::pair<uint32_t ,uint32_t > HypersuccinctTree::MicroTreeToFIDIndexConversion(MiniTree &miniTree, uint32_t microTree) {
+    auto iterD = miniTree.FIDs.cbegin();
+    std::vector<Bitvector> fids;
+    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0}));
+
+    auto iterD2 = miniTree.typeVectors.cbegin();
+    auto iterF = miniTree.FIDs.cbegin();
+    std::vector<Bitvector> tvs;
+    tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 2, 0}));
+
+    std::vector<Bitvector>dummys;
+    auto iter = microSize.cbegin();
+    uint32_t miniSizeNum = pht::Bitvector_Utils::decodeNumber(iter, microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+    uint32_t dummySize = floor(log2(2*miniSizeNum+1))+1;
+    auto iterD3 = miniTree.dummys.cbegin();
+    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+
+    uint32_t topOffset = 0;
+    std::vector<uint32_t > childFIDs;
+    uint32_t currentIndex = 0;
+    uint32_t topIndex = -1;
+    uint32_t lowIndex = -1;
+
+    while(currentIndex < fids.size()) {
+        Bitvector fid = fids.at(currentIndex);
+        uint32_t topTrees = Bitvector_Utils::countOccurences(tvs.at(currentIndex).cbegin(), tvs.at(currentIndex).cend());
+        uint32_t lowTrees = Bitvector_Utils::countOccurences(tvs.at(currentIndex).cbegin(), tvs.at(currentIndex).cend(),true);
+        //This is obvious: its a single node miniTree
+        if(topTrees == 0) {
+            topTrees = 1;
+        }
+
+        //LowTree Index Conversion
+        uint32_t childIndex = 0;
+        for(int i=0; i<childFIDs.size(); i++) {
+            childIndex += childFIDs.at(i);
+            if(currentIndex <= childIndex && microTree < topOffset + topTrees) {
+                lowIndex = i;
+                break;
+            }
+        }
+
+        childFIDs.push_back(lowTrees);
+
+        //TopTree Index Conversion
+        if(microTree < topOffset + topTrees) {
+            topIndex = currentIndex;
+            return {topIndex,lowIndex};
+        }
+        topOffset += topTrees;
+
+        //Getting new FIDs
+        if(iterD != miniTree.FIDs.cend()) {
+            for (uint32_t i = 0; i < lowTrees; i++) {
+                fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 2, 0}));
+                dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+            }
+        }
+        auto iterDummy = dummys.at(currentIndex).cbegin();
+        if(pht::Bitvector_Utils::decodeNumber(iterDummy, dummys.at(currentIndex).cend(),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+            tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 2, 0}));
+            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+        }
+        currentIndex++;
+    }
+    return {-1,-1};
+}
