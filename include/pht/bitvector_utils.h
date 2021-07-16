@@ -25,7 +25,7 @@ namespace pht{
             BINARY, ELIAS_GAMMA
         };
         enum class BitvectorEncoding {
-            ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN, PURE_ELIAS_GAMMA
+            ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN, PURE_ELIAS_GAMMA, STATIC_MATRIX_COLUMN
         };
 
         struct HuffmanComparator {
@@ -98,6 +98,8 @@ namespace pht{
         static Bitvector getEntryAtPureEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end);
 
         static Bitvector readEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end);
+
+        static Bitvector getEntryAtStaticMatrixColumn(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size);
 
         static uint32_t getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier);
 

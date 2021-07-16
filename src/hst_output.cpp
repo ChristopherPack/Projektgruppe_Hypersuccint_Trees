@@ -29,8 +29,6 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
     printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
     printBitvector(tree.getMiniDummys());
-    cout << "MiniAncMatrix:  ";
-    printBitvector(tree.getMiniAncMatrix());
 
     pht::MiniTree miniTree = tree.getMiniTree(0);
     for(int index = 0 ; index < tree.getMiniTrees().size(); index++) {
@@ -54,8 +52,6 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).miniDummyPointer);
         cout << "MicroDummyPointers:  ";
         printBitvector(tree.getMiniTree(index).microDummyPointers);
-        cout << "AncMatrix:  ";
-        printBitvector(tree.getMiniTree(index).ancMatrix);
         cout << "Subtree Size at MiniTree Root:  ";
         printBitvector(tree.getMiniTree(index).subTree);
         cout << "SubTreeSize at MicroTree Roots:  ";
@@ -99,7 +95,7 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         cout<< "BP for Huffman:   ";
         printBitvector(tree.getLookupTableEntry(index).bp);
         cout << "AncestorMap:   ";
-        printBitvector(tree.getLookupTableEntry(index).matrix);
+        printBitvector(tree.getLookupTableEntry(index).ancestorMatrix);
         cout << "Degrees:   ";
         printBitvector(tree.getLookupTableEntry(index).degree);
         cout << "Subtrees:   ";
@@ -222,7 +218,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
     for(LookupTableEntry& microTreeData : tree.getLookupTable()) {
         createFileBitvector(microTreeData.index, fileBitvector);
         createFileBitvector(microTreeData.bp, fileBitvector);
-        createFileBitvector(microTreeData.matrix, fileBitvector);
+        createFileBitvector(microTreeData.ancestorMatrix, fileBitvector);
         createFileBitvector(microTreeData.degree, fileBitvector);
         createFileBitvector(microTreeData.subTrees, fileBitvector);
         createFileBitvector(microTreeData.nodeDepths, fileBitvector);
