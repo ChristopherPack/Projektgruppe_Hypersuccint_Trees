@@ -358,15 +358,23 @@ std::pair<uint32_t ,uint32_t > HypersuccinctTree::TreeToFIDIndexConversion(uint3
 
         //LowTree Index Conversion
         uint32_t childIndex = 0;
+        bool found = false;
         for(int i=0; i<childFIDs.size(); i++) {
             childIndex += childFIDs.at(i);
-            if(currentIndex <= childIndex && miniTree < topOffset + topTrees) {
-                lowIndex = i;
+            if(currentIndex <= childIndex) {
+                found = true;
+                if(miniTree < topOffset + topTrees) {
+                    lowIndex = i;
+                }
                 break;
             }
         }
-
-        childFIDs.push_back(lowTrees);
+        if(currentIndex > 0 && !found) {
+            childFIDs.push_back(topTrees + lowTrees);
+        }
+        else {
+            childFIDs.push_back(lowTrees);
+        }
 
         //TopTree Index Conversion
         if(miniTree < topOffset + topTrees) {
@@ -428,15 +436,23 @@ std::pair<uint32_t ,uint32_t > HypersuccinctTree::MicroTreeToFIDIndexConversion(
 
         //LowTree Index Conversion
         uint32_t childIndex = 0;
+        bool found = false;
         for(int i=0; i<childFIDs.size(); i++) {
             childIndex += childFIDs.at(i);
-            if(currentIndex <= childIndex && microTree < topOffset + topTrees) {
-                lowIndex = i;
+            if(currentIndex <= childIndex) {
+                found = true;
+                if(microTree < topOffset + topTrees) {
+                    lowIndex = i;
+                }
                 break;
             }
         }
-
-        childFIDs.push_back(lowTrees);
+        if(currentIndex > 0 && !found) {
+            childFIDs.push_back(topTrees + lowTrees);
+        }
+        else {
+            childFIDs.push_back(lowTrees);
+        }
 
         //TopTree Index Conversion
         if(microTree < topOffset + topTrees) {
