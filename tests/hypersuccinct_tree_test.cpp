@@ -278,26 +278,6 @@ TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
     EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
 }
 
-TEST_F(HypersuccinctTreeTest, getParentFIDMiniTreeTest) {
-    std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
-    res = hyperNath.getParentFIDMiniTree(1);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
-    res = hyperNath.getParentFIDMiniTree(2);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
-    res = hyperNath.getParentFIDMiniTree(3);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    res = hyperNath.getParentFIDMiniTree(4);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    res = hyperNath.getParentFIDMiniTree(5);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    //For Dummys ParentFID matches Normal FID (since actual parent (dummy) has no FID)
-    res = hyperNath.getParentFIDMiniTree(6);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
-    res = hyperNath.getParentFIDMiniTree(7);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
-}
-
 TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
     std::tuple<std::vector<uint32_t >,std::vector<uint32_t >> res = hyperNath.getTreesForFID(0);
     EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(0));

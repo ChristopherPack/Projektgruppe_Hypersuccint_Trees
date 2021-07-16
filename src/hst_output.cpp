@@ -29,8 +29,6 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
     printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
     printBitvector(tree.getMiniDummys());
-    cout << "MiniAncMatrix:  ";
-    printBitvector(tree.getMiniAncMatrix());
 
     pht::MiniTree miniTree = tree.getMiniTree(0);
     for(int index = 0 ; index < tree.getMiniTrees().size(); index++) {
@@ -54,8 +52,6 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).miniDummyPointer);
         cout << "MicroDummyPointers:  ";
         printBitvector(tree.getMiniTree(index).microDummyPointers);
-        cout << "AncMatrix:  ";
-        printBitvector(tree.getMiniTree(index).ancMatrix);
         cout << "Subtree Size at MiniTree Root:  ";
         printBitvector(tree.getMiniTree(index).subTree);
         cout << "SubTreeSize at MicroTree Roots:  ";
