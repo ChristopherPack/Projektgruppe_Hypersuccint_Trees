@@ -155,7 +155,7 @@ namespace pht {
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
                  */
                 LookupTableEntry microTreeData(index, bp);
-                microTreeData.matrix = matrix;
+                microTreeData.ancestorMatrix = matrix;
                 microTreeData.degree = degree;
                 microTreeData.subTrees = subTrees;
                 microTreeData.nodeDepths = nodeDepths;
@@ -351,8 +351,10 @@ namespace pht {
             //Generates LookupTable Entries
             for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
 
+                std::vector<std::shared_ptr<pht::Node<T>>> directDesc = fmMicroTree->getDirectDescendants(node1);
                 for(std::shared_ptr<Node<T>> node2 : fmMicroTree->getNodes()) {
-                    lookupTableEntry.matrix.push_back(fmMicroTree->isAncestor(node2, node1));
+                    lookupTableEntry.ancestorMatrix.push_back(fmMicroTree->isAncestor(node2, node1));
+                    lookupTableEntry.childMatrix.push_back(ListUtils::containsAny(directDesc, {node2}));
                 }
 
                 uint32_t degreeNum = fmMicroTree->getDegree(node1) + 1;

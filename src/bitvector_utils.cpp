@@ -57,6 +57,8 @@ Bitvector Bitvector_Utils::getEntry(Bitvector::const_iterator& iterator, uint32_
             return getEntryAtHuffman(iterator, offset, end, information.huffmanTable);
         case BitvectorEncoding::PURE_ELIAS_GAMMA:
             return getEntryAtPureEliasGamma(iterator, offset, end);
+        case BitvectorEncoding::STATIC_MATRIX_COLUMN:
+            return getEntryAtStaticMatrixColumn(iterator, offset, end, information.staticSize);
         default:
             assert(false);
             return {};
@@ -210,10 +212,10 @@ Bitvector Bitvector_Utils::getEntryAtVectorIndex(Bitvector::const_iterator& iter
     for(int i = 0; i < offset; i++) {
         Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
         uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
-        iterator += indexLength; //skip Entry
         if(end-iterator < indexLength) {
             throw std::runtime_error("Invalid Offset!");
         }
+        iterator += indexLength; //skip Entry
     }
     Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
     uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
@@ -302,6 +304,20 @@ Bitvector Bitvector_Utils::readEliasGamma(Bitvector::const_iterator& iterator, c
             break;
         }
     }
+    return res;
+}
+
+Bitvector Bitvector_Utils::getEntryAtStaticMatrixColumn(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
+    if(iterator > end) {
+        throw std::runtime_error("Invalid Offset!");
+    }
+    iterator += offset;
+    Bitvector res;
+    while(end - iterator >= size) {
+        res.push_back(*iterator);
+        iterator += size;
+    }
+    res.push_back(*iterator);
     return res;
 }
 

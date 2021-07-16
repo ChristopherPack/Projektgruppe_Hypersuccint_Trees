@@ -99,8 +99,10 @@ namespace pht {
         Bitvector index;
         //BP of the Entry. Empty if index is BP
         Bitvector bp;
-        //Ancestor matrix
-        Bitvector matrix;
+        //Ancestor Matrix
+        Bitvector ancestorMatrix;
+        //Child Matrix
+        Bitvector childMatrix;
         //degree for every node + 1
         Bitvector degree;
         //subTree for every node within MicroTree (at least 1)
@@ -218,6 +220,8 @@ namespace pht {
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index);
 
+        uint32_t getMicroTreeCount(MiniTree& miniTree);
+
         /**
          * Returns the MicroFID Entry of the given MiniTree at the given MicroTree Index
          *
@@ -280,7 +284,18 @@ namespace pht {
          * @param node2Index Index of Node 2
          * @return if node1 is ancestor of node2 as bool
          */
-        bool lookupTableMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
+        bool lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index);
+
+        /**
+         * Returns if node1 is child of node2 with the given LookupTable Entry
+         * Both nodes only need their index inside the MicroTree (HstNode index 2)
+         *
+         * @param entry The LookupTable Entry
+         * @param anc Index of Node 1
+         * @param node2Index Index of Node 2
+         * @return if node1 is ancestor of node2 as bool
+         */
+        bool lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index);
 
         /**
          * Returns the FID for a given MiniTree
@@ -314,12 +329,21 @@ namespace pht {
         /**
          * For a fiven FID index, finds all Tree Indices that belong to this FID
          * For MiniTrees
-         * TODO: Is Wrong
          *
          * @param index The index of the FID
          * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
          */
-        std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+
+        /**
+         * For a fiven FID index, finds all Tree Indices that belong to this FID
+         * For MicroTrees
+         *
+         * @param miniTree The Minitree containing the FIDs
+         * @param index The index of the FID
+         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
+         */
+        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForMicroFID(MiniTree &miniTree, uint32_t index);
 
         /**
          * Index conversion between tree indices and their fid inidces
@@ -328,7 +352,7 @@ namespace pht {
          * @param miniTree  The index of the miniTree
          * @return The indices of its Top and Low FID (if they exist)
          */
-        std::pair<uint32_t ,uint32_t > TreeToFIDIndexConversion(uint32_t miniTree);
+        std::pair<uint32_t ,uint32_t > convertTreeToFIDIndex(uint32_t miniTree);
 
         /**
          * Index conversion between tree indices and their fid inidces
@@ -338,7 +362,7 @@ namespace pht {
          * @param microTree The index of the microTree
          * @return The indices of its Top and Low FID (if they exist)
          */
-        std::pair<uint32_t ,uint32_t > MicroTreeToFIDIndexConversion(MiniTree &miniTree, uint32_t microTree);
+        std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(MiniTree &miniTree, uint32_t microTree);
 
         ////////////////////////////////////////////////////////////////////////////
         // Test Methods in this Block
@@ -379,7 +403,7 @@ namespace pht {
          * @param microTree The Index of the microTree
          * @return The indices of its Top and Low FID (if they exist)
          */
-        //std::pair<uint32_t ,uint32_t > MicroTreeToFIDIndexConversion(uint32_t miniTree, uint32_t microTree);
+        //std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(uint32_t miniTree, uint32_t microTree);
 
         ////////////////////////////////////////////////////////////////////////////
         //
@@ -402,6 +426,16 @@ namespace pht {
          * @return if Node is ancestor of MicroDummy as bool
          */
         bool isDummyAncestorWithinMicroTree(HstNode node);
+
+        /**
+         * Returns the Child Rank of a given Node
+         *
+         * @param node The Node as HstNode
+         * @return The Child Rank as int
+         */
+        uint32_t child_rank(HstNode node);
+
+        HstNode HypersuccinctTree::getParent(HstNode node);
 
         /**
          * Returns the degree of a given Node
