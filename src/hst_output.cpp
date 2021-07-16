@@ -215,6 +215,9 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(miniTree.miniTreeRightmostLeafPointer, fileBitvector);
         createFileBitvector(miniTree.microTreeLeftmostLeafPointers, fileBitvector);
         createFileBitvector(miniTree.microTreeRightmostLeafPointers, fileBitvector);
+        createFileBitvector(miniTree.miniRootLeafRank, fileBitvector);
+        createFileBitvector(miniTree.miniDummyLeafRank, fileBitvector);
+        createFileBitvector(miniTree.microRootLeafRanks, fileBitvector);
     }
     for(LookupTableEntry& microTreeData : tree.getLookupTable()) {
         createFileBitvector(microTreeData.index, fileBitvector);
@@ -227,6 +230,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(microTreeData.leaves, fileBitvector);
         createFileBitvector(microTreeData.leftmost_leaf, fileBitvector);
         createFileBitvector(microTreeData.rightmost_leaf, fileBitvector);
+        createFileBitvector(microTreeData.leafRank, fileBitvector);
     }
     //Padding - see CreateFromFile
     fileBitvector.push_back(true);

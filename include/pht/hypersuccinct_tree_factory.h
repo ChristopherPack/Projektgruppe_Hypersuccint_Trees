@@ -117,6 +117,9 @@ namespace pht {
                 createBitvectorFromFile(iter, end, mini.miniTreeRightmostLeafPointer);
                 createBitvectorFromFile(iter, end, mini.microTreeLeftmostLeafPointers);
                 createBitvectorFromFile(iter, end, mini.microTreeRightmostLeafPointers);
+                createBitvectorFromFile(iter, end, mini.miniRootLeafRank);
+                createBitvectorFromFile(iter, end, mini.miniDummyLeafRank);
+                createBitvectorFromFile(iter, end, mini.microRootLeafRanks);
                 hst.miniTrees.push_back(mini);
             }
             for(uint32_t j=0; j<lookupTableSize; j++) {
@@ -140,6 +143,8 @@ namespace pht {
                 createBitvectorFromFile(iter, end, leftmost_leaf);
                 Bitvector rightmost_leaf;
                 createBitvectorFromFile(iter, end, rightmost_leaf);
+                Bitvector leaf_rank;
+                createBitvectorFromFile(iter, end, leaf_rank);
 
                 //TODO: Current Solution - Padding the Bitvector with one full Byte
                 /**
@@ -158,6 +163,7 @@ namespace pht {
                 microTreeData.leaves = leaves;
                 microTreeData.leftmost_leaf = leftmost_leaf;
                 microTreeData.rightmost_leaf = rightmost_leaf;
+                microTreeData.leafRank = leaf_rank;
                 hst.lookupTable.push_back(microTreeData);
             }
             return hst;
@@ -334,6 +340,12 @@ namespace pht {
             return dummys;
         }
 
+        /**
+         * Fills the given Lookup Table entry with data from the given MicroTree
+         * @tparam T Class implemented in UnorderedTree
+         * @param lookupTableEntry The lookupTable Entry to fill
+         * @param fmMicroTree The Micro Tree to get data from
+         */
         template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree){
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
             //Generates LookupTable Entries
@@ -369,6 +381,15 @@ namespace pht {
             }
         }
 
+        /**
+         * Uses the MicroTrees for a given Mini Tree and fills the HypersuccinctTree and MiniTree with data.
+         * @tparam T Class implemented in UnorderedTree
+         * @param hypersuccinctTree The Hypersuccinct Tree to fill
+         * @param miniTree The MiniTree to fill
+         * @param fmMiniTree The Mini Tree to get data from
+         * @param fmMicroTrees The Micro Trees to get data from
+         * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
+         */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences){
             //The actual MicroTree Loop
             //Put everything that needs MicroTree Iteration in this loop
@@ -420,6 +441,15 @@ namespace pht {
             }
         }
 
+        /**
+         * Uses the given Mini Trees to fill the HypersuccinctTree  with data
+         * @tparam T Class implemented in UnorderedTree
+         * @param hypersuccinctTree The Hypersuccinct Tree to fill
+         * @param tree The original Tree to get data from
+         * @param fmMiniTrees The Mini Trees to get data from
+         * @param sizeMicro Average Size of MicroTrees (according to Farzan Munro) for MicroTree generation
+         * @param bpsAndOccurrences Count Table of BP forms for Huffman encoding
+         */
         template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences){
 
             for(std::shared_ptr<UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
@@ -474,6 +504,11 @@ namespace pht {
             }
         }
 
+        /**
+         * For each Node in the original Tree: Marks which MiniTree it belongs to.
+         * @tparam T Class implemented in Unordered Tree
+         * @param fmMiniTrees Mini Trees for marking
+         */
         template<class T> static void enumerateMiniTrees(std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees){
             uint32_t miniTreeNum = 0;
             for(std::shared_ptr<UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
@@ -484,6 +519,11 @@ namespace pht {
             }
         }
 
+        /**
+         * For each Node in the original Tree: Marks which MicroTree it belongs to.
+         * @tparam T Class implemented in Unordered Tree
+         * @param fmMicroTrees Micro Trees for marking
+         */
         template<class T> static void enumerateMicroTrees(std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees){
             uint32_t microTreeNum = 0;
             for(const std::shared_ptr<UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
@@ -494,6 +534,14 @@ namespace pht {
             }
         }
 
+        /**
+         * Generates Pointers for Mini Dummy so that it can be identified as HSTNode later.
+         * @tparam T Class implemented in UnorderedTree
+         * @param miniTree The MiniTree containing the Dummy as Minitree
+         * @param fmMiniTree The Mini Tree containting the Dummy as UnorderedTree
+         * @param fmMicroTree The MicroTree containing the Dummy as UnorderedTree
+         * @param fmMicroTrees Vector of all MicroTrees as UnorderedTree
+         */
         template<class T> static void handleMiniDummyInMicroTree(MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees){
             if(fmMicroTree->contains(fmMiniTree->getDummy())) {
                 auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);

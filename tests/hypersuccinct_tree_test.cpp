@@ -355,6 +355,63 @@ TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
     EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
 }
 
+TEST_F(HypersuccinctTreeTest, TreeToFIDIndexConversionTest) {
+    std::tuple<uint32_t,uint32_t> res = hyperNath.TreeToFIDIndexConversion(0);
+    EXPECT_EQ(std::get<0>(res), 0);
+    EXPECT_EQ(std::get<1>(res), -1);
+
+    res = hyperNath.TreeToFIDIndexConversion(1);
+    EXPECT_EQ(std::get<0>(res), 1);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.TreeToFIDIndexConversion(2);
+    EXPECT_EQ(std::get<0>(res), 2);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.TreeToFIDIndexConversion(3);
+    EXPECT_EQ(std::get<0>(res), 3);
+    EXPECT_EQ(std::get<1>(res), 2);
+
+    res = hyperNath.TreeToFIDIndexConversion(4);
+    EXPECT_EQ(std::get<0>(res), 4);
+    EXPECT_EQ(std::get<1>(res), 2);
+
+    res = hyperNath.TreeToFIDIndexConversion(5);
+    EXPECT_EQ(std::get<0>(res), 5);
+    EXPECT_EQ(std::get<1>(res), 3);
+
+    res = hyperNath.TreeToFIDIndexConversion(6);
+    EXPECT_EQ(std::get<0>(res), 6);
+    EXPECT_EQ(std::get<1>(res), -1);
+
+    res = hyperNath.TreeToFIDIndexConversion(7);
+    EXPECT_EQ(std::get<0>(res), 6);
+    EXPECT_EQ(std::get<1>(res), -1);
+}
+
+TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
+    pht::MiniTree miniTree = hyperNath.getMiniTree(1);
+    std::tuple<uint32_t,uint32_t> res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 0);
+    EXPECT_EQ(std::get<0>(res), 0);
+    EXPECT_EQ(std::get<1>(res), -1);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 1);
+    EXPECT_EQ(std::get<0>(res), 1);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 2);
+    EXPECT_EQ(std::get<0>(res), 2);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 3);
+    EXPECT_EQ(std::get<0>(res), 3);
+    EXPECT_EQ(std::get<1>(res), 2);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 4);
+    EXPECT_EQ(std::get<0>(res), 4);
+    EXPECT_EQ(std::get<1>(res), -1);
+}
+
 TEST_F(HypersuccinctTreeTest, degreeTest) {
     pht::HstNode node = {0,0,0};
     uint32_t res = hyperNath.degree(node);

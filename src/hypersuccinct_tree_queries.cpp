@@ -49,47 +49,6 @@ bool HypersuccinctTree::isDummyAncestorWithinMicroTree(HstNode node) {
     return lookupTableMatrixComparison(getLookupTableEntry(getMicroTree(mini,std::get<1>(node))), std::get<2>(node),dummyNum);
 }
 
-bool HypersuccinctTree::isAncestor(HstNode node, HstNode anc) {
-    if(std::get<0>(node) == std::get<0>(anc))
-    {
-        if(std::get<1>(node)==std::get<1>(anc)) {
-            MiniTree mini = getMiniTree(std::get<0>(anc));
-            Bitvector index = getMicroTree(mini,std::get<1>(anc));
-            return lookupTableMatrixComparison(getLookupTableEntry(index), std::get<2>(anc),std::get<2>(node));
-        }
-        else
-        {
-            if(std::get<1>(node) < std::get<1>(anc)) {
-                return false;
-            }
-            MiniTree mini = getMiniTree(std::get<0>(anc));
-            uint32_t ancMicroDummy = Bitvector_Utils::decodeNumber(getMicroDummys(mini, std::get<1>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
-            if(std::get<2>(anc) != 0 && ancMicroDummy == 0) {
-                return false;
-            }
-            Bitvector index = getMicroTree(mini,std::get<1>(anc));
-            if(!lookupTableMatrixComparison(getLookupTableEntry(index), ancMicroDummy,std::get<2>(anc))) {
-                return false;
-            }
-            return microTreeAncMatrixComparison(mini, std::get<1>(anc), std::get<1>(node));
-        }
-    }
-    else
-    {
-        if(std::get<0>(node) < std::get<0>(anc)) {
-            return false;
-        }
-        uint32_t ancMiniDummy = Bitvector_Utils::decodeNumber(getMiniDummy(std::get<0>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
-        if(std::get<2>(anc) != 0 && ancMiniDummy == 0) {
-                return false;
-        }
-        if(!isDummyAncestorWithinMiniTree(anc) && ancMiniDummy != 0) {
-            return false;
-        }
-        return miniTreeAncMatrixComparison(std::get<0>(anc),std::get<0>(node));
-    }
-}
-
 uint32_t HypersuccinctTree::degree(HstNode node) {
     if(std::get<2>(node) > 0) {
         //LookupTable
@@ -444,6 +403,8 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
     return res + Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
 }
 
+
+
 HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
     if(std::get<2>(node) > 0) {
         //depth via lookputable
@@ -467,6 +428,47 @@ HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
     //M is miniTree Size?
     uint32_t delta = ceil(sqrt(Bitvector_Utils::decodeNumber(miniSize,Bitvector_Utils::NumberEncoding::BINARY)));
     return {};
+}
+
+bool HypersuccinctTree::isAncestor(HstNode node, HstNode anc) {
+    if(std::get<0>(node) == std::get<0>(anc))
+    {
+        if(std::get<1>(node)==std::get<1>(anc)) {
+            MiniTree mini = getMiniTree(std::get<0>(anc));
+            Bitvector index = getMicroTree(mini,std::get<1>(anc));
+            return lookupTableMatrixComparison(getLookupTableEntry(index), std::get<2>(anc),std::get<2>(node));
+        }
+        else
+        {
+            if(std::get<1>(node) < std::get<1>(anc)) {
+                return false;
+            }
+            MiniTree mini = getMiniTree(std::get<0>(anc));
+            uint32_t ancMicroDummy = Bitvector_Utils::decodeNumber(getMicroDummys(mini, std::get<1>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
+            if(std::get<2>(anc) != 0 && ancMicroDummy == 0) {
+                return false;
+            }
+            Bitvector index = getMicroTree(mini,std::get<1>(anc));
+            if(!lookupTableMatrixComparison(getLookupTableEntry(index), ancMicroDummy,std::get<2>(anc))) {
+                return false;
+            }
+            return microTreeAncMatrixComparison(mini, std::get<1>(anc), std::get<1>(node));
+        }
+    }
+    else
+    {
+        if(std::get<0>(node) < std::get<0>(anc)) {
+            return false;
+        }
+        uint32_t ancMiniDummy = Bitvector_Utils::decodeNumber(getMiniDummy(std::get<0>(anc)),Bitvector_Utils::NumberEncoding::BINARY);
+        if(std::get<2>(anc) != 0 && ancMiniDummy == 0) {
+            return false;
+        }
+        if(!isDummyAncestorWithinMiniTree(anc) && ancMiniDummy != 0) {
+            return false;
+        }
+        return miniTreeAncMatrixComparison(std::get<0>(anc),std::get<0>(node));
+    }
 }
 
 HstNode findParent(HstNode node) {
