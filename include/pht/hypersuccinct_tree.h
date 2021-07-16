@@ -284,6 +284,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MiniTree
+         * TODO: Is Wrong
          *
          * @param treeNum Number of the Tree as int
          * @return FID as Bitvector
@@ -292,6 +293,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MicroTree within a MiniTree
+         * TODO: Is Wrong
          *
          * @param miniTree The Minitree as Minitree
          * @param treeNum the Microtree number as int
@@ -301,6 +303,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MicroTree within a MiniTree
+         * TODO: Is Wrong
          *
          * @param miniTree The Minitree number as int
          * @param treeNum the Microtree number as int
@@ -311,11 +314,21 @@ namespace pht {
         /**
          * For a fiven FID index, finds all Tree Indices that belong to this FID
          * For MiniTrees
+         * TODO: Is Wrong
          *
          * @param index The index of the FID
          * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
          */
         std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
+
+        /**
+         * Index conversion between tree indices and their fid inidces
+         * For MiniTrees
+         *
+         * @param miniTree  The index of the miniTree
+         * @return The indices of its Top and Low FID (if they exist)
+         */
+        std::pair<uint32_t ,uint32_t > TreeToFIDIndexConversion(uint32_t miniTree);
 
         ////////////////////////////////////////////////////////////////////////////
         // Test Methods in this Block

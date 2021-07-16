@@ -273,7 +273,7 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
 
     std::vector<uint32_t > topTree;
     topTree.push_back(0);
-    uint32_t offset = 1;
+    uint32_t lowOffset = 1;
     uint32_t currentIndex = 0;
 
     while(currentIndex < fids.size()) {
@@ -291,7 +291,7 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
             }
             lowTreeIndices.reserve(lowTrees);
             for(int i = 0; i< lowTrees; i++) {
-                lowTreeIndices.push_back(offset+i);
+                lowTreeIndices.push_back(lowOffset + i);
             }
             return {topTreeIndices,lowTreeIndices};
         }
@@ -303,7 +303,7 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
         if(topTrees==0) {
             topTree.push_back(topTree.at(currentIndex) + 1);
         }
-        offset += lowTrees;
+        lowOffset += lowTrees;
 
 
         if(iterD != miniFIDs.cend()) {
@@ -321,4 +321,75 @@ std::tuple< std::vector<uint32_t >,std::vector<uint32_t > > HypersuccinctTree::g
         }
         currentIndex++;
     }
+    return {{},{}};
+}
+
+std::pair<uint32_t ,uint32_t > HypersuccinctTree::TreeToFIDIndexConversion(uint32_t miniTree) {
+    auto iterD = miniFIDs.cbegin();
+    std::vector<Bitvector> fids;
+    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniFIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0}));
+
+    auto iterD2 = miniTypeVectors.cbegin();
+    auto iterF = miniFIDs.cbegin();
+    std::vector<Bitvector> tvs;
+    tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniFIDs.cend(), 2, 0}));
+
+    std::vector<Bitvector>dummys;
+    auto iter = miniSize.cbegin();
+    uint32_t miniSizeNum = pht::Bitvector_Utils::decodeNumber(iter, miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+    uint32_t dummySize = floor(log2(2*miniSizeNum+1))+1;
+    auto iterD3 = miniDummys.cbegin();
+    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+
+    uint32_t topOffset = 0;
+    std::vector<uint32_t > childFIDs;
+    uint32_t currentIndex = 0;
+    uint32_t topIndex = -1;
+    uint32_t lowIndex = -1;
+
+    while(currentIndex < fids.size()) {
+        Bitvector fid = fids.at(currentIndex);
+        uint32_t topTrees = Bitvector_Utils::countOccurences(tvs.at(currentIndex).cbegin(), tvs.at(currentIndex).cend());
+        uint32_t lowTrees = Bitvector_Utils::countOccurences(tvs.at(currentIndex).cbegin(), tvs.at(currentIndex).cend(),true);
+        //This is obvious: its a single node miniTree
+        if(topTrees == 0) {
+            topTrees = 1;
+        }
+
+        //LowTree Index Conversion
+        uint32_t childIndex = 0;
+        for(int i=0; i<childFIDs.size(); i++) {
+            childIndex += childFIDs.at(i);
+            if(currentIndex <= childIndex && miniTree < topOffset + topTrees) {
+                lowIndex = i;
+                break;
+            }
+        }
+
+        childFIDs.push_back(lowTrees);
+
+        //TopTree Index Conversion
+        if(miniTree < topOffset + topTrees) {
+            topIndex = currentIndex;
+            return {topIndex,lowIndex};
+        }
+        topOffset += topTrees;
+
+        //Getting new FIDs
+        if(iterD != miniFIDs.cend()) {
+            for (uint32_t i = 0; i < lowTrees; i++) {
+                fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniFIDs.cend(), 2, 0}));
+                dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+            }
+        }
+        auto iterDummy = dummys.at(currentIndex).cbegin();
+        if(pht::Bitvector_Utils::decodeNumber(iterDummy, dummys.at(currentIndex).cend(),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+            tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniFIDs.cend(), 2, 0}));
+            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+        }
+        currentIndex++;
+    }
+    return {-1,-1};
 }
