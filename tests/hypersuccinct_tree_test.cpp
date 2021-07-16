@@ -389,6 +389,29 @@ TEST_F(HypersuccinctTreeTest, TreeToFIDIndexConversionTest) {
     EXPECT_EQ(std::get<1>(res), -1);
 }
 
+TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
+    pht::MiniTree miniTree = hyperNath.getMiniTree(1);
+    std::tuple<uint32_t,uint32_t> res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 0);
+    EXPECT_EQ(std::get<0>(res), 0);
+    EXPECT_EQ(std::get<1>(res), -1);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 1);
+    EXPECT_EQ(std::get<0>(res), 1);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 2);
+    EXPECT_EQ(std::get<0>(res), 2);
+    EXPECT_EQ(std::get<1>(res), 0);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 3);
+    EXPECT_EQ(std::get<0>(res), 3);
+    EXPECT_EQ(std::get<1>(res), 2);
+
+    res = hyperNath.MicroTreeToFIDIndexConversion(miniTree, 4);
+    EXPECT_EQ(std::get<0>(res), 4);
+    EXPECT_EQ(std::get<1>(res), -1);
+}
+
 TEST_F(HypersuccinctTreeTest, degreeTest) {
     pht::HstNode node = {0,0,0};
     uint32_t res = hyperNath.degree(node);
