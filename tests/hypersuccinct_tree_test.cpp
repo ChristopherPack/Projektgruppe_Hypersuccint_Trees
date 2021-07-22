@@ -482,11 +482,39 @@ TEST_F(HypersuccinctTreeTest, degreeTest) {
 
     node = {1,1,2};
     res = hyperNath.degree(node);
-    EXPECT_EQ(1, res);
+    EXPECT_EQ(2, res);
 
-    node = {4,1,4};
+    node = {6,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {2,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {3,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,1,1};
     res = hyperNath.degree(node);
     EXPECT_EQ(1, res);
+
+    node = {7,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {0,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {0,1,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {0,1,1};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
 
 }
 

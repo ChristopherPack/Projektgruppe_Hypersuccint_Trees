@@ -223,15 +223,24 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
 
 uint32_t HypersuccinctTree::degree(HstNode node) {
     if(std::get<2>(node) > 0) {
-        //LookupTable
         MiniTree miniTree = getMiniTree(std::get<0>(node));
         if(Bitvector_Utils::decodeNumber(getMicroDummys(miniTree,std::get<1>(node)),Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(node)) {
-            //TODO: Maybe return degree of child? (MicroTree root)
-            return 1;
+            auto dummyIter = miniTree.dummys.cbegin();
+            uint32_t dummyIndex = 0;
+            for(int i=0; i<std::get<1>(node);i++) {
+                Bitvector dummy = getMicroDummys(miniTree, 0);
+                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+                    dummyIndex++;
+                }
+            }
+            auto itermicroPoint = miniTree.microDummyPointers.cbegin();
+            Bitvector subTreeB = Bitvector_Utils::getEntry(itermicroPoint, dummyIndex, miniTree.microDummyPointers.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            uint32_t microNum = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
+            return degree({std::get<0>(node),microNum,0});
         }
-        if(Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(node) ) {
-            //TODO: Maybe return degree of child? (MiniTree root)
-            return 1;
+        if(Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) == std::get<1>(node) && Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(node) ) {
+            uint32_t miniPoint = Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY);
+            return degree({miniPoint,0,0});
         }
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
         auto iter = entry.degree.cbegin();
@@ -242,7 +251,9 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
         Bitvector fid = getFIDforMicroTree(std::get<0>(node), std::get<1>(node));
         return fid.size();
     }
-    Bitvector fid = getFIDforMiniTree(std::get<0>(node));
+    uint32_t fidID = convertTreeToFIDIndex(std::get<0>(node)).first;
+    auto iterD = miniFIDs.cbegin();
+    Bitvector fid = Bitvector_Utils::getEntry(iterD, fidID, miniFIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0});
     return fid.size();
 }
 
