@@ -452,7 +452,7 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
 
     node = {1,4,0};
     res = hyperNath.child_rank(node);
-    EXPECT_EQ(1, res);
+    EXPECT_EQ(0, res);
 
     node = {3,0,1};
     res = hyperNath.child_rank(node);
