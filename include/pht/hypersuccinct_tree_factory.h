@@ -379,7 +379,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(lookupTableEntry.rightmost_leaf, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, leafRankNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             }
         }
 
