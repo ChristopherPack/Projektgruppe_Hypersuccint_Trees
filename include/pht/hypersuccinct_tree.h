@@ -257,6 +257,8 @@ namespace pht {
             return lookupTable.at(index);
         }
 
+
+
         /**
          * Returns the LookupTable Entry of the given MicroTree
          *
@@ -289,7 +291,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MiniTree
-         * TODO: Is Wrong
+         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
          *
          * @param treeNum Number of the Tree as int
          * @return FID as Bitvector
@@ -298,7 +300,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MicroTree within a MiniTree
-         * TODO: Is Wrong
+         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
          *
          * @param miniTree The Minitree as Minitree
          * @param treeNum the Microtree number as int
@@ -308,7 +310,7 @@ namespace pht {
 
         /**
          * Returns the FID for a given MicroTree within a MiniTree
-         * TODO: Is Wrong
+         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
          *
          * @param miniTree The Minitree number as int
          * @param treeNum the Microtree number as int
@@ -353,6 +355,8 @@ namespace pht {
          * @return The indices of its Top and Low FID (if they exist)
          */
         std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(MiniTree &miniTree, uint32_t microTree);
+
+
 
         ////////////////////////////////////////////////////////////////////////////
         // TODO: Test Methods in this Block
@@ -405,7 +409,6 @@ namespace pht {
 
         /**
          * Returns the degree of a given Node
-         * TODO: Unfinished
          *
          * @param node The Node as HstNode
          * @return the degree as int
@@ -493,6 +496,7 @@ namespace pht {
         std::vector<bool> miniDummys;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
+
     };
 }
 

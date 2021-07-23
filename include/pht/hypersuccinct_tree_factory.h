@@ -379,7 +379,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(lookupTableEntry.rightmost_leaf, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, leafRankNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             }
         }
 
@@ -417,6 +417,13 @@ namespace pht {
                 }
 
                 //Simple Additions for Queries - MicroTrees
+                /*Bitvector microSubTree; TODO: Check if Full Elias Gamma is more efficient
+                Bitvector_Utils::encodeNumber(microSubTree, fmMiniTree->getSize(fmMicroTree->getRoot(),false),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                Bitvector_Utils::encodeNumber(miniTree.microSubTrees, microSubTree.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                ListUtils::combine(miniTree.microSubTrees,microSubTree);*/
+
+
+
                 Bitvector_Utils::encodeNumber(miniTree.microSubTrees, fmMiniTree->getSize(fmMicroTree->getRoot(),false),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 Bitvector_Utils::encodeNumber(miniTree.rootDepths, fmMiniTree->getDepth(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 Bitvector_Utils::encodeNumber(miniTree.rootHeights, fmMiniTree->getHeight(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
