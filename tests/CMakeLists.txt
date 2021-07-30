@@ -13,3 +13,7 @@ add_executable(pht_test)
 target_sources(pht_test PRIVATE ${PHT_TEST_SOURCES})
 target_link_libraries(pht_test PRIVATE pht_lib gtest gmock gtest_main gmock_main)
 gtest_discover_tests(pht_test)
+
+add_executable(pht_runtime_test)
+target_sources(pht_runtime_test PRIVATE runtime_test.cpp)
+target_link_libraries(pht_runtime_test PRIVATE pht_lib)

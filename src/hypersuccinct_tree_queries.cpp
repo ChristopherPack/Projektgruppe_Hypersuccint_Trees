@@ -50,6 +50,138 @@ bool HypersuccinctTree::isDummyAncestorWithinMicroTree(HstNode node) {
                                                std::get<2>(node), dummyNum);
 }
 
+HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
+    MiniTree miniTree = getMiniTree(std::get<0>(parent));
+    if(degree(parent) < index) {
+        return {};
+    }
+    if(std::get<2>(parent) > 0) {
+        if(Bitvector_Utils::decodeNumber(getMiniDummy(std::get<0>(parent)),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+            if(Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) == std::get<1>(parent) && Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(parent)) {
+                return child({Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY),0,0},index);
+            }
+        }
+
+        uint32_t microDummy = Bitvector_Utils::decodeNumber(getMicroDummys(miniTree, std::get<1>(parent)),Bitvector_Utils::NumberEncoding::BINARY);
+        if(microDummy != 0 && std::get<2>(parent) == microDummy) {
+            auto dummyIter = miniTree.dummys.cbegin();
+            uint32_t dummyIndex = 0;
+            for(int i=0; i<std::get<1>(parent);i++) {
+                Bitvector dummy = getMicroDummys(miniTree, i);
+                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+                    dummyIndex++;
+                }
+            }
+            auto iterDummy = miniTree.microDummyPointers.cbegin();
+            Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            return child({std::get<0>(parent),Bitvector_Utils::decodeNumber(newMicroBit,Bitvector_Utils::NumberEncoding::BINARY),0},index);
+        }
+
+
+        LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(parent)));
+        auto iter = entry.childMatrix.cbegin();
+        uint32_t size = sqrt(entry.childMatrix.size());
+        Bitvector row = Bitvector_Utils::getEntry(iter, std::get<2>(parent), entry.childMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 0, size});
+        uint32_t countIndex = 0;
+        for(uint32_t i=0; i<row.size(); i++) {
+            if(row.at(i)) {
+                if(index==countIndex) {
+                    return {std::get<0>(parent),std::get<1>(parent),i};
+                }
+                countIndex++;
+            }
+        }
+        return {};
+
+    }
+    if(std::get<1>(parent) > 0) {
+        uint32_t fidIndex = convertMicroTreeToFIDIndex(miniTree, std::get<1>(parent)).first;
+        auto iterD = miniTree.FIDs.cbegin();
+        Bitvector fid = Bitvector_Utils::getEntry(iterD, fidIndex, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0});
+        auto iterTV = miniTree.typeVectors.cbegin();
+        auto iterF = miniTree.FIDs.cbegin();
+        Bitvector tv = Bitvector_Utils::getEntry(iterTV, fidIndex, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 1, 0});
+        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > trees = getTreesForMicroFID(miniTree ,std::get<1>(parent));
+        uint32_t countIndex = 0;
+        auto tvIter = tv.cbegin();
+        uint32_t childNum = 1;
+        uint32_t tree;
+        for(bool b: fid) {
+            if(b) {
+                childNum = 1;
+                bool tvBit = *tvIter;
+                tvIter++;
+                if(tvBit) {
+                    tree = trees.first.front();
+                    trees.first.erase(trees.first.cbegin());
+                    if (index == countIndex) {
+                        return {std::get<0>(parent),tree,childNum};
+                    }
+                } else
+                {
+                    tree = trees.second.front();
+                    trees.second.erase(trees.second.cbegin());
+                    if (index == countIndex) {
+                        return {std::get<0>(parent),tree,0};
+                    }
+                }
+            }
+            else {
+                childNum++;
+                if (index == countIndex) {
+                    return {std::get<0>(parent),tree,childNum};
+                }
+            }
+            countIndex++;
+        }
+    }
+    std::pair<uint32_t ,uint32_t > fidIndices = convertTreeToFIDIndex(std::get<0>(parent));
+    auto iterD = miniFIDs.cbegin();
+    Bitvector fid = Bitvector_Utils::getEntry(iterD, fidIndices.first, miniFIDs.cend(),
+                                              Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,
+                                              {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1,
+                                               0});
+    auto iterTV = miniTypeVectors.cbegin();
+    auto iterF = miniFIDs.cbegin();
+    Bitvector tv = Bitvector_Utils::getEntry(iterTV, fidIndices.first, miniTypeVectors.cend(),
+                                             Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX,
+                                             {iterF, miniFIDs.cend(), 2, 0});
+    std::pair<std::vector<uint32_t>, std::vector<uint32_t> > trees = getTreesForFID(fidIndices.first);
+    uint32_t countIndex = 0;
+    auto tvIter = tv.cbegin();
+    uint32_t childNum = 1;
+    uint32_t tree;
+    for(bool b: fid) {
+        if(b) {
+            childNum = 1;
+            bool tvBit = *tvIter;
+            tvIter++;
+            if(tvBit) {
+                tree = trees.first.front();
+                trees.first.erase(trees.first.cbegin());
+                if (index == countIndex) {
+                    return {tree,childNum,0};
+                }
+            } else
+            {
+                tree = trees.second.front();
+                trees.second.erase(trees.second.cbegin());
+                if (index == countIndex) {
+                    return {tree,0,0};
+                }
+            }
+        }
+        else {
+            childNum++;
+            if (index == countIndex) {
+                return {tree,childNum,0};
+            }
+        }
+        countIndex++;
+    }
+    return {};
+}
+
 uint32_t HypersuccinctTree::child_rank(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));

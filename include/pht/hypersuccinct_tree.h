@@ -390,6 +390,15 @@ namespace pht {
         bool isDummyAncestorWithinMicroTree(HstNode node);
 
         /**
+         * Returns the ith child of a given Node, if it exists
+         *
+         * @param parent The parent Node as HStNode
+         * @param index The index as unint32_t
+         * @return The ith child as HstNode
+         */
+        HstNode child(HstNode parent, uint32_t index);
+
+        /**
          * Returns the Child Rank of a given Node
          *
          * @param node The Node as HstNode
@@ -466,7 +475,6 @@ namespace pht {
         /**
          * Returns the Leaf Rank of a given Node
          * Leaf Rank is the amount of Leaves coming before the Node, in node order
-         * TODO: Unfinished - needs Child_Rank handling
          *
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
