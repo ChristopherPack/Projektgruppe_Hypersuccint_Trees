@@ -9,17 +9,23 @@
 
 #include "pht/timer.h"
 
-#define PHT_LOGGER_DEBUG(tag, param)   pht::Logger::log(pht::Logger::LogLevel::DEBUG,   tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_INFO(tag, param)    pht::Logger::log(pht::Logger::LogLevel::INFO,    tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_WARNING(tag, param) pht::Logger::log(pht::Logger::LogLevel::WARNING, tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_ERROR(tag, param)   pht::Logger::log(pht::Logger::LogLevel::ERROR,   tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_FATAL(tag, param)   pht::Logger::log(pht::Logger::LogLevel::FATAL,   tag, param, __FILE__, __LINE__, __func__)
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
+#define PHT_LOGGER_DEBUG(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, param, __FILE__, __LINE__, __func__)
+#define PHT_LOGGER_INFO(tag, param)    pht::Logger::log(pht::Logger::LogLevel::PHT_INFO,    tag, param, __FILE__, __LINE__, __func__)
+#define PHT_LOGGER_WARNING(tag, param) pht::Logger::log(pht::Logger::LogLevel::PHT_WARNING, tag, param, __FILE__, __LINE__, __func__)
+#define PHT_LOGGER_ERROR(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_ERROR,   tag, param, __FILE__, __LINE__, __func__)
+#define PHT_LOGGER_FATAL(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, param, __FILE__, __LINE__, __func__)
 
 namespace pht {
-    class Logger {
+    class DLL_API Logger {
     public:
-        enum class LogLevel {
-            DEBUG = 0, INFO = 1, WARNING = 2, ERROR = 3, FATAL = 4
+        enum class DLL_API LogLevel {
+            PHT_DEBUG = 0, PHT_INFO = 1, PHT_WARNING = 2, PHT_ERROR = 3, PHT_FATAL = 4
         };
 
     public:
@@ -40,4 +46,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_LOGGER_H_

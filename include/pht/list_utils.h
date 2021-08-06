@@ -5,6 +5,11 @@
 #include <functional>
 #include <vector>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
 namespace pht {
     /**
      * Provides list utility functions.
@@ -12,7 +17,7 @@ namespace pht {
      * This class provides commonly used functionality for the std::vector class, 
      * which is not implemented or very verbose in the standard library. 
      */
-    class ListUtils {
+    class DLL_API ListUtils {
     public:
         /**
          * Appends all the values of the second vector to the first vector. 
@@ -500,4 +505,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS

@@ -6,14 +6,20 @@
 #include <chrono>
 #include <ostream>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht {
-    class Timer;
+    class DLL_API Timer;
 }
 
 std::ostream& operator<<(std::ostream& out, const pht::Timer& timer);
 
 namespace pht {
-    class Timer {
+    class DLL_API Timer {
     public:
         void start();
         void stop();
@@ -27,4 +33,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_TIMER_H_

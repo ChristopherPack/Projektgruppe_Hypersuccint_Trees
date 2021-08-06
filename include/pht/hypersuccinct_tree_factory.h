@@ -5,6 +5,8 @@
 #ifndef PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 #define PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H
 
+
+
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -14,13 +16,19 @@
 #include "huffman.h"
 #include "hypersuccinct_tree.h"
 #include "hst_output.h"
+
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
 using namespace std;
 
 namespace pht {
     /**
      * Creates Hypersuccinct Code for a given Unordered Tree utilizing the Farzan Munro Algorithm.
      */
-    class HypersuccinctTreeFactory {
+    class DLL_API HypersuccinctTreeFactory {
     public:
         /**
          * Creates Hypersuccinct Code for a given Unordered Tree utilizing the Farzan Munro Algorithm.
@@ -565,4 +573,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif //PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_FACTORY_H

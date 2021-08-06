@@ -10,8 +10,14 @@
 #include "pht/unordered_tree.h"
 #include "pht/pyhelper.h"
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht {
-    class Visualize {
+    class DLL_API Visualize {
     public:
         template<class T> static void visualize(std::shared_ptr<pht::UnorderedTree<T>> tree) {
             PyHelper::pyCall("visualize", "visualize", [&tree](){
@@ -60,4 +66,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_VISUALIZE_H_

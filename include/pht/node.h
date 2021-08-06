@@ -6,6 +6,12 @@
 #include <sstream>
 #include <algorithm>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht {
     /**
      * Stores information for use in a tree.
@@ -15,7 +21,7 @@ namespace pht {
      * 
      * @tparam T The type of data stored. Has to be comparable with < and printable via <<.
      */
-    template<class T> class Node {
+    template<class T> class DLL_API Node {
     public:
         /**
          * Constructs a new node with the given value. 
@@ -78,4 +84,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_NODE_H_

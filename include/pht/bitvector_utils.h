@@ -9,6 +9,12 @@
 #include "unordered_tree.h"
 #include "list_utils.h"
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht{
     typedef std::vector<bool> Bitvector;
     /**
@@ -19,20 +25,20 @@ namespace pht{
      * Functionality concerns specific encodings for the implemented Farzan Munro Algorithm.
      *
      */
-    class Bitvector_Utils {
+    class DLL_API Bitvector_Utils {
     public:
-        enum class NumberEncoding {
+        enum class DLL_API NumberEncoding {
             BINARY, ELIAS_GAMMA
         };
-        enum class BitvectorEncoding {
+        enum class DLL_API BitvectorEncoding {
             ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN, PURE_ELIAS_GAMMA, STATIC_MATRIX_COLUMN
         };
 
-        struct HuffmanComparator {
+        struct DLL_API HuffmanComparator {
             bool operator()(const Bitvector &a, const Bitvector &b)const;
         };
 
-        struct IndexingInformation {
+        struct DLL_API IndexingInformation {
             Bitvector::const_iterator& indexStart;
             const Bitvector::const_iterator& indexEnd = nullIterator;
             uint32_t multiplier = 0;
@@ -111,5 +117,5 @@ namespace pht{
     };
 }
 
-
+#undef DLL_API
 #endif //PROJEKTSUCCINCTTREES_BITVECTOR_UTILS_H

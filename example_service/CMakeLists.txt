@@ -13,3 +13,10 @@ add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E
 add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/python ${CMAKE_CURRENT_BINARY_DIR}/Release)
 add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/python ${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel)
 add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/python ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
+
+
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/Debug/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/Release/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/Release)
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/MinSizeRel/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel)
+add_custom_command(TARGET example_service POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/RelWithDebInfo/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)

@@ -3,10 +3,16 @@
 
 #include "pht/hypersuccinct_tree.h"
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 using namespace std;
 
 namespace pht {
-    class HypersuccinctTreeOutput {
+    class DLL_API HypersuccinctTreeOutput {
 
     public:
         /**
@@ -83,4 +89,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif //PROJEKTSUCCINCTTREES_HST_OUTPUT_H
