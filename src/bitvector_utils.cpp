@@ -158,7 +158,11 @@ uint32_t Bitvector_Utils::decodeEliasGamma(Bitvector::const_iterator& iterator, 
 
 uint32_t Bitvector_Utils::decodeBinary(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
     uint32_t res = 0;
+    auto start = iterator;
     for(; iterator != end; iterator++) {
+        if(iterator - start > 32) {
+            break;
+        }
         res <<= 1;
         res = res|(*iterator?1:0);
     }

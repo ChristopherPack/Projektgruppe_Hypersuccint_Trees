@@ -9,6 +9,14 @@
 #include "pht/hypersuccinct_tree_factory.h"
 #include "pht/bitvector_utils.h"
 
+TEST(BitvectorUtilsTest, stupidTest) {
+    std::vector<bool> b = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0};
+    std::cout << b.size() << std::endl;
+    uint32_t c = pht::Bitvector_Utils::decodeNumber(b,pht::Bitvector_Utils::NumberEncoding::BINARY);
+    std::cout << c << std::endl;
+    std::cout << UINT32_MAX << std::endl;
+}
+
 TEST(BitvectorUtilsTest, encodeBinaryTest) {
     std::vector<bool> b;
     pht::Bitvector_Utils::encodeNumber(b, 2, pht::Bitvector_Utils::NumberEncoding::BINARY);
