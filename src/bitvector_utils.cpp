@@ -367,5 +367,3 @@ uint32_t Bitvector_Utils::getEntryCountHuffman(const Bitvector::const_iterator& 
     }
     return count;
 }
-
-Bitvector::const_iterator Bitvector_Utils::nullIterator = Bitvector::const_iterator();
