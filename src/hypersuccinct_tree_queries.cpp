@@ -64,16 +64,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 
         uint32_t microDummy = Bitvector_Utils::decodeNumber(getMicroDummys(miniTree, std::get<1>(parent)),Bitvector_Utils::NumberEncoding::BINARY);
         if(microDummy != 0 && std::get<2>(parent) == microDummy) {
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(parent);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, i);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto iterDummy = miniTree.microDummyPointers.cbegin();
-            Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            Bitvector newMicroBit = getMicroDummyPointers(miniTree,std::get<1>(parent));
             return child({std::get<0>(parent),Bitvector_Utils::decodeNumber(newMicroBit,Bitvector_Utils::NumberEncoding::BINARY),0},index);
         }
 
@@ -196,16 +187,7 @@ uint32_t HypersuccinctTree::child_rank(HstNode node) {
         }
     }
     if(Bitvector_Utils::decodeNumber(getMicroDummys(miniTreeParent, std::get<1>(parent)),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-        auto dummyIter = miniTree.dummys.cbegin();
-        uint32_t dummyIndex = 0;
-        for(int i=0; i<std::get<1>(node);i++) {
-            Bitvector dummy = getMicroDummys(miniTree, i);
-            if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                dummyIndex++;
-            }
-        }
-        auto iterDummy = miniTree.microDummyPointers.cbegin();
-        Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+        Bitvector newMicroBit = getMicroDummyPointers(miniTree,std::get<1>(parent));
     }
     if(std::get<1>(parent) == 0 && std::get<2>(parent)== 0) {
         std::pair<uint32_t ,uint32_t > fidIndices = convertTreeToFIDIndex(std::get<0>(parent));
@@ -319,8 +301,7 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
                 Bitvector microDummy = getMicroDummys(miniTree,i);
                 uint32_t microDummyPointerIndex = 0;
                 if(Bitvector_Utils::decodeNumber(microDummy, Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    auto iterDummy = miniTree.microDummyPointers.cbegin();
-                    Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy, microDummyPointerIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+                    Bitvector newMicroBit = getMicroDummyPointers(miniTree,i);
                     std::pair< std::vector<uint32_t> , std::vector<uint32_t >> trees = getTreesForMicroFID(miniTree,std::get<1>(node));
                     if(ListUtils::containsAny(trees.first,{Bitvector_Utils::decodeNumber(newMicroBit,Bitvector_Utils::NumberEncoding::BINARY)})) {
                         return {std::get<0>(node),i, Bitvector_Utils::decodeNumber(microDummy,Bitvector_Utils::NumberEncoding::BINARY)};
@@ -356,16 +337,7 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
     if(std::get<2>(node) > 0) {
         MiniTree miniTree = getMiniTree(std::get<0>(node));
         if(Bitvector_Utils::decodeNumber(getMicroDummys(miniTree,std::get<1>(node)),Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(node)) {
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, 0);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto itermicroPoint = miniTree.microDummyPointers.cbegin();
-            Bitvector subTreeB = Bitvector_Utils::getEntry(itermicroPoint, dummyIndex, miniTree.microDummyPointers.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            Bitvector subTreeB = getMicroDummyPointers(miniTree,std::get<1>(node));
             uint32_t microNum = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
             return degree({std::get<0>(node),microNum,0});
         }
@@ -395,16 +367,7 @@ uint32_t HypersuccinctTree::subtree_size(HstNode node) {
         uint32_t isDummyAncestor = 0;
         if(isDummyAncestorWithinMicroTree(node)) {
             isDummyAncestor = 1;
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, 0);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto iter = miniTree.microDummyPointers.cbegin();
-            Bitvector subTreeB = Bitvector_Utils::getEntry(iter,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            Bitvector subTreeB = getMicroDummyPointers(miniTree,std::get<1>(node));
             uint32_t dummyPointer = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
             auto iter2 = miniTree.microSubTrees.cbegin();
             Bitvector subtreeSize = Bitvector_Utils::getEntry(iter2,dummyPointer,miniTree.microSubTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
@@ -503,16 +466,7 @@ HstNode HypersuccinctTree::leftmost_leaf(HstNode node) {
             miniTree = getMiniTree(Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY));
         }
         else if (nodeNum == Bitvector_Utils::decodeNumber(microDummy, Bitvector_Utils::NumberEncoding::BINARY)) {
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, 0);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto itermicroPoint = miniTree.microDummyPointers.cbegin();
-            Bitvector subTreeB = Bitvector_Utils::getEntry(itermicroPoint, dummyIndex, miniTree.microDummyPointers.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            Bitvector subTreeB = getMicroDummyPointers(miniTree,std::get<1>(node));
             microNum = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
         }
         else {
@@ -567,16 +521,7 @@ HstNode HypersuccinctTree::rightmost_leaf(HstNode node) {
             miniTree = getMiniTree(Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY));
         }
         else if (nodeNum == Bitvector_Utils::decodeNumber(microDummy, Bitvector_Utils::NumberEncoding::BINARY)) {
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, 0);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto itermicroPoint = miniTree.microDummyPointers.cbegin();
-            Bitvector subTreeB = Bitvector_Utils::getEntry(itermicroPoint, dummyIndex, miniTree.microDummyPointers.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator});
+            Bitvector subTreeB = getMicroDummyPointers(miniTree,std::get<1>(node));
             microNum = Bitvector_Utils::decodeNumber(subTreeB,Bitvector_Utils::NumberEncoding::BINARY);
         }
         else {
@@ -619,16 +564,7 @@ uint32_t HypersuccinctTree::leaf_size(HstNode node) {
         uint32_t isDummyAncestor = 0;
         if(isDummyAncestorWithinMicroTree(node)) {
             isDummyAncestor = 1;
-            auto dummyIter = miniTree.dummys.cbegin();
-            uint32_t dummyIndex = 0;
-            for(int i=0; i<std::get<1>(node);i++) {
-                Bitvector dummy = getMicroDummys(miniTree, i);
-                if(Bitvector_Utils::decodeNumber(dummy,Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    dummyIndex++;
-                }
-            }
-            auto iterDummy = miniTree.microDummyPointers.cbegin();
-            Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy,dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+            Bitvector newMicroBit = getMicroDummyPointers(miniTree,std::get<1>(node));
             uint32_t newMicro = Bitvector_Utils::decodeNumber(newMicroBit,Bitvector_Utils::NumberEncoding::BINARY);
             auto iterm = miniTree.microLeaves.cbegin();
             Bitvector microLeafSize = Bitvector_Utils::getEntry(iterm,newMicro,miniTree.microLeaves.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
@@ -675,17 +611,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
                 dummyMarker = 1;
             }
             if(dummyNum < std::get<2>(node)) {
-                //isDummyAncestor = 1;
-                auto dummyIter = miniTree.dummys.cbegin();
-                uint32_t dummyIndex = 0;
-                for (int i = 0; i < std::get<1>(node); i++) {
-                    Bitvector dummyS = getMicroDummys(miniTree, i);
-                    if (Bitvector_Utils::decodeNumber(dummyS, Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                        dummyIndex++;
-                    }
-                }
-                auto iterDummy = miniTree.microDummyPointers.cbegin();
-                Bitvector newMicroBit = Bitvector_Utils::getEntry(iterDummy, dummyIndex,miniTree.microDummyPointers.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});
+                Bitvector newMicroBit = getMicroDummyPointers(miniTree,std::get<1>(node));
                 uint32_t newMicro = Bitvector_Utils::decodeNumber(newMicroBit, Bitvector_Utils::NumberEncoding::BINARY);
                 auto iterm = miniTree.microRootLeafRanks.cbegin();
                 Bitvector leaf_rank_node = Bitvector_Utils::getEntry(iterm, newMicro,miniTree.microRootLeafRanks.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator});

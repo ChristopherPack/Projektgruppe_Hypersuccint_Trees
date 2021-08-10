@@ -35,7 +35,7 @@ namespace pht {
         Bitvector FIDs;
         //MicroTypeVectors
         Bitvector typeVectors;
-        //MicroDummys
+        //MicroDummys: Static Size Encoding
         Bitvector dummys;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         Bitvector microTrees;
@@ -49,7 +49,7 @@ namespace pht {
         Bitvector miniDummyIndex;
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
-        //MicroTree Dummy Pointer
+        //MicroTree Dummy Pointer: Static Size Encoding
         Bitvector microDummyPointers;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
@@ -244,6 +244,15 @@ namespace pht {
          * @return the Dummy Entry as bitvector
          */
         Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index);
+
+        /**
+         * Returns the MicroDummy Pointer Entry for a given MicroTree
+         *
+         * @param miniTree The MiniTree of the Dummy
+         * @param index The index of the MicroTree
+         * @return The Dummy Pointed MicroTree as int
+         */
+        Bitvector getMicroDummyPointers(MiniTree& miniTree, uint32_t index);
 
         /**
          * Returns the MiniDummy Entry from the perspective of the MiniTree

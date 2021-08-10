@@ -403,7 +403,7 @@ namespace pht {
          * @param fmMicroTrees The Micro Trees to get data from
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
-        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences){
+        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
             //The actual MicroTree Loop
             //Put everything that needs MicroTree Iteration in this loop
             for(const std::shared_ptr<UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
@@ -421,10 +421,20 @@ namespace pht {
                 }
 
                 //MicroDummyPointers
+                uint32_t dummySize = floor(log2(2*sizeMicro+1))+1;
                 if(fmMicroTree->hasDummy()) {
                     std::shared_ptr<Node<T>> dummyPoint = fmMiniTree->getDirectDescendants(fmMicroTree->getDummy()).at(0);
                     uint32_t microTreePointer = dummyPoint->getMicroTree();
-                    Bitvector_Utils::encodeNumber(miniTree.microDummyPointers, microTreePointer, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                    Bitvector microDummyP;
+                    Bitvector_Utils::encodeNumber(microDummyP, microTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
+                    for(uint32_t i=0; i<dummySize-microDummyP.size(); i++) {
+                        miniTree.microDummyPointers.push_back(false);
+                    }
+                    ListUtils::combine(miniTree.microDummyPointers,microDummyP);
+                } else {
+                    for(uint32_t i=0; i<dummySize;i++) {
+                        miniTree.microDummyPointers.push_back(false);
+                    }
                 }
 
                 //Simple Additions for Queries - MicroTrees
@@ -503,7 +513,7 @@ namespace pht {
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                 }
 
-                createMicroTrees(hypersuccinctTree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences);
+                createMicroTrees(hypersuccinctTree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences,sizeMicro);
 
                 //This is done so late because of Huffman checks
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
