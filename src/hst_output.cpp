@@ -40,6 +40,16 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).typeVectors);
         cout << "MicroTreeDummys:  ";
         printBitvector(tree.getMiniTree(index).dummys);
+
+        cout << "Mini Top FID Index:  ";
+        printBitvector(tree.getMiniTree(index).miniTopFIDIndex);
+        cout << "Mini Low FID Index:  ";
+        printBitvector(tree.getMiniTree(index).miniLowFIDIndex);
+        cout << "Micro Top FID Indices:  ";
+        printBitvector(tree.getMiniTree(index).microTopFIDIndices);
+        cout << "Micro Low FID Indices:  ";
+        printBitvector(tree.getMiniTree(index).microLowFIDIndices);
+
         cout << "RootAncestors:  ";
         printBitvector(tree.getMiniTree(index).rootAncestors);
         cout << "DummyAncestors:  ";
@@ -96,6 +106,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).bp);
         cout << "AncestorMap:   ";
         printBitvector(tree.getLookupTableEntry(index).ancestorMatrix);
+        cout << "ChildMap:   ";
+        printBitvector(tree.getLookupTableEntry(index).childMatrix);
         cout << "Degrees:   ";
         printBitvector(tree.getLookupTableEntry(index).degree);
         cout << "Subtrees:   ";

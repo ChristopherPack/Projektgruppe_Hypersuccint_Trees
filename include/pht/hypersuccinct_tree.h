@@ -39,6 +39,17 @@ namespace pht {
         Bitvector dummys;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         Bitvector microTrees;
+
+        //MiniTree Top FID Index + 1
+        Bitvector miniTopFIDIndex;
+        //MiniTree Low FID Index + 1
+        Bitvector miniLowFIDIndex;
+        //MicroTree Top FID Indices + 1
+        Bitvector microTopFIDIndices;
+        //MicroTree Low FID Indices + 1
+        Bitvector microLowFIDIndices;
+
+
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
         Bitvector rootAncestors;
         //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
@@ -160,7 +171,7 @@ namespace pht {
          * @param index The Index of the MiniTree as integer
          * @return MiniTree as MiniTree
          */
-        MiniTree getMiniTree(uint32_t index ) {
+        MiniTree& getMiniTree(uint32_t index ) {
             return miniTrees.at(index);
         }
 
