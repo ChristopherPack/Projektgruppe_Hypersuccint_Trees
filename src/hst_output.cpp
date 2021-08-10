@@ -219,6 +219,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(microTreeData.index, fileBitvector);
         createFileBitvector(microTreeData.bp, fileBitvector);
         createFileBitvector(microTreeData.ancestorMatrix, fileBitvector);
+        createFileBitvector(microTreeData.childMatrix, fileBitvector);
         createFileBitvector(microTreeData.degree, fileBitvector);
         createFileBitvector(microTreeData.subTrees, fileBitvector);
         createFileBitvector(microTreeData.nodeDepths, fileBitvector);

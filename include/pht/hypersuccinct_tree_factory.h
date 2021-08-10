@@ -135,8 +135,10 @@ namespace pht {
                 createBitvectorFromFile(iter, end, index);
                 Bitvector bp;
                 createBitvectorFromFile(iter, end, bp);
-                Bitvector matrix;
-                createBitvectorFromFile(iter, end, matrix);
+                Bitvector ancMatrix;
+                createBitvectorFromFile(iter, end, ancMatrix);
+                Bitvector childMatrix;
+                createBitvectorFromFile(iter, end, childMatrix);
                 Bitvector degree;
                 createBitvectorFromFile(iter, end, degree);
                 Bitvector subTrees;
@@ -163,7 +165,8 @@ namespace pht {
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
                  */
                 LookupTableEntry microTreeData(index, bp);
-                microTreeData.ancestorMatrix = matrix;
+                microTreeData.ancestorMatrix = ancMatrix;
+                microTreeData.childMatrix = childMatrix;
                 microTreeData.degree = degree;
                 microTreeData.subTrees = subTrees;
                 microTreeData.nodeDepths = nodeDepths;

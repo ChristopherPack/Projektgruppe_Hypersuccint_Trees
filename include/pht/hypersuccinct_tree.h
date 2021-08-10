@@ -81,7 +81,6 @@ namespace pht {
         Bitvector microTreeLeftmostLeafPointers;
         //Rightmost Leaf Pointers for MicroTrees
         Bitvector microTreeRightmostLeafPointers;
-
         //Leaf Rank of MiniTree Root
         Bitvector miniRootLeafRank;
         //Leaf Rank of MiniTree Dummy
