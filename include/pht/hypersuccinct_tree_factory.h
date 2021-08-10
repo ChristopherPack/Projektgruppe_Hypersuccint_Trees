@@ -28,7 +28,7 @@ namespace pht {
     /**
      * Creates Hypersuccinct Code for a given Unordered Tree utilizing the Farzan Munro Algorithm.
      */
-    class DLL_API HypersuccinctTreeFactory {
+    class HypersuccinctTreeFactory {
     public:
         /**
          * Creates Hypersuccinct Code for a given Unordered Tree utilizing the Farzan Munro Algorithm.

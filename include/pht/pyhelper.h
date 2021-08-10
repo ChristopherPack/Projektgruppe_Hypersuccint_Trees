@@ -14,7 +14,7 @@
 #endif
 
 namespace pht {
-    class DLL_API PyHelper {
+    class PyHelper {
     public:
         static void pyCall(const std::string& file, const std::string& function, std::function<PyObject*()> getArguments, std::function<void(PyObject*)> deleteArguments) {
             Py_Initialize();

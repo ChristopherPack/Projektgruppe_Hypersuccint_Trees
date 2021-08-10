@@ -17,7 +17,7 @@
 #endif
 
 namespace pht {
-    class DLL_API Visualize {
+    class Visualize {
     public:
         template<class T> static void visualize(std::shared_ptr<pht::UnorderedTree<T>> tree) {
             PyHelper::pyCall("visualize", "visualize", [&tree](){

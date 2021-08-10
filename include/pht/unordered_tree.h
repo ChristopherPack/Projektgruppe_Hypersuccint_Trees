@@ -33,7 +33,7 @@ namespace pht {
      */
     //TODO Caching
     //Todo: Rewrite tree for consistent ORDER
-    template<class T> class DLL_API UnorderedTree {
+    template<class T> class UnorderedTree {
         friend class Visualize;
 
     public:

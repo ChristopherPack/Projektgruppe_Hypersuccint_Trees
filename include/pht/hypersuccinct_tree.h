@@ -22,7 +22,7 @@ namespace pht {
     //node identification by: Minitree, MicroTree, NodeInMicroTree
     typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
-    enum class DLL_API TreeTypes {
+    enum class TreeTypes {
         MINI, MICRO
     };
 
@@ -30,7 +30,7 @@ namespace pht {
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
      */
-    struct DLL_API MiniTree {
+    struct MiniTree {
         //MicroFIDs
         Bitvector FIDs;
         //MicroTypeVectors
@@ -95,7 +95,7 @@ namespace pht {
      * It is indexed by the MicroTrees Balanced Parenthesis form (if no encoding is chosen) or by their Huffman code (if Huffman encoding is chosen)
      * It contains all fields necessary to satisfy the query's need for structural information
      */
-    struct DLL_API LookupTableEntry {
+    struct LookupTableEntry {
         //Index of the LookupTableEntry
         Bitvector index;
         //BP of the Entry. Empty if index is BP
@@ -150,7 +150,7 @@ namespace pht {
      * Get functions for all Bitvectors
      * Queries as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro
      */
-    class DLL_API HypersuccinctTree {
+    class HypersuccinctTree {
         friend class HypersuccinctTreeFactory;
     public:
 

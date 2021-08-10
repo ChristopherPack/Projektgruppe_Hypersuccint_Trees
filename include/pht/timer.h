@@ -13,13 +13,13 @@
 #endif
 
 namespace pht {
-    class DLL_API Timer;
+    class Timer;
 }
 
 std::ostream& operator<<(std::ostream& out, const pht::Timer& timer);
 
 namespace pht {
-    class DLL_API Timer {
+    class Timer {
     public:
         void start();
         void stop();

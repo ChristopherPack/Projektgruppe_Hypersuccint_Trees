@@ -21,7 +21,7 @@ namespace pht {
      * 
      * @tparam T The type of data stored. Has to be comparable with < and printable via <<.
      */
-    template<class T> class DLL_API Node {
+    template<class T> class Node {
     public:
         /**
          * Constructs a new node with the given value. 

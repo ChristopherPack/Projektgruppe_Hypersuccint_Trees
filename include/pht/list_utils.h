@@ -17,7 +17,7 @@ namespace pht {
      * This class provides commonly used functionality for the std::vector class, 
      * which is not implemented or very verbose in the standard library. 
      */
-    class DLL_API ListUtils {
+    class ListUtils {
     public:
         /**
          * Appends all the values of the second vector to the first vector. 

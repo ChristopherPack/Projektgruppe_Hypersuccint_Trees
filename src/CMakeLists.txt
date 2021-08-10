@@ -27,7 +27,7 @@ set(PHT_LIB_SOURCES
     timer.cpp
 )
 list(TRANSFORM PHT_LIB_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
-add_library(pht_lib SHARED)
+add_library(pht_lib STATIC)
 target_sources(pht_lib PRIVATE ${PHT_LIB_SOURCES})
 target_link_libraries(pht_lib PRIVATE irrxml)
 target_link_libraries(pht_lib PUBLIC Python::Python sdsl)
