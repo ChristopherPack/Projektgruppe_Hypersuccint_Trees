@@ -380,6 +380,15 @@ TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
     res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
     EXPECT_EQ(std::get<0>(res), 1);
     EXPECT_EQ(std::get<1>(res), 0);
+
+    miniTree = hyperNath.getMiniTree(0);
+    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 0);
+    EXPECT_EQ(std::get<0>(res), 0);
+    EXPECT_EQ(std::get<1>(res), -1);
+
+    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
+    EXPECT_EQ(std::get<0>(res), 1);
+    EXPECT_EQ(std::get<1>(res), 0);
 }
 
 TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {

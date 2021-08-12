@@ -404,6 +404,7 @@ namespace pht {
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
+            uint32_t microCount = 0;
             //The actual MicroTree Loop
             //Put everything that needs MicroTree Iteration in this loop
             for(const std::shared_ptr<UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
@@ -468,14 +469,13 @@ namespace pht {
                     fillLookupTableEntry(microTreeData, fmMicroTree);
                     hypersuccinctTree.lookupTable.push_back(microTreeData);
                 }
-            }
 
-            /*for(uint32_t i=0; i<hypersuccinctTree.miniTrees.size(); i++) {
-                std::pair<uint32_t ,uint32_t > miniFIDIndices = convertTreeToFIDIndex(hypersuccinctTree,i);
-                MiniTree miniTree = hypersuccinctTree.getMiniTree(i);
-                Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.first,Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.second,Bitvector_Utils::NumberEncoding::BINARY);
-            }*/
+
+                std::pair<uint32_t ,uint32_t > microFIDIndices = convertMicroTreeToFIDIndex(hypersuccinctTree,miniTree,microCount);
+                Bitvector_Utils::encodeNumber(miniTree.microTopFIDIndices, microFIDIndices.first+2, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                Bitvector_Utils::encodeNumber(miniTree.microLowFIDIndices, microFIDIndices.second+2, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                microCount++;
+            }
         }
 
         /**
@@ -543,8 +543,6 @@ namespace pht {
             uint32_t miniSize = hypersuccinctTree.miniTrees.size();
             for(uint32_t i=0; i<miniSize; i++) {
                 std::pair<uint32_t ,uint32_t > miniFIDIndices = convertTreeToFIDIndex(hypersuccinctTree,i);
-                std::cout << miniFIDIndices.first << std::endl;
-                std::cout << miniFIDIndices.second << std::endl;
                 MiniTree& miniTree = hypersuccinctTree.getMiniTree(i);
                 Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.first+1,Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniLowFIDIndex, miniFIDIndices.second+1,Bitvector_Utils::NumberEncoding::BINARY);

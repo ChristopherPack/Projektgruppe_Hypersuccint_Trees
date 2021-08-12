@@ -44,9 +44,9 @@ namespace pht {
         Bitvector miniTopFIDIndex;
         //MiniTree Low FID Index + 1
         Bitvector miniLowFIDIndex;
-        //MicroTree Top FID Indices + 1
+        //MicroTree Top FID Indices + 1 + 1
         Bitvector microTopFIDIndices;
-        //MicroTree Low FID Indices + 1
+        //MicroTree Low FID Indices + 1 + 1
         Bitvector microLowFIDIndices;
 
 
