@@ -8,6 +8,10 @@
 using namespace pht;
 using namespace std;
 
+void hello() {
+std::cout << "Hello";
+}
+
 /**
  * todo: include printing the Lookup Table
  * @param tree
