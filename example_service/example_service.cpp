@@ -8,6 +8,7 @@
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
+#include "sdsl/vectors.hpp"
 #ifdef NDEBUG
 #include "pht/visualize.h"
 #endif

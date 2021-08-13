@@ -605,7 +605,7 @@ namespace pht {
         static std::pair<uint32_t ,uint32_t > convertTreeToFIDIndex(const HypersuccinctTree& hypersuccinctTree, uint32_t miniTree) {
             auto iterD = hypersuccinctTree.miniFIDs.cbegin();
             std::vector<Bitvector> fids;
-            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0}));
+            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 1, 0}));
 
             auto iterD2 = hypersuccinctTree.miniTypeVectors.cbegin();
             auto iterF = hypersuccinctTree.miniFIDs.cbegin();
@@ -617,7 +617,7 @@ namespace pht {
             uint32_t miniSizeNum = pht::Bitvector_Utils::decodeNumber(iter, hypersuccinctTree.miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t dummySize = floor(log2(2*miniSizeNum+1))+1;
             auto iterD3 = hypersuccinctTree.miniDummys.cbegin();
-            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
 
             uint32_t topOffset = 0;
             std::vector<uint32_t > childFIDs;
@@ -664,16 +664,16 @@ namespace pht {
                 //Getting new FIDs
                 if(iterD != hypersuccinctTree.miniFIDs.cend()) {
                     for (uint32_t i = 0; i < lowTrees; i++) {
-                        fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                        fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),1, 0}));
                         tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, hypersuccinctTree.miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, hypersuccinctTree.miniFIDs.cend(), 2, 0}));
-                        dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+                        dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
                     }
                 }
                 auto iterDummy = dummys.at(currentIndex).cbegin();
                 if(pht::Bitvector_Utils::decodeNumber(iterDummy, dummys.at(currentIndex).cend(),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, hypersuccinctTree.miniFIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),1, 0}));
                     tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, hypersuccinctTree.miniTypeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, hypersuccinctTree.miniFIDs.cend(), 2, 0}));
-                    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+                    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, hypersuccinctTree.miniDummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
                 }
                 currentIndex++;
             }
@@ -683,7 +683,7 @@ namespace pht {
         static std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(const HypersuccinctTree& hypersuccinctTree, MiniTree &miniTree, uint32_t microTree) {
             auto iterD = miniTree.FIDs.cbegin();
             std::vector<Bitvector> fids;
-            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0}));
+            fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 1, 0}));
 
             auto iterD2 = miniTree.typeVectors.cbegin();
             auto iterF = miniTree.FIDs.cbegin();
@@ -695,7 +695,7 @@ namespace pht {
             uint32_t miniSizeNum = pht::Bitvector_Utils::decodeNumber(iter, hypersuccinctTree.microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
             uint32_t dummySize = floor(log2(2*miniSizeNum+1))+1;
             auto iterD3 = miniTree.dummys.cbegin();
-            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+            dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
 
             uint32_t topOffset = 0;
             std::vector<uint32_t > childFIDs;
@@ -742,16 +742,16 @@ namespace pht {
                 //Getting new FIDs
                 if(iterD != miniTree.FIDs.cend()) {
                     for (uint32_t i = 0; i < lowTrees; i++) {
-                        fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                        fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),1, 0}));
                         tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 2, 0}));
-                        dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+                        dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
                     }
                 }
                 auto iterDummy = dummys.at(currentIndex).cbegin();
                 if(pht::Bitvector_Utils::decodeNumber(iterDummy, dummys.at(currentIndex).cend(),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
-                    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,1, 0}));
+                    fids.push_back(Bitvector_Utils::getEntry(iterD, 0, miniTree.FIDs.cend(),Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,{Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),1, 0}));
                     tvs.push_back(Bitvector_Utils::getEntry(iterD2, 0, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 2, 0}));
-                    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator,0, dummySize}));
+                    dummys.push_back(Bitvector_Utils::getEntry(iterD3, 0, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(),0, dummySize}));
                 }
                 currentIndex++;
             }

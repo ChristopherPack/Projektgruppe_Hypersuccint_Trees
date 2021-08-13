@@ -46,8 +46,9 @@ namespace pht{
             const std::set<Bitvector, HuffmanComparator>& huffmanTable = {};
         };
 
-        static Bitvector::const_iterator nullIterator() {
-            return Bitvector::const_iterator();
+        static Bitvector::const_iterator& nullIterator() {
+            static Bitvector::const_iterator iter = Bitvector::const_iterator();
+            return iter;
         }
 
         static uint32_t encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding);

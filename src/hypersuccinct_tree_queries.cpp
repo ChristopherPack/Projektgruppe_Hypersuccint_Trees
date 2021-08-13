@@ -72,7 +72,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(parent)));
         auto iter = entry.childMatrix.cbegin();
         uint32_t size = sqrt(entry.childMatrix.size());
-        Bitvector row = Bitvector_Utils::getEntry(iter, std::get<2>(parent), entry.childMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 0, size});
+        Bitvector row = Bitvector_Utils::getEntry(iter, std::get<2>(parent), entry.childMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 0, size});
         uint32_t countIndex = 0;
         for(uint32_t i=0; i<row.size(); i++) {
             if(row.at(i)) {
@@ -89,7 +89,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
         //TODO: Remove convertMicro
         uint32_t fidIndex = convertMicroTreeToFIDIndex(miniTree, std::get<1>(parent)).first;
         auto iterD = miniTree.FIDs.cbegin();
-        Bitvector fid = Bitvector_Utils::getEntry(iterD, fidIndex, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1, 0});
+        Bitvector fid = Bitvector_Utils::getEntry(iterD, fidIndex, miniTree.FIDs.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 1, 0});
         auto iterTV = miniTree.typeVectors.cbegin();
         auto iterF = miniTree.FIDs.cbegin();
         Bitvector tv = Bitvector_Utils::getEntry(iterTV, fidIndex, miniTree.typeVectors.cend(), Bitvector_Utils::BitvectorEncoding::VECTOR_INDEX, { iterF, miniTree.FIDs.cend(), 1, 0});
@@ -131,7 +131,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     auto iterD = miniFIDs.cbegin();
     Bitvector fid = Bitvector_Utils::getEntry(iterD, fidIndices.first, miniFIDs.cend(),
                                               Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA,
-                                              {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 1,
+                                              {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 1,
                                                0});
     auto iterTV = miniTypeVectors.cbegin();
     auto iterF = miniFIDs.cbegin();
