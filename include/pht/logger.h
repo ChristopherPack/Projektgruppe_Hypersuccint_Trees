@@ -22,9 +22,9 @@
 #define PHT_LOGGER_FATAL(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, param, __FILE__, __LINE__, __func__)
 
 namespace pht {
-    class Logger {
+    class __declspec(dllexport) Logger {
     public:
-        enum class LogLevel {
+        enum class __declspec(dllexport) LogLevel {
             PHT_DEBUG = 0, PHT_INFO = 1, PHT_WARNING = 2, PHT_ERROR = 3, PHT_FATAL = 4
         };
 

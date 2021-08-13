@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace pht {
-    class HypersuccinctTreeOutput {
+    class __declspec(dllexport) HypersuccinctTreeOutput {
 
     public:
         /**

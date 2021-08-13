@@ -19,7 +19,7 @@ namespace pht {
 std::ostream& operator<<(std::ostream& out, const pht::Timer& timer);
 
 namespace pht {
-    class Timer {
+    class __declspec(dllexport) Timer {
     public:
         void start();
         void stop();

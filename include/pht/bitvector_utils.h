@@ -25,28 +25,30 @@ namespace pht{
      * Functionality concerns specific encodings for the implemented Farzan Munro Algorithm.
      *
      */
-    class Bitvector_Utils {
+    class __declspec(dllexport) Bitvector_Utils {
     public:
-        enum class NumberEncoding {
+        enum class __declspec(dllexport) NumberEncoding {
             BINARY, ELIAS_GAMMA
         };
-        enum class BitvectorEncoding {
+        enum class __declspec(dllexport) BitvectorEncoding {
             ELIAS_GAMMA, VECTOR_INDEX, STATIC, HUFFMAN, PURE_ELIAS_GAMMA, STATIC_MATRIX_COLUMN
         };
 
-        struct HuffmanComparator {
+        struct __declspec(dllexport) HuffmanComparator {
             bool operator()(const Bitvector &a, const Bitvector &b)const;
         };
 
-        struct IndexingInformation {
+        struct __declspec(dllexport) IndexingInformation {
             Bitvector::const_iterator& indexStart;
-            const Bitvector::const_iterator& indexEnd = nullIterator;
+            const Bitvector::const_iterator& indexEnd = nullIterator();
             uint32_t multiplier = 0;
             uint32_t staticSize = 0;
             const std::set<Bitvector, HuffmanComparator>& huffmanTable = {};
         };
 
-        static Bitvector::const_iterator nullIterator;
+        static Bitvector::const_iterator nullIterator() {
+            return Bitvector::const_iterator();
+        }
 
         static uint32_t encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding);
 

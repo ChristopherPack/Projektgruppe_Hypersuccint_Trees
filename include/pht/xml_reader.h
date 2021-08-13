@@ -13,7 +13,7 @@ namespace pht {
     /**
      * 
      */
-    class XMLReader {
+    class __declspec(dllexport) XMLReader {
     public:
         /**
          * 
