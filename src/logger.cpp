@@ -9,7 +9,7 @@
 #define PHT_LOGGER_MSG_OFFSET 22+PHT_LOGGER_TAG_WIDTH
 #define PHT_LOGGER_COLORIZE
 
-pht::Logger::LogLevel pht::Logger::logLevel = pht::Logger::LogLevel::DEBUG;
+pht::Logger::LogLevel pht::Logger::logLevel = pht::Logger::LogLevel::PHT_DEBUG;
 pht::Timer pht::Logger::timer = pht::Timer();
 std::regex pht::Logger::unifyLinebreakRegex = std::regex("\r\n?");
 std::streambuf* pht::Logger::stdoutBuf = std::cout.rdbuf();
@@ -28,11 +28,11 @@ void pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const
 
     #ifdef PHT_LOGGER_COLORIZE
     switch(level) {
-        case LogLevel::DEBUG:   stdOutWrapper << "\033[3m"; break;
-        case LogLevel::INFO:    stdOutWrapper << "\033[1m"; break;
-        case LogLevel::WARNING: stdOutWrapper << "\033[1;33m"; break;
-        case LogLevel::ERROR:   stdOutWrapper << "\033[1;31m"; break;
-        case LogLevel::FATAL:   stdOutWrapper << "\033[1;37;41m"; break;
+        case LogLevel::PHT_DEBUG:   stdOutWrapper << "\033[3m"; break;
+        case LogLevel::PHT_INFO:    stdOutWrapper << "\033[1m"; break;
+        case LogLevel::PHT_WARNING: stdOutWrapper << "\033[1;33m"; break;
+        case LogLevel::PHT_ERROR:   stdOutWrapper << "\033[1;31m"; break;
+        case LogLevel::PHT_FATAL:   stdOutWrapper << "\033[1;37;41m"; break;
     }
     #endif
 
@@ -41,11 +41,11 @@ void pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const
 
     stdOutWrapper << " [";
     switch(level) {
-        case LogLevel::DEBUG:   stdOutWrapper << "DBG"; break;
-        case LogLevel::INFO:    stdOutWrapper << "INF"; break;
-        case LogLevel::WARNING: stdOutWrapper << "WRN"; break;
-        case LogLevel::ERROR:   stdOutWrapper << "ERR"; break;
-        case LogLevel::FATAL:   stdOutWrapper << "FAT"; break;
+        case LogLevel::PHT_DEBUG:   stdOutWrapper << "DBG"; break;
+        case LogLevel::PHT_INFO:    stdOutWrapper << "INF"; break;
+        case LogLevel::PHT_WARNING: stdOutWrapper << "WRN"; break;
+        case LogLevel::PHT_ERROR:   stdOutWrapper << "ERR"; break;
+        case LogLevel::PHT_FATAL:   stdOutWrapper << "FAT"; break;
         default:                stdOutWrapper << "???"; break;
     }
     stdOutWrapper << "]";

@@ -6,6 +6,12 @@
 #include <sstream>
 #include <algorithm>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht {
     /**
      * Stores information for use in a tree.
@@ -78,4 +84,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_NODE_H_
