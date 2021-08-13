@@ -9,11 +9,6 @@
 #include "unordered_tree.h"
 #include "list_utils.h"
 
-#ifdef DLL_EXPORTS
-#define DLL_API __declspec(dllexport)
-#else
-#define DLL_API __declspec(dllimport)
-#endif
 
 namespace pht{
     typedef std::vector<bool> Bitvector;

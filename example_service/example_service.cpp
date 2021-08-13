@@ -22,7 +22,6 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 int main() {
 
-
     sdsl::bit_vector test = {true,true,false,true,false,true};
     sdsl::rank_support_v5 rs;
     sdsl::util::init_support(rs,&test);

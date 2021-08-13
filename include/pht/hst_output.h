@@ -11,6 +11,8 @@
 
 using namespace std;
 
+extern "C" void __declspec(dllexport) hello();
+
 namespace pht {
     class __declspec(dllexport) HypersuccinctTreeOutput {
 
