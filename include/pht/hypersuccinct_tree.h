@@ -9,6 +9,13 @@
 #include "list_utils.h"
 #include "farzan_munro.h"
 #include "bitvector_utils.h"
+#include "sdsl/bit_vectors.hpp"
+
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
 
 namespace pht {
     typedef std::vector<bool> Bitvector;
@@ -28,10 +35,21 @@ namespace pht {
         Bitvector FIDs;
         //MicroTypeVectors
         Bitvector typeVectors;
-        //MicroDummys
+        //MicroDummys: Static Size Encoding
         Bitvector dummys;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         Bitvector microTrees;
+
+        //MiniTree Top FID Index + 1
+        Bitvector miniTopFIDIndex;
+        //MiniTree Low FID Index + 1
+        Bitvector miniLowFIDIndex;
+        //MicroTree Top FID Indices + 1 + 1
+        Bitvector microTopFIDIndices;
+        //MicroTree Low FID Indices + 1 + 1
+        Bitvector microLowFIDIndices;
+
+
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
         Bitvector rootAncestors;
         //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
@@ -42,7 +60,7 @@ namespace pht {
         Bitvector miniDummyIndex;
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
-        //MicroTree Dummy Pointer
+        //MicroTree Dummy Pointer: Static Size Encoding
         Bitvector microDummyPointers;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
@@ -74,7 +92,6 @@ namespace pht {
         Bitvector microTreeLeftmostLeafPointers;
         //Rightmost Leaf Pointers for MicroTrees
         Bitvector microTreeRightmostLeafPointers;
-
         //Leaf Rank of MiniTree Root
         Bitvector miniRootLeafRank;
         //Leaf Rank of MiniTree Dummy
@@ -154,7 +171,7 @@ namespace pht {
          * @param index The Index of the MiniTree as integer
          * @return MiniTree as MiniTree
          */
-        MiniTree getMiniTree(uint32_t index ) {
+        MiniTree& getMiniTree(uint32_t index ) {
             return miniTrees.at(index);
         }
 
@@ -238,6 +255,15 @@ namespace pht {
          * @return the Dummy Entry as bitvector
          */
         Bitvector getMicroDummys(MiniTree& miniTree, uint32_t index);
+
+        /**
+         * Returns the MicroDummy Pointer Entry for a given MicroTree
+         *
+         * @param miniTree The MiniTree of the Dummy
+         * @param index The index of the MicroTree
+         * @return The Dummy Pointed MicroTree as int
+         */
+        Bitvector getMicroDummyPointers(MiniTree& miniTree, uint32_t index);
 
         /**
          * Returns the MiniDummy Entry from the perspective of the MiniTree
@@ -390,6 +416,15 @@ namespace pht {
         bool isDummyAncestorWithinMicroTree(HstNode node);
 
         /**
+         * Returns the ith child of a given Node, if it exists
+         *
+         * @param parent The parent Node as HStNode
+         * @param index The index as unint32_t
+         * @return The ith child as HstNode
+         */
+        HstNode child(HstNode parent, uint32_t index);
+
+        /**
          * Returns the Child Rank of a given Node
          *
          * @param node The Node as HstNode
@@ -466,7 +501,6 @@ namespace pht {
         /**
          * Returns the Leaf Rank of a given Node
          * Leaf Rank is the amount of Leaves coming before the Node, in node order
-         * TODO: Unfinished - needs Child_Rank handling
          *
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
@@ -500,4 +534,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif //PROJEKTSUCCINCTTREES_HYPERSUCCINCT_TREE_H

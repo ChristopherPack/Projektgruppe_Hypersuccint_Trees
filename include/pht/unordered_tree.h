@@ -13,6 +13,12 @@
 #include "node.h"
 #include "list_utils.h"
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 #define ASSERT(condition, msg) assert((condition) && msg);
 
 namespace pht {
@@ -741,4 +747,5 @@ namespace pht {
     }
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_UNORDERED_TREE_H_

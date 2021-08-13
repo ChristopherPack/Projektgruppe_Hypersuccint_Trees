@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include "pht/logger.h"
 
 #define PHT_TEST
 #include "pht/unordered_tree.h"
@@ -11,7 +12,6 @@
 #include "pht/visualize.h"
 #endif
 
-#include "pht/logger.h"
 
 using namespace pht;
 
@@ -20,7 +20,21 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    pht::Logger::setLogLevel(pht::Logger::LogLevel::DEBUG);
+
+
+    sdsl::bit_vector test = {true,true,false,true,false,true};
+    sdsl::rank_support_v5 rs;
+    sdsl::util::init_support(rs,&test);
+    sdsl::select_support_mcl ss;
+    sdsl::util::init_support(ss, &test);
+    uint32_t i = rs(5);
+    std::cout << i << std::endl;
+    uint32_t j = ss(4);
+    std::cout << j << std::endl;
+
+
+
+    pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");
     PHT_LOGGER_INFO("MAIN", "Current Filesystem:" + std::filesystem::current_path().string());

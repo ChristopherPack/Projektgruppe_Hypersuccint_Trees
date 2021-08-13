@@ -64,6 +64,14 @@ Bitvector HypersuccinctTree::getMicroDummys(MiniTree& miniTree, uint32_t index) 
     return Bitvector_Utils::getEntry(iterD, index, miniTree.dummys.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 0, dummySize});
 }
 
+Bitvector HypersuccinctTree::getMicroDummyPointers(MiniTree& miniTree, uint32_t index) {
+    auto iter = microSize.cbegin();
+    uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, microSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+    uint32_t dummySize = floor(log2(2*size+1))+1;
+    auto iterD = miniTree.microDummyPointers.cbegin();
+    return Bitvector_Utils::getEntry(iterD, index, miniTree.microDummyPointers.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator, Bitvector_Utils::nullIterator, 0, dummySize});
+}
+
 Bitvector HypersuccinctTree::getMiniDummy(uint32_t index) {
     auto iter = miniSize.cbegin();
     uint32_t size = pht::Bitvector_Utils::decodeNumber(iter, miniSize.cend(),Bitvector_Utils::NumberEncoding::BINARY);

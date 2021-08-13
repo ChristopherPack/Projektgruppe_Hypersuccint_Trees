@@ -19,3 +19,7 @@ add_custom_command(TARGET pht_test PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${
 #add_custom_command(TARGET pht_test PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/Release/pht_lib.dll        ${CMAKE_CURRENT_BINARY_DIR}/Release)
 #add_custom_command(TARGET pht_test PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/MinSizeRel/pht_lib.dll     ${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel)
 #add_custom_command(TARGET pht_test PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/RelWithDebInfo/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
+
+#add_executable(pht_runtime_test)
+#target_sources(pht_runtime_test PRIVATE runtime_test.cpp)
+#target_link_libraries(pht_runtime_test PRIVATE pht_lib)
