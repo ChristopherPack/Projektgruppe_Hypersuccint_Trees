@@ -98,6 +98,13 @@ namespace pht {
         Bitvector miniDummyLeafRank;
         //Leaf Ranks of MicroTree Roots + 1
         Bitvector microRootLeafRanks;
+
+
+        //sdsl::bit_vector test;
+        //static sdsl::rank_support_v5 rs;
+        //sdsl::util::init_support(rs,&test);
+        //sdsl::select_support_mcl ss;
+        //sdsl::util::init_support(ss, &test);
     };
 
     /**

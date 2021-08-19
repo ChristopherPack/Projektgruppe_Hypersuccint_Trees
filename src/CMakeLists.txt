@@ -25,11 +25,13 @@ set(PHT_LIB_SOURCES
     hypersuccinct_tree_queries.cpp
     logger.cpp
     timer.cpp
+    bitvector.cpp
 )
 list(TRANSFORM PHT_LIB_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
-add_library(pht_lib SHARED)
+add_library(pht_lib SHARED bitvector.cpp)
 target_sources(pht_lib PRIVATE ${PHT_LIB_SOURCES})
 target_link_libraries(pht_lib PRIVATE irrxml)
 target_link_libraries(pht_lib PUBLIC sdsl)
+#target_link_libraries(pht_lib PUBLIC succinct_bv)
 #target_link_libraries(pht_lib PUBLIC Python::Python)
 target_include_directories(pht_lib PUBLIC "${PROJECT_SOURCE_DIR}/include")
