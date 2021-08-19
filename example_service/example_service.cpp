@@ -22,26 +22,6 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    /*sdsl::bit_vector test = {true,true,false,true,false,true};
-    sdsl::bit_vector test2 = {true,false,false,false,true,true,false};
-    sdsl::rank_support_v5 rs;
-    sdsl::util::init_support(rs,&test);
-    sdsl::select_support_mcl ss;
-    sdsl::util::init_support(ss, &test);
-    sdsl::bit_vector empty = {true,true};
-    sdsl::select_support_mcl emptySS;
-    sdsl::util::init_support(emptySS, &empty);
-    sdsl::select_support& testss = emptySS;
-    sdsl::util::init_support(ss, &test);
-    //testss = ss; //This does not work
-    //sdsl::util::init_support(ss, test2);
-    //uint32_t j2 = testss.select(4);
-    //std::cout << j2 << std::endl;
-    uint32_t i = rs(5);
-    std::cout << i << std::endl;
-    uint32_t j = ss(4);
-    std::cout << j << std::endl;*/
-
     std::vector<bool> arm = {true,false,true,true,false,false,true};
     pht::BitVector test = BitVector(arm);
     uint64_t rs = test.Rank(2);

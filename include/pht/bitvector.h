@@ -22,7 +22,13 @@ namespace pht {
 
         explicit BitVector(const std::vector<bool> &v) : b_(nullptr) { Init(v); }
 
-        ~BitVector() { _aligned_free(b_); }
+        ~BitVector() {
+#ifdef _MSC_VER
+            _aligned_free(b_);
+#elif
+            free(b_);
+#endif
+        }
 
         uint64_t Rank(uint64_t x) const;
 
