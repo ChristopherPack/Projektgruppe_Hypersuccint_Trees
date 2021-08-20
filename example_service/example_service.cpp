@@ -8,7 +8,7 @@
 #include "pht/farzan_munro.h"
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
-#include "pht/bitvector.h"
+#include "bit_vector.h"
 #ifdef NDEBUG
 #include "pht/visualize.h"
 #endif
@@ -22,7 +22,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 int main() {
     std::vector<bool> arm = {true,false,true,true,false,false,true};
-    pht::BitVector test = BitVector(arm);
+    succinct_bv::BitVector test = succinct_bv::BitVector(arm);
     uint64_t rs = test.Rank(2);
     std::cout << rs << std::endl;
     uint64_t ss = test.Select(2);

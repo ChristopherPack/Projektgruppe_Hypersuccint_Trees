@@ -10,7 +10,6 @@
 #include "farzan_munro.h"
 #include "bitvector_utils.h"
 #include "bit_vector.h"
-#include <bit_vector.h>
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
