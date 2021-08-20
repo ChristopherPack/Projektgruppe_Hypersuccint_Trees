@@ -9,7 +9,6 @@ cmake-build-release/
 cmake-build-relwithdebinfo/
 python_visualize/
 venv/
-extern/succinct-bit-vector-master/
 
 /build/
 /.vscode/

@@ -9,7 +9,8 @@
 #include "list_utils.h"
 #include "farzan_munro.h"
 #include "bitvector_utils.h"
-#include "sdsl/bit_vectors.hpp"
+#include "bit_vector.h"
+#include <bit_vector.h>
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
@@ -100,8 +101,6 @@ namespace pht {
         Bitvector microRootLeafRanks;
 
 
-        //sdsl::bit_vector test;
-        //static sdsl::rank_support_v5 rs;
         //sdsl::util::init_support(rs,&test);
         //sdsl::select_support_mcl ss;
         //sdsl::util::init_support(ss, &test);
