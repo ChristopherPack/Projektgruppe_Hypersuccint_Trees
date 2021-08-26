@@ -69,6 +69,9 @@ namespace pht {
                 convertToHuffman(hypersuccinctTree, huffmanTable);
             }
 
+            //TODO: convert std::bool to BitVector
+            //convertToBitVector();
+
             return hypersuccinctTree;
         }
 
