@@ -72,7 +72,7 @@ namespace pht {
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
 
             //TODO: convert std::bool to BitVector
-            //convertToBitVector(hypersuccinctTree);
+            convertToBitVector(hypersuccinctTree);
 
             return hypersuccinctTree;
         }
@@ -363,6 +363,7 @@ namespace pht {
          * @param fmMicroTree The Micro Tree to get data from
          */
         template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree){
+            PHT_LOGGER_INFO("Factory Create", string("Creating LookupTableEntries..."));
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
             //Generates LookupTable Entries
             for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
@@ -397,6 +398,7 @@ namespace pht {
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
                 Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, leafRankNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
             }
+            PHT_LOGGER_INFO("Factory Create", string("Finished creating LookupTableEntries."));
         }
 
         /**
@@ -823,7 +825,7 @@ namespace pht {
             }
         }
 
-        static void assignBitVector(succinct_bv::BitVector& bitVector, Bitvector& bitvector) {
+        static void assignBitVector(succinct_bv::BitVector& bitVector, const Bitvector& bitvector) {
             if(!bitvector.empty()) {
                 bitVector = bitvector;
             }
