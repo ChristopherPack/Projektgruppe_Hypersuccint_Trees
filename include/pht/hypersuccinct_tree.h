@@ -565,8 +565,11 @@ namespace pht {
         //miniTrees
         std::vector<MiniTree> miniTrees;
         std::vector<bool> miniFIDs;
+        succinct_bv::BitVector miniFIDsSupport;
         std::vector<bool> miniTypeVectors;
+        succinct_bv::BitVector miniTypeVectorsSupport;
         std::vector<bool> miniDummys;
+        succinct_bv::BitVector miniDummysSupport;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
 

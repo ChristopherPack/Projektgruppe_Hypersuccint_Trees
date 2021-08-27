@@ -220,6 +220,17 @@ TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
     EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
 }
 
+TEST_F(HypersuccinctTreeTest, SupportTest) {
+    try {
+        pht::MiniTree miniTree = hyperNath.getMiniTree(1);
+        miniTree.FIDsSupport.Rank(0);
+        miniTree.FIDsSupport.Select(0);
+    }
+    catch (runtime_error) {
+        EXPECT_EQ(0,1);
+    }
+}
+
 TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
     pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree,true);
