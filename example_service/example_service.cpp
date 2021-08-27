@@ -21,16 +21,6 @@ std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 
 int main() {
-    std::vector<bool> arm = {true,false,true,true,false,false,true};
-    succinct_bv::BitVector test = succinct_bv::BitVector(arm);
-    uint64_t rs = test.Rank(2);
-    std::cout << rs << std::endl;
-    uint64_t ss = test.Select(2);
-    std::cout << ss << std::endl;
-
-
-
-
     pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN", "Executing example service");
