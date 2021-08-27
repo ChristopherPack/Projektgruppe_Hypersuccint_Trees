@@ -435,7 +435,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The Child Rank as int
          */
-        uint32_t child_rank(HstNode node);
+        uint32_t childRank(HstNode node);
 
         /**
          * Finds the direct Parent of the given Node
@@ -461,7 +461,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return Subtree size as int
          */
-        uint32_t subtree_size(HstNode node);
+        uint32_t subtreeSize(HstNode node);
 
         /**
          * Returns the Depth of a given Node
@@ -485,7 +485,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The leftmost leaf as HstNode
          */
-        HstNode leftmost_leaf(HstNode node);
+        HstNode leftmostLeaf(HstNode node);
 
         /**
          * Returns the rightmost leaf of a given Node
@@ -493,7 +493,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The rightmost leaf as HstNode
          */
-        HstNode rightmost_leaf(HstNode node);
+        HstNode rightmostLeaf(HstNode node);
 
         /**
          * Returns the Leaf size of a given Node
@@ -501,7 +501,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
          */
-        uint32_t leaf_size(HstNode node);
+        uint32_t leafSize(HstNode node);
 
         /**
          * Returns the Leaf Rank of a given Node
@@ -510,7 +510,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
          */
-         uint32_t leaf_rank(HstNode node);
+         uint32_t leafRank(HstNode node);
 
         /**
          * TODO: Unfinished
@@ -519,7 +519,7 @@ namespace pht {
          * @param node
          * @return
          */
-        HstNode levelAncestor(uint32_t level, HstNode node);
+        HstNode levelAncestor(HstNode node, uint32_t level);
 
     private:
         HypersuccinctTree() = default;
