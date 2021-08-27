@@ -174,7 +174,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     return {};
 }
 
-uint32_t HypersuccinctTree::child_rank(HstNode node) {
+uint32_t HypersuccinctTree::childRank(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
     if(std::get<0>(node) == 0 && std::get<1>(node) == 0 && std::get<2>(node) == 0) {
@@ -184,7 +184,7 @@ uint32_t HypersuccinctTree::child_rank(HstNode node) {
     MiniTree miniTreeParent = getMiniTree(std::get<0>(parent));
     if(Bitvector_Utils::decodeNumber(getMiniDummy(std::get<0>(parent)),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
         if(Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) == std::get<1>(parent) && Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == std::get<2>(parent)) {
-            return child_rank(parent);
+            return childRank(parent);
         }
     }
     if(Bitvector_Utils::decodeNumber(getMicroDummys(miniTreeParent, std::get<1>(parent)),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
@@ -363,7 +363,7 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
     return fid.size();
 }
 
-uint32_t HypersuccinctTree::subtree_size(HstNode node) {
+uint32_t HypersuccinctTree::subtreeSize(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
     if(std::get<2>(node) > 0) {
@@ -450,7 +450,7 @@ uint32_t HypersuccinctTree::height(HstNode node) {
     return res + Bitvector_Utils::decodeNumber(miniTree.miniHeight, Bitvector_Utils::NumberEncoding::BINARY);
 }
 
-HstNode HypersuccinctTree::leftmost_leaf(HstNode node) {
+HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
     uint32_t miniNum = std::get<0>(node);
     uint32_t microNum = std::get<1>(node);
     uint32_t nodeNum = std::get<2>(node);
@@ -505,7 +505,7 @@ HstNode HypersuccinctTree::leftmost_leaf(HstNode node) {
     return {miniNum, microNum, nodeNum};
 }
 
-HstNode HypersuccinctTree::rightmost_leaf(HstNode node) {
+HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
     uint32_t miniNum = std::get<0>(node);
     uint32_t microNum = std::get<1>(node);
     uint32_t nodeNum = std::get<2>(node);
@@ -560,7 +560,7 @@ HstNode HypersuccinctTree::rightmost_leaf(HstNode node) {
     return {miniNum, microNum, nodeNum};
 }
 
-uint32_t HypersuccinctTree::leaf_size(HstNode node) {
+uint32_t HypersuccinctTree::leafSize(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
     if(std::get<2>(node) > 0) {
@@ -601,7 +601,7 @@ uint32_t HypersuccinctTree::leaf_size(HstNode node) {
     return res + Bitvector_Utils::decodeNumber(miniTree.miniLeaves, Bitvector_Utils::NumberEncoding::BINARY);
 }
 
-uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
+uint32_t HypersuccinctTree::leafRank(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(std::get<0>(node));
 
@@ -679,7 +679,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
                     if (tree == std::get<1>(node)) {
                         break;
                     } else {
-                        res += leaf_size({std::get<0>(node), tree, 0});
+                        res += leafSize({std::get<0>(node), tree, 0});
                     }
                 } else {
                     uint32_t tree = trees.second.front();
@@ -687,7 +687,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
                     if (tree == std::get<1>(node)) {
                         break;
                     } else {
-                        res += leaf_size({std::get<0>(node), tree, 0});
+                        res += leafSize({std::get<0>(node), tree, 0});
                     }
                 }
             }
@@ -697,7 +697,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
 
     res += Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
 
-    //if(child_rank(node) > 0) {
+    //if(childRank(node) > 0) {
     if ((std::get<1>(node) != 0 || std::get<2>(node) != 0)) {
         uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
         auto iterD = miniFIDs.cbegin();
@@ -718,7 +718,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
                 if (tree == std::get<0>(node)) {
                     break;
                 } else {
-                    res += leaf_size({tree, 0, 0});
+                    res += leafSize({tree, 0, 0});
                 }
             } else {
                 uint32_t tree = trees.second.front();
@@ -726,7 +726,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
                 if (tree == std::get<0>(node)) {
                     break;
                 } else {
-                    res += leaf_size({tree, 0, 0});
+                    res += leafSize({tree, 0, 0});
                 }
             }
         }
@@ -739,7 +739,7 @@ uint32_t HypersuccinctTree::leaf_rank(HstNode node) {
 
 
 
-HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
+HstNode HypersuccinctTree::levelAncestor(HstNode node, uint32_t level) {
     //TODO:
     if(std::get<2>(node) > 0) {
         //depth via lookputable
@@ -748,14 +748,14 @@ HstNode HypersuccinctTree::levelAncestor(uint32_t level, HstNode node) {
             //ancestormatrix oder so
             return {std::get<0>(node),std::get<1>(node),0};
         }
-        return levelAncestor(level-depth, {std::get<0>(node),std::get<1>(node),0});
+        return levelAncestor({std::get<0>(node), std::get<1>(node), 0}, level - depth);
     }
     if(std::get<1>(node) > 0) {
         //TreeSize or microTreeSize???
         uint32_t delta = ceil(sqrt(log2(Bitvector_Utils::decodeNumber(size, Bitvector_Utils::NumberEncoding::BINARY))));
         uint32_t depth = 0; //depth of MicroTree in MiniTree
         if(level > depth) {
-            return levelAncestor(level-depth, {std::get<0>(node),0,0});
+            return levelAncestor({std::get<0>(node), 0, 0}, level - depth);
         }
         //???
     }
