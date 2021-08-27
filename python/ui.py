@@ -1,6 +1,10 @@
-import ctypes as ct
-import os.path
+import time
 
-pht_lib = ct.CDLL(os.path.join(os.path.curdir,"pht_lib.dll"))
+import pht_timer
 
-pht_lib.hello()
+tmr = pht_timer.PyTimer()
+print(tmr)
+tmr.start()
+time.sleep(2.4)
+tmr.stop()
+print(tmr.toString())
