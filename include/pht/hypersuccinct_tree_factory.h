@@ -59,7 +59,7 @@ namespace pht {
 
             enumerateMiniTrees(fmMiniTrees);
 
-            PHT_LOGGER_INFO("", string ("Amount of Minitrees: ") + to_string(fmMiniTrees.size()));
+            PHT_LOGGER_INFO("Factory Create", string ("Amount of Minitrees: ") + to_string(fmMiniTrees.size()));
 
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
             createMiniTrees(hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences);
@@ -68,6 +68,11 @@ namespace pht {
                 std::map<std::vector<bool>,std::vector<bool>> huffmanTable = Huffman::generateTable<std::vector<bool>>(bpsAndOccurrences);
                 convertToHuffman(hypersuccinctTree, huffmanTable);
             }
+
+            PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
+
+            //TODO: convert std::bool to BitVector
+            //convertToBitVector();
 
             return hypersuccinctTree;
         }
@@ -404,6 +409,7 @@ namespace pht {
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
+            PHT_LOGGER_INFO("Factory Create", string("Creating MicroTrees for a MiniTree..."));
             uint32_t microCount = 0;
             //The actual MicroTree Loop
             //Put everything that needs MicroTree Iteration in this loop
@@ -476,6 +482,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.microLowFIDIndices, microFIDIndices.second+2, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 microCount++;
             }
+            PHT_LOGGER_INFO("Factory Create", string("Finished Creating MicroTrees for this MiniTree."));
         }
 
         /**
@@ -489,9 +496,12 @@ namespace pht {
          */
         template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences){
 
+            PHT_LOGGER_INFO("Factory Create", string("Creating MiniTrees..."));
             for(std::shared_ptr<UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<UnorderedTree<T>>> fmMicroTrees = FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
+                std::cout << "Test" << std::endl;
                 MiniTree miniTree = MiniTree();
+                std::cout << "TestEnd" << std::endl;
 
                 //Creating Micro Interconnections and Dummys
                 std::tie(miniTree.FIDs, miniTree.typeVectors) = create1_2_Interconnections(fmMiniTree,fmMicroTrees,sizeMicro);
@@ -547,6 +557,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.first+1,Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniLowFIDIndex, miniFIDIndices.second+1,Bitvector_Utils::NumberEncoding::BINARY);
             }
+            PHT_LOGGER_INFO("Factory Create", string("Finished Creating MiniTrees."));
         }
 
         /**

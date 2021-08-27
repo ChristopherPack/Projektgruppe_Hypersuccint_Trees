@@ -22,10 +22,6 @@ namespace pht {
     //node identification by: Minitree, MicroTree, NodeInMicroTree
     typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
-    enum class __declspec(dllexport) TreeTypes {
-        MINI, MICRO
-    };
-
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
@@ -33,76 +29,103 @@ namespace pht {
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
         Bitvector FIDs;
+        succinct_bv::BitVector FIDsSupport;
         //MicroTypeVectors
         Bitvector typeVectors;
+        succinct_bv::BitVector typeVectorsSupport;
         //MicroDummys: Static Size Encoding
         Bitvector dummys;
+        succinct_bv::BitVector dummysSupport;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         Bitvector microTrees;
+        succinct_bv::BitVector microTreesSupport;
 
         //MiniTree Top FID Index + 1
         Bitvector miniTopFIDIndex;
+        succinct_bv::BitVector miniTopFIDIndexSupport;
         //MiniTree Low FID Index + 1
         Bitvector miniLowFIDIndex;
+        succinct_bv::BitVector miniLowFIDIndexSupport;
         //MicroTree Top FID Indices + 1 + 1
         Bitvector microTopFIDIndices;
+        succinct_bv::BitVector microTopFIDIndicesSupport;
         //MicroTree Low FID Indices + 1 + 1
         Bitvector microLowFIDIndices;
+        succinct_bv::BitVector microLowFIDIndicesSupport;
 
 
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
         Bitvector rootAncestors;
+        succinct_bv::BitVector rootAncestorsSupport;
         //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
         Bitvector dummyAncestors;
+        succinct_bv::BitVector dummyAncestorsSupport;
         //If MiniTree has Dummy: Which MicroTree contains this Dummy?
         Bitvector miniDummyTree;
+        succinct_bv::BitVector miniDummyTreeSupport;
         //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
         Bitvector miniDummyIndex;
+        succinct_bv::BitVector miniDummyIndexSupport;
         //If MiniTree has Dummy: To which Tree does the pointer lead?
         Bitvector miniDummyPointer;
+        succinct_bv::BitVector miniDummyPointerSupport;
         //MicroTree Dummy Pointer: Static Size Encoding
         Bitvector microDummyPointers;
+        succinct_bv::BitVector microDummyPointersSupport;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
+        succinct_bv::BitVector miniAncSupport;
         //SubTree Size MiniTree
         Bitvector subTree;
+        succinct_bv::BitVector subTreeSupport;
         //SubTree Size for MicroTree roots
         Bitvector microSubTrees;
+        succinct_bv::BitVector microSubTreesSupport;
         //Depth of the MiniTree root
         Bitvector miniDepth;
+        succinct_bv::BitVector miniDepthSupport;
         //Height of the MiniTree root
         Bitvector miniHeight;
+        succinct_bv::BitVector miniHeightSupport;
         //Depth of the MiniTree Dummy
         Bitvector miniDummyDepth;
+        succinct_bv::BitVector miniDummyDepthSupport;
         //Height of the MiniTree Dummy
         Bitvector miniDummyHeight;
+        succinct_bv::BitVector miniDummyHeightSupport;
         //Depths for MicroTree roots + 1
         Bitvector rootDepths;
+        succinct_bv::BitVector rootDepthsSupport;
         //Heights for MicroTree roots + 1
         Bitvector rootHeights;
+        succinct_bv::BitVector rootHeightsSupport;
         //Amount of Leaves in MiniTree
         Bitvector miniLeaves;
+        succinct_bv::BitVector miniLeavesSupport;
         //Amount of Leaves within MicroTrees
         Bitvector microLeaves;
+        succinct_bv::BitVector microLeavesSupport;
         //Leftmost Leaf Pointer for MiniTree
         Bitvector miniTreeLeftmostLeafPointer;
+        succinct_bv::BitVector miniTreeLeftmostLeafPointerSupport;
         //Rightmost Leaf Pointer for MiniTree
         Bitvector miniTreeRightmostLeafPointer;
+        succinct_bv::BitVector miniTreeRightmostLeafPointerSupport;
         //Leftmost Leaf Pointers for MicroTrees
         Bitvector microTreeLeftmostLeafPointers;
+        succinct_bv::BitVector microTreeLeftmostLeafPointersSupport;
         //Rightmost Leaf Pointers for MicroTrees
         Bitvector microTreeRightmostLeafPointers;
+        succinct_bv::BitVector microTreeRightmostLeafPointersSupport;
         //Leaf Rank of MiniTree Root
         Bitvector miniRootLeafRank;
+        succinct_bv::BitVector miniRootLeafRankSupport;
         //Leaf Rank of MiniTree Dummy
         Bitvector miniDummyLeafRank;
+        succinct_bv::BitVector miniDummyLeafRankSupport;
         //Leaf Ranks of MicroTree Roots + 1
         Bitvector microRootLeafRanks;
-
-
-        //sdsl::util::init_support(rs,&test);
-        //sdsl::select_support_mcl ss;
-        //sdsl::util::init_support(ss, &test);
+        succinct_bv::BitVector microRootLeafRanksSupport;
     };
 
     /**
@@ -113,29 +136,40 @@ namespace pht {
     struct __declspec(dllexport) LookupTableEntry {
         //Index of the LookupTableEntry
         Bitvector index;
+        succinct_bv::BitVector indexSupport;
         //BP of the Entry. Empty if index is BP
         Bitvector bp;
+        succinct_bv::BitVector bpSupport;
         //Ancestor Matrix
         Bitvector ancestorMatrix;
+        succinct_bv::BitVector ancestorMatrixSupport;
         //Child Matrix
         Bitvector childMatrix;
+        succinct_bv::BitVector childMatrixSupport;
         //degree for every node + 1
         Bitvector degree;
+        succinct_bv::BitVector degreeSupport;
         //subTree for every node within MicroTree (at least 1)
         Bitvector subTrees;
+        succinct_bv::BitVector subTreesSupport;
         //Depths of nodes + 1
         Bitvector nodeDepths;
+        succinct_bv::BitVector nodeDepthsSupport;
         //Heights of nodes + 1
         Bitvector nodeHeights;
+        succinct_bv::BitVector nodeHeightsSupport;
         //Amount of Leaves for every node within MicroTree (at least 1)
         Bitvector leaves;
+        succinct_bv::BitVector leavesSupport;
         //Rightmost leaves for every node within MicroTree
         Bitvector leftmost_leaf;
+        succinct_bv::BitVector leftmost_leafSupport;
         //Leftmose leaves for every node within MicroTree
         Bitvector rightmost_leaf;
-
+        succinct_bv::BitVector rightmost_leafSupport;
         //Leaf Rank for every node within MicroTree + 1
         Bitvector leafRank;
+        succinct_bv::BitVector leafRankSupport;
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -435,7 +469,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The Child Rank as int
          */
-        uint32_t child_rank(HstNode node);
+        uint32_t childRank(HstNode node);
 
         /**
          * Finds the direct Parent of the given Node
@@ -461,7 +495,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return Subtree size as int
          */
-        uint32_t subtree_size(HstNode node);
+        uint32_t subtreeSize(HstNode node);
 
         /**
          * Returns the Depth of a given Node
@@ -485,7 +519,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The leftmost leaf as HstNode
          */
-        HstNode leftmost_leaf(HstNode node);
+        HstNode leftmostLeaf(HstNode node);
 
         /**
          * Returns the rightmost leaf of a given Node
@@ -493,7 +527,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return The rightmost leaf as HstNode
          */
-        HstNode rightmost_leaf(HstNode node);
+        HstNode rightmostLeaf(HstNode node);
 
         /**
          * Returns the Leaf size of a given Node
@@ -501,7 +535,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
          */
-        uint32_t leaf_size(HstNode node);
+        uint32_t leafSize(HstNode node);
 
         /**
          * Returns the Leaf Rank of a given Node
@@ -510,7 +544,7 @@ namespace pht {
          * @param node The Node as HstNode
          * @return the Leaf Size as uint32_t
          */
-         uint32_t leaf_rank(HstNode node);
+         uint32_t leafRank(HstNode node);
 
         /**
          * TODO: Unfinished
@@ -519,7 +553,7 @@ namespace pht {
          * @param node
          * @return
          */
-        HstNode levelAncestor(uint32_t level, HstNode node);
+        HstNode levelAncestor(HstNode node, uint32_t level);
 
     private:
         HypersuccinctTree() = default;
