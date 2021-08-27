@@ -1,6 +1,3 @@
 [submodule "extern/googletest"]
 	path = extern/googletest
 	url = https://github.com/google/googletest.git
-[submodule "extern/succinct_bv"]
-	path = extern/succinct_bv
-	url = https://github.com/ChristopherPack/succinct-bit-vector.git
