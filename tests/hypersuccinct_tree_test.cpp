@@ -579,6 +579,10 @@ TEST_F(HypersuccinctTreeTest, degreeTest) {
     res = hyperNath.degree(node);
     EXPECT_EQ(2, res);
 
+    node = {4,1,4};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
     node = {1,1,2};
     res = hyperNath.degree(node);
     EXPECT_EQ(2, res);
@@ -634,7 +638,15 @@ TEST_F(HypersuccinctTreeTest, subtree_sizeTest) {
     res = hyperNath.subtreeSize(node);
     EXPECT_EQ(23, res);
 
+    node = {6,0,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(23, res);
+
     node = {1,1,2};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,4,0};
     res = hyperNath.subtreeSize(node);
     EXPECT_EQ(6, res);
 
@@ -661,6 +673,10 @@ TEST_F(HypersuccinctTreeTest, depthTest) {
     res = hyperNath.depth(node);
     EXPECT_EQ(4, res);
 
+    node = {6,0,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
+
     node = {1,1,2};
     res = hyperNath.depth(node);
     EXPECT_EQ(4, res);
@@ -668,6 +684,10 @@ TEST_F(HypersuccinctTreeTest, depthTest) {
     node = {1,1,1};
     res = hyperNath.depth(node);
     EXPECT_EQ(3, res);
+
+    node = {1,4,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
 
 }
 
@@ -688,7 +708,15 @@ TEST_F(HypersuccinctTreeTest, heightTest) {
     res = hyperNath.height(node);
     EXPECT_EQ(3, res);
 
+    node = {6,0,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(3, res);
+
     node = {1,1,2};
+    res = hyperNath.height(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,4,0};
     res = hyperNath.height(node);
     EXPECT_EQ(2, res);
 
@@ -715,11 +743,19 @@ TEST_F(HypersuccinctTreeTest, leaf_sizeTest) {
     res = hyperNath.leafSize(node);
     EXPECT_EQ(14, res);
 
+    node = {6,0,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(14, res);
+
     node = {4,2,3};
     res = hyperNath.leafSize(node);
     EXPECT_EQ(1, res);
 
     node = {1,1,2};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,4,0};
     res = hyperNath.leafSize(node);
     EXPECT_EQ(3, res);
 
