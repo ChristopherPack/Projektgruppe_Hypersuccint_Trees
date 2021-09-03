@@ -26,6 +26,20 @@ uint32_t Bitvector_Utils::encodeNumber(std::insert_iterator<Bitvector> iterator,
     }
 }
 
+Bitvector Bitvector_Utils::encodeNumberReturn(uint32_t num) {
+    Bitvector res;
+    uint32_t i = 0;
+    if (num == 0) {
+        res.push_back(false);
+        return res;
+    }
+    int size = floor(log2(num)) + 1;
+    for(; i < size; i++) {
+        res.push_back((num>>(size-1-i))&1);
+    }
+    return res;
+}
+
 uint32_t Bitvector_Utils::decodeNumber(const Bitvector& bitvector, NumberEncoding encoding) {
     auto iter = bitvector.cbegin();
     return decodeNumber(iter, bitvector.cend(), encoding);

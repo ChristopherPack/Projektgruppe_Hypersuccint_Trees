@@ -28,7 +28,7 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
 
     cout << "Amount of MiniTrees: " << tree.getMiniTrees().size() << endl;
     cout << "MiniFIDs:  ";
-    cout << splitFIDs(tree.getMiniFIDs(), "  ") << endl;
+    printBitvector(tree.getMiniFIDs());
     cout << "MiniTypeVectors:  ";
     printBitvector(tree.getMiniTypeVectors());
     cout << "MiniDummys:  ";
@@ -39,7 +39,7 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         cout << "MicroTreesinMiniTree" << index << ":  ";
         printBitvector(tree.getMiniTree(index).microTrees);
         cout << "MicroTreeFIDs:  ";
-        cout << splitFIDs(tree.getMiniTree(index).FIDs, "  ") << endl;
+        printBitvector(tree.getMiniTree(index).FIDs);
         cout << "MicroTreeTypeVectors:  ";
         printBitvector(tree.getMiniTree(index).typeVectors);
         cout << "MicroTreeDummys:  ";
@@ -136,6 +136,12 @@ void HypersuccinctTreeOutput::printBitvector(const vector<bool>& bitvector) {
         cout << bit;
     }
     cout << endl;
+}
+
+void HypersuccinctTreeOutput::printBitvector(const vector<vector<bool>> &bitvector) {
+    for (const std::vector<bool>& part : bitvector) {
+        printBitvector(part);
+    }
 }
 
 string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const string &separator) {
@@ -275,6 +281,20 @@ void HypersuccinctTreeOutput::createFileBitvector(Bitvector bitvector, Bitvector
         Bitvector_Utils::encodeNumber(std::inserter(target, target.end()),
                                       bitvector.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
         ListUtils::combine(target, bitvector);
+    }
+}
+
+void HypersuccinctTreeOutput::createFileBitvector(std::vector<Bitvector> bitvector, Bitvector &target) {
+    if(bitvector.empty()) {
+        target.push_back(true);
+        target.push_back(false);
+    } else {
+        Bitvector partFileBit;
+        for(Bitvector& part : bitvector) {
+            createFileBitvector(part,partFileBit);
+        }
+        Bitvector_Utils::encodeNumber(std::inserter(target,target.end()), bitvector.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(target,partFileBit);
     }
 }
 

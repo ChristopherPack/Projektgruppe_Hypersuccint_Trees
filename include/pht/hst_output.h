@@ -30,6 +30,12 @@ namespace pht {
         static void printBitvector(const vector<bool>& bitvector);
 
         /**
+         * prints a given bitvector into the console
+         * @param bitvector the bitvector to be printed
+         */
+        static void printBitvector(const vector<vector<bool>>& bitvector);
+
+        /**
          * splits the FIDs of hypersuccinct Trees into easily readable parts
          * @param bitvector the FID bitvector
          * @param separator the separator for splitting
@@ -70,6 +76,8 @@ namespace pht {
          * @param target The Bitvector to write into
          */
         static void createFileBitvector(Bitvector bitvector, Bitvector& target);
+
+        static void createFileBitvector(std::vector<Bitvector> bitvector, Bitvector& target);
 
         /**
          * Reads a space efficient Bitvector from a file

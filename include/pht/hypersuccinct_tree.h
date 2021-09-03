@@ -28,16 +28,16 @@ namespace pht {
      */
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
-        Bitvector FIDs;
+        std::vector<Bitvector> FIDs;
         succinct_bv::BitVector FIDsSupport;
         //MicroTypeVectors
-        Bitvector typeVectors;
+        std::vector<Bitvector> typeVectors;
         succinct_bv::BitVector typeVectorsSupport;
         //MicroDummys: Static Size Encoding
-        Bitvector dummys;
+        std::vector<Bitvector> dummys;
         succinct_bv::BitVector dummysSupport;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
-        Bitvector microTrees;
+        std::vector<Bitvector> microTrees;
         succinct_bv::BitVector microTreesSupport;
 
         //MiniTree Top FID Index + 1
@@ -47,10 +47,10 @@ namespace pht {
         Bitvector miniLowFIDIndex;
         succinct_bv::BitVector miniLowFIDIndexSupport;
         //MicroTree Top FID Indices + 1 + 1
-        Bitvector microTopFIDIndices;
+        std::vector<Bitvector> microTopFIDIndices;
         succinct_bv::BitVector microTopFIDIndicesSupport;
         //MicroTree Low FID Indices + 1 + 1
-        Bitvector microLowFIDIndices;
+        std::vector<Bitvector> microLowFIDIndices;
         succinct_bv::BitVector microLowFIDIndicesSupport;
 
 
@@ -70,7 +70,7 @@ namespace pht {
         Bitvector miniDummyPointer;
         succinct_bv::BitVector miniDummyPointerSupport;
         //MicroTree Dummy Pointer: Static Size Encoding
-        Bitvector microDummyPointers;
+        std::vector<Bitvector> microDummyPointers;
         succinct_bv::BitVector microDummyPointersSupport;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
@@ -79,7 +79,7 @@ namespace pht {
         Bitvector subTree;
         succinct_bv::BitVector subTreeSupport;
         //SubTree Size for MicroTree roots
-        Bitvector microSubTrees;
+        std::vector<Bitvector> microSubTrees;
         succinct_bv::BitVector microSubTreesSupport;
         //Depth of the MiniTree root
         Bitvector miniDepth;
@@ -94,16 +94,16 @@ namespace pht {
         Bitvector miniDummyHeight;
         succinct_bv::BitVector miniDummyHeightSupport;
         //Depths for MicroTree roots + 1
-        Bitvector rootDepths;
+        std::vector<Bitvector> rootDepths;
         succinct_bv::BitVector rootDepthsSupport;
         //Heights for MicroTree roots + 1
-        Bitvector rootHeights;
+        std::vector<Bitvector> rootHeights;
         succinct_bv::BitVector rootHeightsSupport;
         //Amount of Leaves in MiniTree
         Bitvector miniLeaves;
         succinct_bv::BitVector miniLeavesSupport;
         //Amount of Leaves within MicroTrees
-        Bitvector microLeaves;
+        std::vector<Bitvector> microLeaves;
         succinct_bv::BitVector microLeavesSupport;
         //Leftmost Leaf Pointer for MiniTree
         Bitvector miniTreeLeftmostLeafPointer;
@@ -112,10 +112,10 @@ namespace pht {
         Bitvector miniTreeRightmostLeafPointer;
         succinct_bv::BitVector miniTreeRightmostLeafPointerSupport;
         //Leftmost Leaf Pointers for MicroTrees
-        Bitvector microTreeLeftmostLeafPointers;
+        std::vector<Bitvector> microTreeLeftmostLeafPointers;
         succinct_bv::BitVector microTreeLeftmostLeafPointersSupport;
         //Rightmost Leaf Pointers for MicroTrees
-        Bitvector microTreeRightmostLeafPointers;
+        std::vector<Bitvector> microTreeRightmostLeafPointers;
         succinct_bv::BitVector microTreeRightmostLeafPointersSupport;
         //Leaf Rank of MiniTree Root
         Bitvector miniRootLeafRank;
@@ -124,7 +124,7 @@ namespace pht {
         Bitvector miniDummyLeafRank;
         succinct_bv::BitVector miniDummyLeafRankSupport;
         //Leaf Ranks of MicroTree Roots + 1
-        Bitvector microRootLeafRanks;
+        std::vector<Bitvector> microRootLeafRanks;
         succinct_bv::BitVector microRootLeafRanksSupport;
     };
 
@@ -132,6 +132,7 @@ namespace pht {
      * LookupTableEntry represents a single Entry of the Hypersuccinct Tree's Lookp Table.
      * It is indexed by the MicroTrees Balanced Parenthesis form (if no encoding is chosen) or by their Huffman code (if Huffman encoding is chosen)
      * It contains all fields necessary to satisfy the query's need for structural information
+     * TODO: std::vector<Bitvector>
      */
     struct __declspec(dllexport) LookupTableEntry {
         //Index of the LookupTableEntry
@@ -240,15 +241,15 @@ namespace pht {
             return miniTrees;
         }
 
-        Bitvector getMiniFIDs() {
+        std::vector<Bitvector> getMiniFIDs() {
             return miniFIDs;
         }
 
-        Bitvector getMiniTypeVectors() {
+        std::vector<Bitvector> getMiniTypeVectors() {
             return miniTypeVectors;
         }
 
-        Bitvector getMiniDummys() {
+        std::vector<Bitvector> getMiniDummys() {
             return miniDummys;
         }
 
@@ -564,11 +565,11 @@ namespace pht {
         std::vector<bool> miniSize;
         //miniTrees
         std::vector<MiniTree> miniTrees;
-        std::vector<bool> miniFIDs;
+        std::vector<Bitvector> miniFIDs;
         succinct_bv::BitVector miniFIDsSupport;
-        std::vector<bool> miniTypeVectors;
+        std::vector<Bitvector> miniTypeVectors;
         succinct_bv::BitVector miniTypeVectorsSupport;
-        std::vector<bool> miniDummys;
+        std::vector<Bitvector> miniDummys;
         succinct_bv::BitVector miniDummysSupport;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
