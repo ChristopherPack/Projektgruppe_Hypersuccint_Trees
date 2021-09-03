@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <set>
 
 #include "logger.h"
@@ -38,9 +39,9 @@ namespace pht {
          * @param huffman If the MicroTrees should be encoded with Huffman encoding
          * @return HypersuccinctTree class representing the Hypersuccinct code
          */
-        template<class T> static HypersuccinctTree create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false) {
-            HypersuccinctTree hypersuccinctTree;
-            hypersuccinctTree.huffmanFlag = huffman;
+        template<class T> static std::unique_ptr<HypersuccinctTree> create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false) {
+            std::unique_ptr<HypersuccinctTree> hypersuccinctTree = std::unique_ptr<HypersuccinctTree>(new HypersuccinctTree());
+            hypersuccinctTree->huffmanFlag = huffman;
 
             #ifdef PHT_TEST
             uint32_t sizeMini = 12;
@@ -50,23 +51,23 @@ namespace pht {
             uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
             #endif
 
-            encodeAllSizesInHST(hypersuccinctTree, tree->getSize(), sizeMini, sizeMicro);
+            encodeAllSizesInHST(*hypersuccinctTree, tree->getSize(), sizeMini, sizeMicro);
 
             std::vector<std::shared_ptr<UnorderedTree<T>>> fmMiniTrees = FarzanMunro<T>::decompose(tree, sizeMini);
 
-            std::tie(hypersuccinctTree.miniFIDs, hypersuccinctTree.miniTypeVectors) = create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
-            hypersuccinctTree.miniDummys = createDummyInterconnections(tree,fmMiniTrees,sizeMini);
+            std::tie(hypersuccinctTree->miniFIDs, hypersuccinctTree->miniTypeVectors) = create1_2_Interconnections(tree,fmMiniTrees,sizeMini);
+            hypersuccinctTree->miniDummys = createDummyInterconnections(tree,fmMiniTrees,sizeMini);
 
             enumerateMiniTrees(fmMiniTrees);
 
             PHT_LOGGER_INFO("Factory Create", string ("Amount of Minitrees: ") + to_string(fmMiniTrees.size()));
 
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
-            createMiniTrees(hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences);
+            createMiniTrees(*hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences);
 
-            if(hypersuccinctTree.huffmanFlag) {
+            if(hypersuccinctTree->huffmanFlag) {
                 std::map<std::vector<bool>,std::vector<bool>> huffmanTable = Huffman::generateTable<std::vector<bool>>(bpsAndOccurrences);
-                convertToHuffman(hypersuccinctTree, huffmanTable);
+                convertToHuffman(*hypersuccinctTree, huffmanTable);
             }
 
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));

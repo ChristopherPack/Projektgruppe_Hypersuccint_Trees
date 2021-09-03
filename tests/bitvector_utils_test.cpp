@@ -79,9 +79,9 @@ TEST(BitvectorUtilsTest, getEntryEliasGammaTest) {
 
 TEST(BitvectorUtilsTest, getEntryEliasGammaOffsetTest) {
     std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+    std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
 
-    pht::MiniTree miniTree1 = hst.getMiniTree(1);
+    pht::MiniTree miniTree1 = hst->getMiniTree(1);
     auto iter = miniTree1.microTrees.cbegin();
     EXPECT_THAT(pht::Bitvector_Utils::getEntry(iter, 0, miniTree1.microTrees.cend(), pht::Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {pht::Bitvector_Utils::nullIterator(), pht::Bitvector_Utils::nullIterator(), 2, 0}), testing::ElementsAre(1,1,1,1,0,0,0,0));
     iter = miniTree1.microTrees.cbegin();
