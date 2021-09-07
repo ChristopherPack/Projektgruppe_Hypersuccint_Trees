@@ -85,7 +85,6 @@ namespace pht {
          * @return Hypersuccinct Tree Class representing the encoded Tree
          */
         static HypersuccinctTree createFromFile(Bitvector& fullBitvector) {
-            HypersuccinctTreeOutput::printBitvector(fullBitvector);
             HypersuccinctTree hst;
             auto iter = fullBitvector.cbegin();
             auto end = fullBitvector.cend();

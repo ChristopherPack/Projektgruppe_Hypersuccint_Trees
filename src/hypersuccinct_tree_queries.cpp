@@ -408,7 +408,7 @@ uint32_t HypersuccinctTree::height(HstNode node) {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,std::get<1>(node)));
             //auto iter = entry.nodeHeights.cbegin();
             //Bitvector entryDepth = Bitvector_Utils::getEntry(iter,std::get<2>(node),entry.nodeHeights.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
-            Bitvector entryDepth = entry.nodeDepths.at(std::get<2>(node));
+            Bitvector entryDepth = entry.nodeHeights.at(std::get<2>(node));
             return res + Bitvector_Utils::decodeNumber(entryDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1;
         }
     }
@@ -418,7 +418,7 @@ uint32_t HypersuccinctTree::height(HstNode node) {
             res -= (Bitvector_Utils::decodeNumber(microDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1);
         }
         else {
-            Bitvector microDepth = miniTree.rootDepths.at(std::get<1>(node));
+            Bitvector microDepth = miniTree.rootHeights.at(std::get<1>(node));
             return res + Bitvector_Utils::decodeNumber(microDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1;
         }
     }
@@ -459,7 +459,7 @@ HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
         //auto iter = entry.leftmost_leaf.cbegin();
         //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.leftmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
-        Bitvector entryleftmost = entry.leftmost_leaf.at(nodeNum);
+        Bitvector entryleftmost = entry.leftmost_leaf.at(0);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
 
         if(microNum == miniDummyTree && nodeNum == miniDummyIndex) {
@@ -476,7 +476,7 @@ HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
     LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini,microNum));
     //auto iter = entry.leftmost_leaf.cbegin();
     //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.leftmost_leaf.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator()});
-    Bitvector entryleftmost = entry.leftmost_leaf.at(nodeNum);
+    Bitvector entryleftmost = entry.leftmost_leaf.at(0);
     nodeNum = Bitvector_Utils::decodeNumber(entryleftmost,Bitvector_Utils::NumberEncoding::BINARY);
     return {miniNum, microNum, nodeNum};
 }
@@ -515,7 +515,7 @@ HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
         //auto iter = entry.rightmost_leaf.cbegin();
         //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.rightmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
-        Bitvector entryleftmost = entry.rightmost_leaf.at(nodeNum);
+        Bitvector entryleftmost = entry.rightmost_leaf.at(0);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
 
         if(microNum == miniDummyTree && nodeNum == miniDummyIndex) {
@@ -527,12 +527,12 @@ HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
     }
     miniNum = Bitvector_Utils::decodeNumber(miniTree.miniTreeRightmostLeafPointer,Bitvector_Utils::NumberEncoding::BINARY);
     leftmostMini = getMiniTree(miniNum);
-    Bitvector leftmostMicro = leftmostMini.microTreeLeftmostLeafPointers.at(0);
+    Bitvector leftmostMicro = leftmostMini.microTreeRightmostLeafPointers.at(0);
     microNum = Bitvector_Utils::decodeNumber(leftmostMicro,Bitvector_Utils::NumberEncoding::BINARY);
     LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini,microNum));
     //auto iter = entry.rightmost_leaf.cbegin();
     //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.rightmost_leaf.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator()});
-    Bitvector entryleftmost = entry.rightmost_leaf.at(nodeNum);
+    Bitvector entryleftmost = entry.rightmost_leaf.at(0);
     nodeNum = Bitvector_Utils::decodeNumber(entryleftmost,Bitvector_Utils::NumberEncoding::BINARY);
     return {miniNum, microNum, nodeNum};
 }

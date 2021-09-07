@@ -140,8 +140,12 @@ void HypersuccinctTreeOutput::printBitvector(const vector<bool>& bitvector) {
 
 void HypersuccinctTreeOutput::printBitvector(const vector<vector<bool>> &bitvector) {
     for (const std::vector<bool>& part : bitvector) {
-        printBitvector(part);
+        for(bool bit: part) {
+            cout << bit;
+        }
+        cout << "  ";
     }
+    cout << endl;
 }
 
 string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const string &separator) {

@@ -82,142 +82,14 @@ protected:
 
 };
 
-/*TEST_F(HypersuccinctTreeTest, TreeDataTest) {
-    EXPECT_EQ(78, treeNath->getSize());
-    EXPECT_EQ("((((((x,x)x,(x)x)x)x)x,(((x,x)x)x,x)x)x,(((((((x)x,(x)x)x)x)x,((x,x,x,x)x,(x,x)x)x)x,(x,x)x)x,((,(x,x,x)x,(x,x)x,(((x,x,x)x,(x,x)x)x,(x,x)x,(x,(x,x,x,x)x,(x)x)x,(x)x)x)x)x)x,((x,x)x,(x,x)x)x)x;",
-              treeNath->toNewickString());
-    pht::Bitvector miniSize = convertToBitvector("1100");
-    pht::Bitvector microSize = convertToBitvector("100");
-    EXPECT_EQ(miniSize, hyperNath.getMiniSize());
-    EXPECT_EQ(microSize, hyperNath.getMicroSize());
-}*/
-
 TEST_F(HypersuccinctTreeTest, MiniTreesTest){
-    pht::Bitvector miniFIDs = convertToBitvector("0111110101001011010111101010001001001");
-    pht::Bitvector miniConnectionTypeVectors = convertToBitvector("001100011111");
-    pht::Bitvector miniDummys = convertToBitvector("0000000000000000000000100000000000000000");
+    std::vector<pht::Bitvector> miniFIDs = {{true,true,true},{true,false},{true,true},{true,true},{true},{true,false},{true,false,false,true}};
+    std::vector<pht::Bitvector> miniConnectionTypeVectors = {{0,0,1},{1},{0,0},{0,1},{1},{1},{1,1}};
+    std::vector<pht::Bitvector> miniDummys = {{0},{0},{0},{0},{1,0,0},{0},{0},{0}};
     EXPECT_EQ(8, hyperNath.getMiniTrees().size());
     EXPECT_EQ(miniFIDs, hyperNath.getMiniFIDs());
     EXPECT_EQ(miniConnectionTypeVectors, hyperNath.getMiniTypeVectors());
     EXPECT_EQ(miniDummys, hyperNath.getMiniDummys());
-}
-
-TEST_F(HypersuccinctTreeTest, MicroTreesTest){
-    // MiniTree 0
-    EXPECT_EQ(hyperNath.getMiniTree(0).microTrees, convertToBitvector("1100011111101001101000"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).FIDs, convertToBitvector("1101010"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).typeVectors, convertToBitvector("01"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).dummys, convertToBitvector("00000000"));
-
-    // MiniTree 1
-    EXPECT_EQ(hyperNath.getMiniTree(1).microTrees, convertToBitvector("1100111110000101100001001110100000110111010011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).FIDs, convertToBitvector("0101111010111101010"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).typeVectors, convertToBitvector("0010111"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).dummys, convertToBitvector("00000010000000000000"));
-
-    // MiniTree 2
-    EXPECT_EQ(hyperNath.getMiniTree(2).microTrees, convertToBitvector("110"));
-    EXPECT_EQ(hyperNath.getMiniTree(2).FIDs, convertToBitvector(""));
-    EXPECT_EQ(hyperNath.getMiniTree(2).typeVectors, convertToBitvector(""));
-    EXPECT_EQ(hyperNath.getMiniTree(2).dummys, convertToBitvector("0000"));
-
-    // MiniTree 3
-    EXPECT_EQ(hyperNath.getMiniTree(3).microTrees, convertToBitvector("0010011101000"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).FIDs, convertToBitvector("11"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).typeVectors, convertToBitvector("1"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).dummys, convertToBitvector("0000"));
-
-    // MiniTree 4
-    EXPECT_EQ(hyperNath.getMiniTree(4).microTrees, convertToBitvector("1100010111101001000010011010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).FIDs, convertToBitvector("11011110011100"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).typeVectors, convertToBitvector("0011"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).dummys, convertToBitvector("000000000000"));
-
-    // MiniTree 5
-    EXPECT_EQ(hyperNath.getMiniTree(5).microTrees, convertToBitvector("1100111110000010011101000001011101010100001011110011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).FIDs, convertToBitvector("01011110101100100100001010"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).typeVectors, convertToBitvector("0010111"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).dummys, convertToBitvector("00000010000000000000"));
-
-    // MiniTree 6
-    EXPECT_EQ(hyperNath.getMiniTree(6).microTrees, convertToBitvector("0010011101000001001110100000100110110000010011010100001011101010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).FIDs, convertToBitvector("01111101011011110011100001001000"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).typeVectors, convertToBitvector("010011011"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).dummys, convertToBitvector("00000000000000000000"));
-
-    // MiniTree 7
-    EXPECT_EQ(hyperNath.getMiniTree(7).microTrees, convertToBitvector("011111000"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).FIDs, convertToBitvector("11"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).typeVectors, convertToBitvector("1"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).dummys, convertToBitvector("0000"));
-
-}
-
-TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(xmlTree);
-
-    EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
-    EXPECT_THAT(hst.getMicroSize(), ::testing::ElementsAre(1,0,0));
-
-    EXPECT_EQ(hst.getMiniTrees().size(), 9);
-    EXPECT_THAT(hst.getMiniFIDs(), ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,1,1,0,1));
-    EXPECT_THAT(hst.getMiniTypeVectors(), ::testing::ElementsAre(0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1));
-    EXPECT_THAT(hst.getMiniDummys(), ::testing::ElementsAre(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
-
-    pht::MiniTree miniTree = hst.getMiniTree(0);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
-
-    miniTree = hst.getMiniTree(1);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1,0,1,1,1,0,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,1,1,0,0,0,0,0));
-
-    miniTree = hst.getMiniTree(2);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
-
-    miniTree = hst.getMiniTree(3);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,1,1,1,0,1,1,0,1,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,1,0,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,0,0,0));
-
-    miniTree = hst.getMiniTree(4);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
-
-    miniTree = hst.getMiniTree(5);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,0,0,1,0,0,0,0,1,1,0,1,1,0,1,1,1,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,1,1,0,1,0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,0,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,1,0,1,0,0,0,0));
-
-    miniTree = hst.getMiniTree(6);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0,1,1,0,0,0,1,0,0,1,1,0,1,0,1,0,0,0,0,1,1,0,1,1,0,1,0,1,1,0,1,0,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,1,1,0,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(0,0,0,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
-
-    miniTree = hst.getMiniTree(7);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0,0,1,0,1,1,0,0,0,0,1,1,1,1,1,1,0,1,0,0,1,1,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(0,0,0,1,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
-
-    miniTree = hst.getMiniTree(8);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,1,0,1,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
 }
 
 TEST_F(HypersuccinctTreeTest, SupportTest) {
@@ -242,33 +114,6 @@ TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
     res = hst.getMicroTree(mini, 2);
     EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
 }
-
-/*TEST_F(HypersuccinctTreeTest, isAncestorTest) {
-    pht::HstNode node1 = {4,1,4};
-    pht::HstNode anc = {4,1,4};
-    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
-    anc = {4,1,1};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-    anc = {4,0,0};
-    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
-    anc = {4,2,0};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-    anc = {4,2,2};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-    anc = {4,1,2};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-    anc = {4,1,4};
-    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
-
-    anc = {0,0,0};
-    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
-    anc = {0,1,0};
-    EXPECT_TRUE(hyperNath.isAncestor(node1,anc));
-    anc = {0,1,3};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-    anc = {1,1,0};
-    EXPECT_FALSE(hyperNath.isAncestor(node1,anc));
-}*/
 
 TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
     std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
