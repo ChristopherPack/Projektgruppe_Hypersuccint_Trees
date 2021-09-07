@@ -148,28 +148,28 @@ namespace pht {
         Bitvector childMatrix;
         succinct_bv::BitVector childMatrixSupport;
         //degree for every node + 1
-        Bitvector degree;
+        std::vector<Bitvector> degree;
         succinct_bv::BitVector degreeSupport;
         //subTree for every node within MicroTree (at least 1)
-        Bitvector subTrees;
+        std::vector<Bitvector> subTrees;
         succinct_bv::BitVector subTreesSupport;
         //Depths of nodes + 1
-        Bitvector nodeDepths;
+        std::vector<Bitvector> nodeDepths;
         succinct_bv::BitVector nodeDepthsSupport;
         //Heights of nodes + 1
-        Bitvector nodeHeights;
+        std::vector<Bitvector> nodeHeights;
         succinct_bv::BitVector nodeHeightsSupport;
         //Amount of Leaves for every node within MicroTree (at least 1)
-        Bitvector leaves;
+        std::vector<Bitvector> leaves;
         succinct_bv::BitVector leavesSupport;
         //Rightmost leaves for every node within MicroTree
-        Bitvector leftmost_leaf;
+        std::vector<Bitvector> leftmost_leaf;
         succinct_bv::BitVector leftmost_leafSupport;
         //Leftmose leaves for every node within MicroTree
-        Bitvector rightmost_leaf;
+        std::vector<Bitvector> rightmost_leaf;
         succinct_bv::BitVector rightmost_leafSupport;
         //Leaf Rank for every node within MicroTree + 1
-        Bitvector leafRank;
+        std::vector<Bitvector> leafRank;
         succinct_bv::BitVector leafRankSupport;
 
 

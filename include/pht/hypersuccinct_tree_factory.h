@@ -145,21 +145,21 @@ namespace pht {
                 createBitvectorFromFile(iter, end, ancMatrix);
                 Bitvector childMatrix;
                 createBitvectorFromFile(iter, end, childMatrix);
-                Bitvector degree;
+                std::vector<Bitvector> degree;
                 createBitvectorFromFile(iter, end, degree);
-                Bitvector subTrees;
+                std::vector<Bitvector> subTrees;
                 createBitvectorFromFile(iter, end, subTrees);
-                Bitvector nodeDepths;
+                std::vector<Bitvector> nodeDepths;
                 createBitvectorFromFile(iter, end, nodeDepths);
-                Bitvector nodeHeights;
+                std::vector<Bitvector> nodeHeights;
                 createBitvectorFromFile(iter, end, nodeHeights);
-                Bitvector leaves;
+                std::vector<Bitvector> leaves;
                 createBitvectorFromFile(iter, end, leaves);
-                Bitvector leftmost_leaf;
+                std::vector<Bitvector> leftmost_leaf;
                 createBitvectorFromFile(iter, end, leftmost_leaf);
-                Bitvector rightmost_leaf;
+                std::vector<Bitvector> rightmost_leaf;
                 createBitvectorFromFile(iter, end, rightmost_leaf);
-                Bitvector leaf_rank;
+                std::vector<Bitvector> leaf_rank;
                 createBitvectorFromFile(iter, end, leaf_rank);
 
                 //TODO: Current Solution - Padding the Bitvector with one full Byte
@@ -405,28 +405,36 @@ namespace pht {
                 }
 
                 uint32_t degreeNum = fmMicroTree->getDegree(node1) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.degree, degreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.degree, degreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.degree.push_back(Bitvector_Utils::encodeNumberReturn(degreeNum));
 
                 uint32_t subTreeNum = fmMicroTree->getSize(node1,true) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.subTrees,subTreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.subTrees,subTreeNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.subTrees.push_back(Bitvector_Utils::encodeNumberReturn(subTreeNum));
 
                 uint32_t nodeDepthNum = fmMicroTree->getDepth(node1, true) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.nodeDepths, nodeDepthNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.nodeDepths, nodeDepthNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.nodeDepths.push_back(Bitvector_Utils::encodeNumberReturn(nodeDepthNum));
 
                 uint32_t nodeHeightNum = fmMicroTree->getHeight(node1, true) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.nodeHeights, nodeHeightNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.nodeHeights, nodeHeightNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.nodeHeights.push_back(Bitvector_Utils::encodeNumberReturn(nodeHeightNum));
 
                 uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
-                Bitvector_Utils::encodeNumber(lookupTableEntry.leaves, leaveNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.leaves, leaveNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.leaves.push_back(Bitvector_Utils::encodeNumberReturn(leaveNum));
 
                 uint32_t leftmost_leafNum =  std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeaf(node1)));
-                Bitvector_Utils::encodeNumber(lookupTableEntry.leftmost_leaf, leftmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.leftmost_leaf, leftmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.leftmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(leftmost_leafNum));
 
                 uint32_t rightmost_leafNum = std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeaf(node1)));
-                Bitvector_Utils::encodeNumber(lookupTableEntry.rightmost_leaf, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.rightmost_leaf, rightmost_leafNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.rightmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(rightmost_leafNum));
 
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
-                Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, leafRankNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                //Bitvector_Utils::encodeNumber(lookupTableEntry.leafRank, leafRankNum,Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                lookupTableEntry.leafRank.push_back(Bitvector_Utils::encodeNumberReturn(leafRankNum));
             }
             PHT_LOGGER_INFO("Factory Create", string("Finished creating LookupTableEntries."));
         }
