@@ -13,8 +13,8 @@ from pht_hst_node cimport HstNode
 cdef class PyHST:
     cdef unique_ptr[HypersuccinctTree] hst
 
-    def __cinit__(self, path, huffman=True):
-        self.hst = HypersuccinctTreeFactory.create(XMLReader.read(path.encode('UTF-8')), huffman)
+    def __cinit__(self, path, huffman=False, sizeMini=0, sizeMicro=0):
+        self.hst = HypersuccinctTreeFactory.create(XMLReader.read(path.encode('UTF-8')), huffman, sizeMini, sizeMicro)
 
     def degree(self, mini, micro, node):
         return dereference(self.hst).degree(HstNode(mini, micro, node))

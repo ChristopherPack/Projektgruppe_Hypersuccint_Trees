@@ -42,7 +42,7 @@ int main() {
 
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();
-    std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true);
+    std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 12, 4);
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
     PHT_LOGGER_INFO("MAIN", "Saving tree to file...");

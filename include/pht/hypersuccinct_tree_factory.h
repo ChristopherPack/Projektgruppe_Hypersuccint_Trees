@@ -39,17 +39,12 @@ namespace pht {
          * @param huffman If the MicroTrees should be encoded with Huffman encoding
          * @return HypersuccinctTree class representing the Hypersuccinct code
          */
-        template<class T> static std::unique_ptr<HypersuccinctTree> create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false) {
+        template<class T> static std::unique_ptr<HypersuccinctTree> create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false, uint32_t sizeMiniParam = 0, uint32_t sizeMicroParam = 0) {
             std::unique_ptr<HypersuccinctTree> hypersuccinctTree = std::unique_ptr<HypersuccinctTree>(new HypersuccinctTree());
             hypersuccinctTree->huffmanFlag = huffman;
 
-            #ifdef PHT_TEST
-            uint32_t sizeMini = 12;
-            uint32_t sizeMicro = 4;
-            #else
-            uint32_t sizeMini = ceil(pow(log2(tree->getSize()), 2.0));
-            uint32_t sizeMicro = ceil((log2(tree->getSize())) / 8.0);
-            #endif
+            uint32_t sizeMini = sizeMiniParam == 0 ? ceil(pow(log2(tree->getSize()), 2.0)) : sizeMiniParam;
+            uint32_t sizeMicro = sizeMicroParam == 0 ? ceil((log2(tree->getSize())) / 8.0) : sizeMicroParam;
 
             encodeAllSizesInHST(*hypersuccinctTree, tree->getSize(), sizeMini, sizeMicro);
 

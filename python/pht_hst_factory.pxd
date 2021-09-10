@@ -9,4 +9,4 @@ from pht_hst cimport HypersuccinctTree
 cdef extern from "../include/pht/hypersuccinct_tree_factory.h" namespace "pht":
     cdef cppclass HypersuccinctTreeFactory:
         @staticmethod
-        unique_ptr[HypersuccinctTree] create(shared_ptr[UnorderedTree[string]] tree, bool huffman);
+        unique_ptr[HypersuccinctTree] create(shared_ptr[UnorderedTree[string]] tree, bool huffman, unsigned int sizeMini, unsigned int sizeMicro)
