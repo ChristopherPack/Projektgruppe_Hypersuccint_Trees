@@ -1,5 +1,6 @@
 set(PHT_LIB_SOURCES
     xml_reader.cpp
+    hst_node.cpp
     hst_output.cpp
     hypersuccinct_tree.cpp
     bitvector_utils.cpp
