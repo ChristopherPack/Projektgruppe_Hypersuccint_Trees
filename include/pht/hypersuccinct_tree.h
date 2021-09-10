@@ -29,16 +29,16 @@ namespace pht {
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
         std::vector<Bitvector> FIDs;
-        succinct_bv::BitVector FIDsSupport;
+        std::vector<succinct_bv::BitVector> FIDsSupport;
         //MicroTypeVectors
         std::vector<Bitvector> typeVectors;
-        succinct_bv::BitVector typeVectorsSupport;
+        std::vector<succinct_bv::BitVector> typeVectorsSupport;
         //MicroDummys: Static Size Encoding
         std::vector<Bitvector> dummys;
-        succinct_bv::BitVector dummysSupport;
+        std::vector<succinct_bv::BitVector> dummysSupport;
         //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
         std::vector<Bitvector> microTrees;
-        succinct_bv::BitVector microTreesSupport;
+        std::vector<succinct_bv::BitVector> microTreesSupport;
 
         //MiniTree Top FID Index + 1
         Bitvector miniTopFIDIndex;
@@ -46,12 +46,18 @@ namespace pht {
         //MiniTree Low FID Index + 1
         Bitvector miniLowFIDIndex;
         succinct_bv::BitVector miniLowFIDIndexSupport;
-        //MicroTree Top FID Indices + 1 + 1
+        //MicroTree Top FID Indices + 1
         std::vector<Bitvector> microTopFIDIndices;
-        succinct_bv::BitVector microTopFIDIndicesSupport;
-        //MicroTree Low FID Indices + 1 + 1
+        std::vector<succinct_bv::BitVector> microTopFIDIndicesSupport;
+        //MicroTree Low FID Indices + 1
         std::vector<Bitvector> microLowFIDIndices;
-        succinct_bv::BitVector microLowFIDIndicesSupport;
+        std::vector<succinct_bv::BitVector> microLowFIDIndicesSupport;
+        //First Top Tree of MicroFIDs
+        std::vector<Bitvector> microFIDTopTrees;
+        std::vector<succinct_bv::BitVector> microFIDTopTreesSupport;
+        //First Low Tree of MicroFIDs
+        std::vector<Bitvector> microFIDLowTrees;
+        std::vector<succinct_bv::BitVector> microFIDLowTreesSupport;
 
 
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
@@ -71,7 +77,7 @@ namespace pht {
         succinct_bv::BitVector miniDummyPointerSupport;
         //MicroTree Dummy Pointer: Static Size Encoding
         std::vector<Bitvector> microDummyPointers;
-        succinct_bv::BitVector microDummyPointersSupport;
+        std::vector<succinct_bv::BitVector> microDummyPointersSupport;
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
         succinct_bv::BitVector miniAncSupport;
@@ -80,7 +86,7 @@ namespace pht {
         succinct_bv::BitVector subTreeSupport;
         //SubTree Size for MicroTree roots
         std::vector<Bitvector> microSubTrees;
-        succinct_bv::BitVector microSubTreesSupport;
+        std::vector<succinct_bv::BitVector> microSubTreesSupport;
         //Depth of the MiniTree root
         Bitvector miniDepth;
         succinct_bv::BitVector miniDepthSupport;
@@ -95,16 +101,16 @@ namespace pht {
         succinct_bv::BitVector miniDummyHeightSupport;
         //Depths for MicroTree roots + 1
         std::vector<Bitvector> rootDepths;
-        succinct_bv::BitVector rootDepthsSupport;
+        std::vector<succinct_bv::BitVector> rootDepthsSupport;
         //Heights for MicroTree roots + 1
         std::vector<Bitvector> rootHeights;
-        succinct_bv::BitVector rootHeightsSupport;
+        std::vector<succinct_bv::BitVector> rootHeightsSupport;
         //Amount of Leaves in MiniTree
         Bitvector miniLeaves;
         succinct_bv::BitVector miniLeavesSupport;
         //Amount of Leaves within MicroTrees
         std::vector<Bitvector> microLeaves;
-        succinct_bv::BitVector microLeavesSupport;
+        std::vector<succinct_bv::BitVector> microLeavesSupport;
         //Leftmost Leaf Pointer for MiniTree
         Bitvector miniTreeLeftmostLeafPointer;
         succinct_bv::BitVector miniTreeLeftmostLeafPointerSupport;
@@ -113,10 +119,10 @@ namespace pht {
         succinct_bv::BitVector miniTreeRightmostLeafPointerSupport;
         //Leftmost Leaf Pointers for MicroTrees
         std::vector<Bitvector> microTreeLeftmostLeafPointers;
-        succinct_bv::BitVector microTreeLeftmostLeafPointersSupport;
+        std::vector<succinct_bv::BitVector> microTreeLeftmostLeafPointersSupport;
         //Rightmost Leaf Pointers for MicroTrees
         std::vector<Bitvector> microTreeRightmostLeafPointers;
-        succinct_bv::BitVector microTreeRightmostLeafPointersSupport;
+        std::vector<succinct_bv::BitVector> microTreeRightmostLeafPointersSupport;
         //Leaf Rank of MiniTree Root
         Bitvector miniRootLeafRank;
         succinct_bv::BitVector miniRootLeafRankSupport;
@@ -125,7 +131,7 @@ namespace pht {
         succinct_bv::BitVector miniDummyLeafRankSupport;
         //Leaf Ranks of MicroTree Roots + 1
         std::vector<Bitvector> microRootLeafRanks;
-        succinct_bv::BitVector microRootLeafRanksSupport;
+        std::vector<succinct_bv::BitVector> microRootLeafRanksSupport;
     };
 
     /**
@@ -149,28 +155,28 @@ namespace pht {
         succinct_bv::BitVector childMatrixSupport;
         //degree for every node + 1
         std::vector<Bitvector> degree;
-        succinct_bv::BitVector degreeSupport;
+        std::vector<succinct_bv::BitVector> degreeSupport;
         //subTree for every node within MicroTree (at least 1)
         std::vector<Bitvector> subTrees;
-        succinct_bv::BitVector subTreesSupport;
+        std::vector<succinct_bv::BitVector> subTreesSupport;
         //Depths of nodes + 1
         std::vector<Bitvector> nodeDepths;
-        succinct_bv::BitVector nodeDepthsSupport;
+        std::vector<succinct_bv::BitVector> nodeDepthsSupport;
         //Heights of nodes + 1
         std::vector<Bitvector> nodeHeights;
-        succinct_bv::BitVector nodeHeightsSupport;
+        std::vector<succinct_bv::BitVector> nodeHeightsSupport;
         //Amount of Leaves for every node within MicroTree (at least 1)
         std::vector<Bitvector> leaves;
-        succinct_bv::BitVector leavesSupport;
+        std::vector<succinct_bv::BitVector> leavesSupport;
         //Rightmost leaves for every node within MicroTree
         std::vector<Bitvector> leftmost_leaf;
-        succinct_bv::BitVector leftmost_leafSupport;
+        std::vector<succinct_bv::BitVector> leftmost_leafSupport;
         //Leftmose leaves for every node within MicroTree
         std::vector<Bitvector> rightmost_leaf;
-        succinct_bv::BitVector rightmost_leafSupport;
+        std::vector<succinct_bv::BitVector> rightmost_leafSupport;
         //Leaf Rank for every node within MicroTree + 1
         std::vector<Bitvector> leafRank;
-        succinct_bv::BitVector leafRankSupport;
+        std::vector<succinct_bv::BitVector> leafRankSupport;
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -566,11 +572,15 @@ namespace pht {
         //miniTrees
         std::vector<MiniTree> miniTrees;
         std::vector<Bitvector> miniFIDs;
-        succinct_bv::BitVector miniFIDsSupport;
+        std::vector<succinct_bv::BitVector> miniFIDsSupport;
+        //First Top Tree of FIDs +1
+        std::vector<Bitvector> FIDTopTree;
+        //First Low Tree of FIDs +1
+        std::vector<Bitvector> FIDLowTree;
         std::vector<Bitvector> miniTypeVectors;
-        succinct_bv::BitVector miniTypeVectorsSupport;
+        std::vector<succinct_bv::BitVector> miniTypeVectorsSupport;
         std::vector<Bitvector> miniDummys;
-        succinct_bv::BitVector miniDummysSupport;
+        std::vector<succinct_bv::BitVector> miniDummysSupport;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
 

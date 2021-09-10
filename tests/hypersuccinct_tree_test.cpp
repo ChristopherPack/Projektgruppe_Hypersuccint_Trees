@@ -95,8 +95,8 @@ TEST_F(HypersuccinctTreeTest, MiniTreesTest){
 TEST_F(HypersuccinctTreeTest, SupportTest) {
     try {
         pht::MiniTree miniTree = hyperNath.getMiniTree(1);
-        miniTree.FIDsSupport.Rank(0);
-        miniTree.FIDsSupport.Select(0);
+        miniTree.FIDsSupport.at(0).Rank(0);
+        miniTree.FIDsSupport.at(0).Select(0);
     }
     catch (runtime_error) {
         EXPECT_EQ(0,1);
