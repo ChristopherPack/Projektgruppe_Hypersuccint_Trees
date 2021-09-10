@@ -236,7 +236,7 @@ namespace pht {
             return miniSize;
         }
 
-        std::vector<MiniTree> getMiniTrees() {
+        std::vector<MiniTree>& getMiniTrees() {
             return miniTrees;
         }
 
@@ -318,7 +318,7 @@ namespace pht {
          * @param index The index as int
          * @return LookupTable Entry as LookupTableEntry
          */
-        LookupTableEntry getLookupTableEntry(uint32_t index) {
+        LookupTableEntry& getLookupTableEntry(uint32_t index) {
             return lookupTable.at(index);
         }
 
