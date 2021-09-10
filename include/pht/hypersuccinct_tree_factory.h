@@ -68,7 +68,7 @@ namespace pht {
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
 
             //TODO: convert std::bool to BitVector
-            convertToBitVector(hypersuccinctTree);
+            convertToBitVector(*hypersuccinctTree);
 
             return hypersuccinctTree;
         }
