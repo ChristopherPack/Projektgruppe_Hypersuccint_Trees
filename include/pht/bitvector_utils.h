@@ -48,6 +48,8 @@ namespace pht{
 
         static uint32_t encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding);
 
+        static Bitvector encodeNumberReturn(uint32_t num);
+
         static uint32_t encodeNumber(std::insert_iterator<Bitvector> iterator, uint32_t num, NumberEncoding encoding);
 
         static uint32_t decodeNumber(const Bitvector& bitvector, NumberEncoding encoding);
