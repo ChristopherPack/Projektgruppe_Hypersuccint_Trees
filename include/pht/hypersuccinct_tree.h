@@ -10,6 +10,7 @@
 #include "farzan_munro.h"
 #include "bitvector_utils.h"
 #include "bit_vector.h"
+#include "hst_node.h"
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
@@ -20,7 +21,6 @@
 namespace pht {
     typedef std::vector<bool> Bitvector;
     //node identification by: Minitree, MicroTree, NodeInMicroTree
-    typedef std::tuple<uint32_t ,uint32_t ,uint32_t > HstNode;
 
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree

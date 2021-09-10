@@ -13,3 +13,6 @@ venv/
 /build/
 /.vscode/
 /resources/
+
+/python/build/
+/python/*.pyd

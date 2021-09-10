@@ -42,19 +42,19 @@ int main() {
 
     PHT_LOGGER_INFO("MAIN", "Creating HST...");
     localTimer.start();
-    pht::HypersuccinctTree hst = pht::HypersuccinctTreeFactory::create(tree, true);
+    std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 12, 4);
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
     PHT_LOGGER_INFO("MAIN", "Saving tree to file...");
     localTimer.start();
-    HypersuccinctTreeOutput::writeToFile(hst);
+    HypersuccinctTreeOutput::writeToFile(*hst);
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("Tree saved in ")+localTimer.toString());
 
     PHT_LOGGER_DEBUG("MAIN", "Printing original Tree data:");
     PHT_LOGGER_DEBUG("TREE", "Size: " + to_string(tree->getSize()));
     std::cout << tree->toNewickString() << std::endl;
-    HypersuccinctTreeOutput::printTree(hst);
+    HypersuccinctTreeOutput::printTree(*hst);
     pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
     PHT_LOGGER_DEBUG("TREE", "FileTree:");
     HypersuccinctTreeOutput::printTree(fileHst);
