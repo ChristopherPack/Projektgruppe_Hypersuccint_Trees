@@ -132,6 +132,8 @@ namespace pht {
         //Leaf Ranks of MicroTree Roots + 1
         std::vector<Bitvector> microRootLeafRanks;
         std::vector<succinct_bv::BitVector> microRootLeafRanksSupport;
+        std::vector<Bitvector> microExtendedLeafRanks;
+        std::vector<succinct_bv::BitVector> microExtendedLeafRanksSupport;
     };
 
     /**
