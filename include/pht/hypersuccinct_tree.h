@@ -79,6 +79,7 @@ namespace pht {
         //MicroTree Dummy Pointer: Static Size Encoding
         std::vector<Bitvector> microDummyPointers;
         std::vector<succinct_bv::BitVector> microDummyPointersSupport;
+        //TODO: Maybe just use direct parent pointer
         //Reverse Pointer to miniTree with Dummy to this tree
         Bitvector reverseMiniDummy;
         std::vector<succinct_bv::BitVector> reverseMiniDummySupport;
