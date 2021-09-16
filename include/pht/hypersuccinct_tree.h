@@ -25,6 +25,7 @@ namespace pht {
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
+     * TODO: ALL vectors get +1 to their numbers - so 0 is clear illegal value!
      */
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
@@ -78,6 +79,14 @@ namespace pht {
         //MicroTree Dummy Pointer: Static Size Encoding
         std::vector<Bitvector> microDummyPointers;
         std::vector<succinct_bv::BitVector> microDummyPointersSupport;
+        //TODO: Maybe just use direct parent pointer
+        //Reverse Pointer to miniTree with Dummy to this tree
+        Bitvector reverseMiniDummy;
+        std::vector<succinct_bv::BitVector> reverseMiniDummySupport;
+        //Reverse Pointers to microTree with Dummy to these trees
+        std::vector<Bitvector> reverseMicroDummy;
+        std::vector<succinct_bv::BitVector> reverseMicroDummySupport;
+
         //Ancestor of MiniTreeRoot
         Bitvector miniAnc;
         succinct_bv::BitVector miniAncSupport;
@@ -132,13 +141,15 @@ namespace pht {
         //Leaf Ranks of MicroTree Roots + 1
         std::vector<Bitvector> microRootLeafRanks;
         std::vector<succinct_bv::BitVector> microRootLeafRanksSupport;
+        //Special Leaf Ranks for displaced microTrees + 1
+        std::vector<Bitvector> microExtendedLeafRanks;
+        std::vector<succinct_bv::BitVector> microExtendedLeafRanksSupport;
     };
 
     /**
      * LookupTableEntry represents a single Entry of the Hypersuccinct Tree's Lookp Table.
      * It is indexed by the MicroTrees Balanced Parenthesis form (if no encoding is chosen) or by their Huffman code (if Huffman encoding is chosen)
      * It contains all fields necessary to satisfy the query's need for structural information
-     * TODO: std::vector<Bitvector>
      */
     struct __declspec(dllexport) LookupTableEntry {
         //Index of the LookupTableEntry
@@ -153,6 +164,9 @@ namespace pht {
         //Child Matrix
         Bitvector childMatrix;
         succinct_bv::BitVector childMatrixSupport;
+        //ParentPointers + 1
+        std::vector<Bitvector> parentPointers;
+        std::vector<succinct_bv::BitVector> parentPointersSupport;
         //degree for every node + 1
         std::vector<Bitvector> degree;
         std::vector<succinct_bv::BitVector> degreeSupport;

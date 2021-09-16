@@ -176,6 +176,7 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
             return childRank(parent);
         }
     }
+    //TODO: should check if node.node is microDummy
     if(Bitvector_Utils::decodeNumber(getMicroDummys(miniTreeParent, parent.micro),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
         Bitvector newMicroBit = getMicroDummyPointers(miniTree,parent.micro);
     }
@@ -257,7 +258,7 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
     MiniTree miniTree = getMiniTree(node.mini);
     if(node.node > 0) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //TODO: This Block could become function: LookupTableParentMatrixComparison
+        //TODO: This has to be changed
         auto iter = entry.childMatrix.cbegin();
         uint32_t size = sqrt(entry.childMatrix.size());
         Bitvector column = Bitvector_Utils::getEntry(iter, node.node, entry.childMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC_MATRIX_COLUMN, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 0, size});
@@ -294,6 +295,7 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
         return {node.mini,trees.first.front(),0};
     }
     uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
+
     if(fidIndex == -1) {
         if(node.mini == 0) {
             return {static_cast<uint32_t>(-1),static_cast<uint32_t>(-1),static_cast<uint32_t>(-1)};
@@ -309,8 +311,9 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
             }
         }
     }
-    std::pair< std::vector<uint32_t >,std::vector<uint32_t > > trees = getTreesForFID(fidIndex);
-    return {trees.first.front(),0,0};
+
+    uint32_t firstTree = Bitvector_Utils::decodeNumber(FIDTopTree.at(fidIndex),Bitvector_Utils::NumberEncoding::BINARY);
+    return {firstTree,0,0};
 }
 
 uint32_t HypersuccinctTree::degree(HstNode node) {
@@ -326,8 +329,6 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
             return degree({miniPoint,0,0});
         }
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //auto iter = entry.degree.cbegin();
-        //Bitvector degreeB = Bitvector_Utils::getEntry(iter,node.node,entry.degree.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector degreeB = entry.degree.at(node.node);
         return Bitvector_Utils::decodeNumber(degreeB,Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
@@ -360,8 +361,6 @@ uint32_t HypersuccinctTree::subtreeSize(HstNode node) {
         res -= isDummyAncestor;
 
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //auto iter = entry.subTrees.cbegin();
-        //Bitvector degreeB = Bitvector_Utils::getEntry(iter,node.node,entry.subTrees.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector degreeB = entry.subTrees.at(node.node);
         return res + Bitvector_Utils::decodeNumber(degreeB,Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
@@ -382,8 +381,6 @@ uint32_t HypersuccinctTree::depth(HstNode node) {
     if(node.node > 0) {
 
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //auto iter = entry.nodeDepths.cbegin();
-        //Bitvector entryDepth = Bitvector_Utils::getEntry(iter,node.node,entry.nodeDepths.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector entryDepth = entry.nodeDepths.at(node.node);
         res += Bitvector_Utils::decodeNumber(entryDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
@@ -400,15 +397,11 @@ uint32_t HypersuccinctTree::height(HstNode node) {
     if(node.node > 0) {
         if(isDummyAncestorWithinMicroTree(node) || isDummyAncestorWithinMiniTree(node)) {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-            //auto iter = entry.nodeDepths.cbegin();
-            //Bitvector entryDepth = Bitvector_Utils::getEntry(iter,node.node,entry.nodeDepths.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
             Bitvector entryDepth = entry.nodeDepths.at(node.node);
             res -= (Bitvector_Utils::decodeNumber(entryDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1);
         }
         else {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-            //auto iter = entry.nodeHeights.cbegin();
-            //Bitvector entryDepth = Bitvector_Utils::getEntry(iter,node.node,entry.nodeHeights.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
             Bitvector entryDepth = entry.nodeHeights.at(node.node);
             return res + Bitvector_Utils::decodeNumber(entryDepth, Bitvector_Utils::NumberEncoding::BINARY) - 1;
         }
@@ -437,8 +430,6 @@ HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
 
     if(node.node > 0) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
-        //auto iter = entry.leftmost_leaf.cbegin();
-        //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, nodeNum, entry.leftmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector entryleftmost = entry.leftmost_leaf.at(nodeNum);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
         Bitvector microDummy = getMicroDummys(miniTree, microNum);
@@ -458,8 +449,6 @@ HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
         Bitvector leftmostMicro = leftmostMini.microTreeLeftmostLeafPointers.at(microNum);
         microNum = Bitvector_Utils::decodeNumber(leftmostMicro,Bitvector_Utils::NumberEncoding::BINARY);
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
-        //auto iter = entry.leftmost_leaf.cbegin();
-        //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.leftmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector entryleftmost = entry.leftmost_leaf.at(0);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
 
@@ -475,8 +464,6 @@ HstNode HypersuccinctTree::leftmostLeaf(HstNode node) {
     Bitvector leftmostMicro = leftmostMini.microTreeLeftmostLeafPointers.at(0);
     microNum = Bitvector_Utils::decodeNumber(leftmostMicro,Bitvector_Utils::NumberEncoding::BINARY);
     LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini,microNum));
-    //auto iter = entry.leftmost_leaf.cbegin();
-    //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.leftmost_leaf.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator()});
     Bitvector entryleftmost = entry.leftmost_leaf.at(0);
     nodeNum = Bitvector_Utils::decodeNumber(entryleftmost,Bitvector_Utils::NumberEncoding::BINARY);
     return {miniNum, microNum, nodeNum};
@@ -493,8 +480,6 @@ HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
 
     if(node.node > 0) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
-        //auto iter = entry.rightmost_leaf.cbegin();
-        //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, nodeNum, entry.rightmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector entryleftmost = entry.rightmost_leaf.at(nodeNum);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
         Bitvector microDummy = getMicroDummys(miniTree, microNum);
@@ -514,8 +499,6 @@ HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
         Bitvector leftmostMicro = leftmostMini.microTreeRightmostLeafPointers.at(microNum);
         microNum = Bitvector_Utils::decodeNumber(leftmostMicro,Bitvector_Utils::NumberEncoding::BINARY);
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini, microNum));
-        //auto iter = entry.rightmost_leaf.cbegin();
-        //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.rightmost_leaf.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector entryleftmost = entry.rightmost_leaf.at(0);
         nodeNum = Bitvector_Utils::decodeNumber(entryleftmost, Bitvector_Utils::NumberEncoding::BINARY);
 
@@ -531,8 +514,6 @@ HstNode HypersuccinctTree::rightmostLeaf(HstNode node) {
     Bitvector leftmostMicro = leftmostMini.microTreeRightmostLeafPointers.at(0);
     microNum = Bitvector_Utils::decodeNumber(leftmostMicro,Bitvector_Utils::NumberEncoding::BINARY);
     LookupTableEntry entry = getLookupTableEntry(getMicroTree(leftmostMini,microNum));
-    //auto iter = entry.rightmost_leaf.cbegin();
-    //Bitvector entryleftmost = Bitvector_Utils::getEntry(iter, 0, entry.rightmost_leaf.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator()});
     Bitvector entryleftmost = entry.rightmost_leaf.at(0);
     nodeNum = Bitvector_Utils::decodeNumber(entryleftmost,Bitvector_Utils::NumberEncoding::BINARY);
     return {miniNum, microNum, nodeNum};
@@ -561,8 +542,6 @@ uint32_t HypersuccinctTree::leafSize(HstNode node) {
         res -= isDummyAncestor;
 
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //auto iter = entry.leaves.cbegin();
-        //Bitvector entryLeafSize = Bitvector_Utils::getEntry(iter, node.node, entry.leaves.cend(), Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA, {Bitvector_Utils::nullIterator()});
         Bitvector entryLeafSize = entry.leaves.at(node.node);
         return res + Bitvector_Utils::decodeNumber(entryLeafSize, Bitvector_Utils::NumberEncoding::BINARY);
     }
@@ -612,8 +591,6 @@ uint32_t HypersuccinctTree::leafRank(HstNode node) {
         }
 
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
-        //auto iter = entry.leafRank.cbegin();
-        //Bitvector leaf_rank_node = Bitvector_Utils::getEntry(iter,node.node,entry.leafRank.cend(),Bitvector_Utils::BitvectorEncoding::PURE_ELIAS_GAMMA,{Bitvector_Utils::nullIterator()});
         Bitvector leaf_rank_node = entry.leafRank.at(node.node);
         res += Bitvector_Utils::decodeNumber(leaf_rank_node, Bitvector_Utils::NumberEncoding::BINARY) - 1 - dummyMarker;
     }
@@ -628,72 +605,18 @@ uint32_t HypersuccinctTree::leafRank(HstNode node) {
                 res += Bitvector_Utils::decodeNumber(newMiniTree.miniDummyLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
             }
         }
-
-        Bitvector leaf_rank_micro = miniTree.microRootLeafRanks.at(node.micro);
-        res += (Bitvector_Utils::decodeNumber(leaf_rank_micro, Bitvector_Utils::NumberEncoding::BINARY) - 1);
-
-
-
         if (node.node!=0 && (node.micro + node.node > 1)) {
-            uint32_t fidIndex = convertMicroTreeToFIDIndex(miniTree, node.micro).first;
-            Bitvector fid = miniTree.FIDs.at(fidIndex);
-            Bitvector tv = miniTree.typeVectors.at(fidIndex);
-            std::pair<std::vector<uint32_t>, std::vector<uint32_t> > trees = getTreesForMicroFID(miniTree,
-                                                                                                 node.micro);
-            for (bool b: tv) {
-                if (b) {
-                    uint32_t tree = trees.first.front();
-                    trees.first.erase(trees.first.cbegin());
-                    if (tree == node.micro) {
-                        break;
-                    } else {
-                        res += leafSize({node.mini, tree, 0});
-                    }
-                } else {
-                    uint32_t tree = trees.second.front();
-                    trees.second.erase(trees.second.cbegin());
-                    if (tree == node.micro) {
-                        break;
-                    } else {
-                        res += leafSize({node.mini, tree, 0});
-                    }
-                }
-            }
+            res += Bitvector_Utils::decodeNumber(miniTree.microExtendedLeafRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        } else {
+            res += (Bitvector_Utils::decodeNumber(miniTree.microRootLeafRanks.at(node.micro), Bitvector_Utils::NumberEncoding::BINARY) - 1);
         }
 
     }
-
-    res += Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
-
-    //if(childRank(node) > 0) {
     if ((node.micro != 0 || node.node != 0)) {
-        uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
-        Bitvector fid = miniFIDs.at(fidIndex);
-        Bitvector tv = miniTypeVectors.at(fidIndex);
-        std::pair<std::vector<uint32_t>, std::vector<uint32_t> > trees = getTreesForFID(fidIndex);
-        for (bool b: tv) {
-            if (b) {
-                uint32_t tree = trees.first.front();
-                trees.first.erase(trees.first.cbegin());
-                if (tree == node.mini) {
-                    break;
-                } else {
-                    res += leafSize({tree, 0, 0});
-                }
-            } else {
-                uint32_t tree = trees.second.front();
-                trees.second.erase(trees.second.cbegin());
-                if (tree == node.mini) {
-                    break;
-                } else {
-                    res += leafSize({tree, 0, 0});
-                }
-            }
-        }
+        res += Bitvector_Utils::decodeNumber(miniTree.microRootLeafRanks.at(0),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    } else {
+        res += Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
     }
-    //}
-
-
     return res;
 }
 

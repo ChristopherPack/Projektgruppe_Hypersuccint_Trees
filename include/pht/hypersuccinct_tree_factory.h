@@ -443,7 +443,7 @@ namespace pht {
          * @param fmMicroTrees The Micro Trees to get data from
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
-        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
+        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
             PHT_LOGGER_INFO("Factory Create", string("Creating MicroTrees for a MiniTree..."));
             uint32_t microCount = 0;
             //The actual MicroTree Loop
@@ -497,13 +497,38 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.microTreeRightmostLeafPointers, fmMiniTree->getRightmostLeaf(fmMicroTree->getRoot())->getMicroTree(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
                 Bitvector_Utils::encodeNumber(miniTree.microRootLeafRanks, fmMiniTree->getLeafRank(fmMicroTree->getRoot())+1, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);*/
 
-                miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn( fmMiniTree->getSize(fmMicroTree->getRoot(),false)));
-                miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(fmMicroTree->getRoot())+1));
-                miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeight(fmMicroTree->getRoot())+1));
-                miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(fmMicroTree->getRoot())));
-                miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(fmMicroTree->getRoot())->getMicroTree()));
-                miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(fmMicroTree->getRoot())->getMicroTree()));
-                miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(fmMicroTree->getRoot())+1));
+                std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
+                miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn( fmMiniTree->getSize(microRoot,false)));
+                miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot)+1));
+                miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeight(microRoot)+1));
+                miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
+                miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
+                miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
+                if(fmMiniTree->isRoot(microRoot)) {
+
+                    std::vector<std::shared_ptr<Node<T>>> children = fmMiniTree->getDirectDescendants(microRoot);
+                    if(children.empty()) {
+                        miniTree.microRootLeafRanks.push_back({false});
+                    } else {
+                        miniTree.microRootLeafRanks.push_back(
+                                Bitvector_Utils::encodeNumberReturn(tree->getLeafRank(children.at(0)) + 1));
+                    }
+                } else {
+                    miniTree.microRootLeafRanks.push_back(
+                            Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microRoot) + 1));
+                }
+                std::vector<std::shared_ptr<Node<T>>> microChildren = fmMicroTree->getDirectDescendants(microRoot);
+                if(microChildren.empty()) {
+                    miniTree.microExtendedLeafRanks.push_back(
+                            {false});
+                } else {
+                    bool removeLeafMan = false;
+                    if(fmMiniTree->isLeaf(microChildren.at(0))) {
+                        removeLeafMan = true;
+                    }
+                    miniTree.microExtendedLeafRanks.push_back(
+                            Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microChildren.at(0)) + 1 - removeLeafMan));
+                }
 
                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                 if(hypersuccinctTree.huffmanFlag) {
@@ -598,7 +623,7 @@ namespace pht {
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                 }
 
-                createMicroTrees(hypersuccinctTree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences,sizeMicro);
+                createMicroTrees(hypersuccinctTree, tree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences,sizeMicro);
 
                 //This is done so late because of Huffman checks
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
@@ -1071,6 +1096,7 @@ namespace pht {
                 assignBitVector(miniTree.miniRootLeafRankSupport , miniTree.miniRootLeafRank);
                 assignBitVector(miniTree.miniDummyLeafRankSupport , miniTree.miniDummyLeafRank);
                 assignBitVector(miniTree.microRootLeafRanksSupport , miniTree.microRootLeafRanks);
+                assignBitVector(miniTree.microExtendedLeafRanksSupport,miniTree.microExtendedLeafRanks);
             }
             for(LookupTableEntry &entry : hst.lookupTable) {
                 assignBitVector(entry.indexSupport , entry.index);
@@ -1095,7 +1121,6 @@ namespace pht {
         }
 
         static void assignBitVector(std::vector<succinct_bv::BitVector>& bitVector, const std::vector<Bitvector>& bitvector) {
-            //TODO:
             if(!bitvector.empty()) {
                 bitVector.reserve(bitvector.size());
                 for (const Bitvector &bit : bitvector) {
