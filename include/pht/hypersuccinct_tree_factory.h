@@ -562,7 +562,7 @@ namespace pht {
                 enumerateMicroTrees(fmMicroTrees);
 
                 //Simple Additions for Queries - MiniTree
-                std::shared_ptr<Node<T>>& miniRoot = fmMiniTree->getRoot();
+                std::shared_ptr<Node<T>> miniRoot = fmMiniTree->getRoot();
                 Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSize(miniRoot,false),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(miniRoot), Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(miniRoot), Bitvector_Utils::NumberEncoding::BINARY);
