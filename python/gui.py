@@ -5,44 +5,47 @@ import xml.etree.ElementTree as ET
 
 import pht_hst
 
-layer_height = 20
-node_radius = 20
+node_size = (40, 20)
 
 rawtree = None
 tree = None
 
 def drawNode(content, x, y, startNode, resultNode):
-    if startNode:
-        canvas.create_oval(x-(layer_height/2.0), y-(layer_height/2.0), x+(layer_height/2.0), y+(layer_height/2.0), fill="white", outline="blue")
-    elif resultNode:
-        canvas.create_oval(x-(layer_height/2.0), y-(layer_height/2.0), x+(layer_height/2.0), y+(layer_height/2.0), fill="white", outline="red")
-    else:
-        canvas.create_oval(x-(layer_height/2.0), y-(layer_height/2.0), x+(layer_height/2.0), y+(layer_height/2.0), fill="white", outline="black")
+    outline = "blue" if startNode else ("red" if resultNode else "black")
+    thickness = 2 if startNode or resultNode else 1
+    canvas.create_oval(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill="white", outline=outline)
+    canvas.create_rectangle(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill="white", outline=outline)
     canvas.create_text(x, y, text=content)
 
 def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, lines):
-    '''
+    childCount = tree.degree(hstnode[0], hstnode[1], hstnode[2])
+    identifiers = []
+    for i in range(childCount):
+        child = tree.child(hstnode[0], hstnode[1], hstnode[2], i)
+        identifiers.append(tree.getParent(child[0], child[1], child[2]))
+
+    node_data = "("+str(hstnode[0])+", "+str(hstnode[1])+", "+str(hstnode[2])+")"
     if not lines:
         if startNode != None:
             if resultNode != None:
-                pass #drawNode(rawnode.tag, x, y, rawnode == startNode, rawnode == resultNode)
-            if False: #rawnode == startNode
-                drawNode(rawnode.tag, x, y, True, False)
+                drawNode(node_data, x, y, startNode in identifiers, resultNode in identifiers)
+            else:
+                drawNode(node_data, x, y, startNode in identifiers, False)
         elif resultNode != None:
-            if False: #rawnode == resultNode
-                drawNode(rawnode.tag, x, y, False, True)
+            if resultNode in identifiers:
+                drawNode(node_data, x, y, False, True)
         else:
-            drawNode(rawnode.tag, x, y, False, False)
-    '''
-    if not lines:
-        drawNode("("+str(hstnode[0])+", "+str(hstnode[1])+", "+str(hstnode[2])+")", x, y, False, False)
+            drawNode(node_data, x, y, False, False)
+
+    '''if not lines:
+        drawNode("("+str(hstnode[0])+", "+str(hstnode[1])+", "+str(hstnode[2])+")", x, y, False, False)'''
 
     '''childCount = len(rawnode)
     for i, child in enumerate(rawnode):
         if lines:
             canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1))
         drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, lines)'''
-    childCount = tree.degree(hstnode[0], hstnode[1], hstnode[2])
+    
     for i in range(childCount):
         if lines:
             canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1))
