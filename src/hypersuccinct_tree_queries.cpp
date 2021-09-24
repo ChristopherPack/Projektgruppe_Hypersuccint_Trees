@@ -80,10 +80,12 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     if(parent.node > 0) {
         miniRes = parent.mini;
         microRes = parent.micro;
+        nodeIndexHelp = index;
         checkMini = false;
         checkNode = true;
     } else if(parent.micro > 0) {
         miniRes = parent.mini;
+        microIndexHelp = index;
         checkMini = false;
         checkMicro = true;
     }
