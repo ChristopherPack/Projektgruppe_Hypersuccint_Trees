@@ -80,10 +80,12 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     if(parent.node > 0) {
         miniRes = parent.mini;
         microRes = parent.micro;
+        nodeIndexHelp = index;
         checkMini = false;
         checkNode = true;
     } else if(parent.micro > 0) {
         miniRes = parent.mini;
+        microIndexHelp = index;
         checkMini = false;
         checkMicro = true;
     }
@@ -238,26 +240,21 @@ HstNode HypersuccinctTree::getParent(HstNode node) {
     }
     if(node.micro > 0) {
         Bitvector parentBit = miniTree.microParents.at(node.micro);
-        uint32_t parentMicro = Bitvector_Utils::decodeNumber(parentBit,Bitvector_Utils::NumberEncoding::BINARY);
+        uint32_t parentMicro = Bitvector_Utils::decodeNumber(parentBit,Bitvector_Utils::NumberEncoding::BINARY) - 1;
         uint32_t parentDummy = Bitvector_Utils::decodeNumber(miniTree.dummys.at(parentMicro),Bitvector_Utils::NumberEncoding::BINARY);
-        if(parentDummy != 0) {
-            Bitvector dummyPointBit = miniTree.microDummyPointers.at(parentMicro);
-            uint32_t dummyPoint = Bitvector_Utils::decodeNumber(dummyPointBit,Bitvector_Utils::NumberEncoding::BINARY);
-            if(dummyPoint == node.micro) {
-                return {node.mini,parentMicro - 1,parentDummy};
-            }
+        uint32_t parentFID = Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY);
+        if(parentFID == 0) {
+            return getParent({node.mini,parentMicro,parentDummy});
         }
-        return {node.mini,parentMicro - 1,0};
+        return {node.mini,parentMicro,0};
     }
-    uint32_t parentMini = Bitvector_Utils::decodeNumber(miniTree.miniParent,Bitvector_Utils::NumberEncoding::BINARY);
-    uint32_t miniDummy = Bitvector_Utils::decodeNumber(miniDummys.at(node.mini),Bitvector_Utils::NumberEncoding::BINARY);
-    if(miniDummy != 0) {
-        uint32_t dummyPoint = Bitvector_Utils::decodeNumber(miniTree.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY);
-        if(dummyPoint == node.mini) {
-            return {parentMini,Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::decodeNumber(miniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY)};
-        }
+    uint32_t parentMini = Bitvector_Utils::decodeNumber(miniTree.miniParent,Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    MiniTree parentMiniTree = getMiniTree(parentMini);
+    uint32_t parentFID = Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,Bitvector_Utils::NumberEncoding::BINARY);
+    if(parentFID == 0) {
+        return getParent({parentMini,Bitvector_Utils::decodeNumber(parentMiniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::decodeNumber(parentMiniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY)});
     }
-    return {parentMini - 1,0,0};
+    return {parentMini,0,0};
 }
 
 uint32_t HypersuccinctTree::degree(HstNode node) {

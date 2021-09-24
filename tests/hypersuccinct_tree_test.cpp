@@ -299,6 +299,14 @@ TEST_F(HypersuccinctTreeTest, childTest) {
     res = hyperNath.child(node,0);
     EXPECT_EQ(pht::HstNode(4,2,0), res);
 
+    node = {4,1,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(4,1,1), res);
+
+    node = {4,1,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(7,0,0), res);
+
     node = {1,1,2};
     res = hyperNath.child(node,0);
     EXPECT_EQ(pht::HstNode(1,4,1), res);
@@ -310,6 +318,10 @@ TEST_F(HypersuccinctTreeTest, childTest) {
     node = {1,2,0};
     res = hyperNath.child(node,0);
     EXPECT_EQ(pht::HstNode(1,3,0), res);
+
+    node = {1,2,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
 
     node = {1,2,1};
     res = hyperNath.child(node,0);
@@ -403,10 +415,36 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     EXPECT_EQ(2, res);
 }
 
+TEST_F(HypersuccinctTreeTest, getParentTest) {
+    pht::HstNode node = {6,1,0};
+    pht::HstNode resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(6,0,0),resNode);
+
+    node = {6,0,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(4,1,0),resNode);
+
+    node = {1,3,3};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,3,1),resNode);
+
+    node = {1,3,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,2,0),resNode);
+
+    node = {1,4,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,1,1),resNode);
+}
+
 TEST_F(HypersuccinctTreeTest, degreeTest) {
     pht::HstNode node = {0,0,0};
     uint32_t res = hyperNath.degree(node);
     EXPECT_EQ(3, res);
+
+    node = {0,1,6};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(0, res);
 
     node = {2,0,0};
     res = hyperNath.degree(node);
