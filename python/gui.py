@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import pht_hst
 
 layer_height = 20
+node_radius = 20
 
 rawtree = None
 tree = None
@@ -19,7 +20,7 @@ def drawNode(content, x, y, startNode, resultNode):
         canvas.create_oval(x-(layer_height/2.0), y-(layer_height/2.0), x+(layer_height/2.0), y+(layer_height/2.0), fill="white", outline="black")
     canvas.create_text(x, y, text=content)
 
-def drawSubtree(rawnode, x, width, y, depth, startNode, resultNode, lines):
+def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, lines):
     '''
     if not lines:
         if startNode != None:
@@ -34,12 +35,18 @@ def drawSubtree(rawnode, x, width, y, depth, startNode, resultNode, lines):
             drawNode(rawnode.tag, x, y, False, False)
     '''
     if not lines:
-        drawNode(rawnode.tag, x, y, False, False)
+        drawNode("("+str(hstnode[0])+", "+str(hstnode[1])+", "+str(hstnode[2])+")", x, y, False, False)
 
-    childCount = len(rawnode)
+    '''childCount = len(rawnode)
     for i, child in enumerate(rawnode):
         if lines:
             canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1))
+        drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, lines)'''
+    childCount = tree.degree(hstnode[0], hstnode[1], hstnode[2])
+    for i in range(childCount):
+        if lines:
+            canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1))
+        child = tree.child(hstnode[0], hstnode[1], hstnode[2], i)
         drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, lines)
 
 def drawTree(startNode=None, resultNode=None):
@@ -48,8 +55,8 @@ def drawTree(startNode=None, resultNode=None):
     if tree == None:
         return
     canvas.delete("all")
-    drawSubtree(rawtree.getroot(), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, True)
-    drawSubtree(rawtree.getroot(), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, False)
+    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, True)
+    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, False)
 
 def loadTree():
     global rawtree, tree
