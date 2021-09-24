@@ -305,7 +305,7 @@ TEST_F(HypersuccinctTreeTest, childTest) {
 
     node = {1,1,1};
     res = hyperNath.child(node,0);
-    EXPECT_EQ(pht::HstNode(1,1,2), res);
+    EXPECT_EQ(pht::HstNode(1,4,0), res);
 
     node = {1,2,0};
     res = hyperNath.child(node,0);

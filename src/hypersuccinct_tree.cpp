@@ -67,7 +67,7 @@ LookupTableEntry HypersuccinctTree::getLookupTableEntry(Bitvector indexV) {
 }
 
 bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index) {
-    auto iter = entry.ancestorMatrix.cbegin();
+    //auto iter = entry.ancestorMatrix.cbegin();
     uint32_t size = sqrt(entry.ancestorMatrix.size());
     return entry.ancestorMatrix.at(size*anc + node2Index);
     //Bitvector segment = Bitvector_Utils::getEntry(iter, anc, entry.ancestorMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 0, size});
@@ -75,7 +75,7 @@ bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEnt
 }
 
 bool HypersuccinctTree::lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index) {
-    auto iter = entry.childMatrix.cbegin();
+    //auto iter = entry.childMatrix.cbegin();
     uint32_t size = sqrt(entry.childMatrix.size());
     return entry.childMatrix.at(size*child + node2Index);
     //Bitvector segment = Bitvector_Utils::getEntry(iter, child, entry.ancestorMatrix.cend(), Bitvector_Utils::BitvectorEncoding::STATIC, {Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator(), 0, size});
