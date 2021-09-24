@@ -15,11 +15,19 @@
 #define DLL_API __declspec(dllimport)
 #endif
 
-#define PHT_LOGGER_DEBUG(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_INFO(tag, param)    pht::Logger::log(pht::Logger::LogLevel::PHT_INFO,    tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_WARNING(tag, param) pht::Logger::log(pht::Logger::LogLevel::PHT_WARNING, tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_ERROR(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_ERROR,   tag, param, __FILE__, __LINE__, __func__)
-#define PHT_LOGGER_FATAL(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, param, __FILE__, __LINE__, __func__)
+#ifndef NDEBUG 
+    #define PHT_LOGGER_DEBUG(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, param, __FILE__, __LINE__, __func__)
+    #define PHT_LOGGER_INFO(tag, param)    pht::Logger::log(pht::Logger::LogLevel::PHT_INFO,    tag, param, __FILE__, __LINE__, __func__)
+    #define PHT_LOGGER_WARNING(tag, param) pht::Logger::log(pht::Logger::LogLevel::PHT_WARNING, tag, param, __FILE__, __LINE__, __func__)
+    #define PHT_LOGGER_ERROR(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_ERROR,   tag, param, __FILE__, __LINE__, __func__)
+    #define PHT_LOGGER_FATAL(tag, param)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, param, __FILE__, __LINE__, __func__)
+#else
+    #define PHT_LOGGER_DEBUG(tag, param)
+    #define PHT_LOGGER_INFO(tag, param)
+    #define PHT_LOGGER_WARNING(tag, param)
+    #define PHT_LOGGER_ERROR(tag, param)
+    #define PHT_LOGGER_FATAL(tag, param)
+#endif
 
 namespace pht {
     class __declspec(dllexport) Logger {

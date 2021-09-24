@@ -1,31 +1,63 @@
 import tkinter as tk
 from tkinter import ttk
-
-import xml.etree.ElementTree as ET
+import math
 
 import pht_hst
 
 node_size = (40, 20)
 
-rawtree = None
+def hsv_to_hex(H, S, V):
+    h = math.floor(H/60.0)
+    f = (H/60.0-h)
+    p = V*(1-S)
+    q = V*(1-S*f)
+    t = V*(1-S*(1-f))
+
+    return [
+        "#"+hex(int(V*255))[2:].ljust(2,'0')+hex(int(t*255))[2:].ljust(2,'0')+hex(int(p*255))[2:].ljust(2,'0'),
+        "#"+hex(int(q*255))[2:].ljust(2,'0')+hex(int(V*255))[2:].ljust(2,'0')+hex(int(p*255))[2:].ljust(2,'0'),
+        "#"+hex(int(p*255))[2:].ljust(2,'0')+hex(int(V*255))[2:].ljust(2,'0')+hex(int(t*255))[2:].ljust(2,'0'),
+        "#"+hex(int(p*255))[2:].ljust(2,'0')+hex(int(q*255))[2:].ljust(2,'0')+hex(int(V*255))[2:].ljust(2,'0'),
+        "#"+hex(int(t*255))[2:].ljust(2,'0')+hex(int(p*255))[2:].ljust(2,'0')+hex(int(V*255))[2:].ljust(2,'0'),
+        "#"+hex(int(t*255))[2:].ljust(2,'0')+hex(int(p*255))[2:].ljust(2,'0')+hex(int(V*255))[2:].ljust(2,'0'),
+        "#"+hex(int(V*255))[2:].ljust(2,'0')+hex(int(t*255))[2:].ljust(2,'0')+hex(int(p*255))[2:].ljust(2,'0')][h]
+
+micro_colors = [[hsv_to_hex((50*(u+10*m))%360, 1.0, 1.0) for u in range(10)] for m in range(10)]
+
+mini_colors = [hsv_to_hex(i/10.0*360.0, 0.75, 0.75) for i in range(10)]
+
 tree = None
 
 def drawNode(content, x, y, startNode, resultNode):
     outline = "blue" if startNode else ("red" if resultNode else "black")
+    background = "#add8e6" if startNode else ("#ff7f7f" if resultNode else "white")
+    #hsv_to_hex(240, 0.5, 1)
     thickness = 2 if startNode or resultNode else 1
-    canvas.create_oval(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill="white", outline=outline)
-    canvas.create_rectangle(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill="white", outline=outline)
+    canvas.create_oval(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill=background, outline=outline)
+    canvas.create_rectangle(x-(node_size[0]/2.0), y-(node_size[1]/2.0), x+(node_size[0]/2.0), y+(node_size[1]/2.0), width=thickness, fill=background, outline=outline)
     canvas.create_text(x, y, text=content)
 
-def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, lines):
+def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, mode):
     childCount = tree.degree(hstnode[0], hstnode[1], hstnode[2])
     identifiers = []
+
+    if mode == "background":
+        if depth == 1:
+            canvas.create_rectangle(x-width/2.0, y, x+width/2.0, y+99999, fill=mini_colors[0], width=0)
+
     for i in range(childCount):
         child = tree.child(hstnode[0], hstnode[1], hstnode[2], i)
         identifiers.append(tree.getParent(child[0], child[1], child[2]))
+        if mode == "background":
+            if child[0] != hstnode[0]:
+                bg_x = x-width/2.0+width/childCount*(0.5+i)
+                bg_w = width/childCount
+                bg_y = 70*(depth+1)
+                canvas.create_rectangle(bg_x-bg_w/2.0, bg_y, bg_x+bg_w/2.0, bg_y+99999, fill=mini_colors[(child[0]+1)%len(mini_colors)], width=0)
 
+    
     node_data = "("+str(hstnode[0])+", "+str(hstnode[1])+", "+str(hstnode[2])+")"
-    if not lines:
+    if mode == "nodes":
         if startNode != None:
             if resultNode != None:
                 drawNode(node_data, x, y, startNode in identifiers, resultNode in identifiers)
@@ -47,23 +79,24 @@ def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, lines):
         drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, lines)'''
     
     for i in range(childCount):
-        if lines:
-            canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1))
         child = tree.child(hstnode[0], hstnode[1], hstnode[2], i)
-        drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, lines)
+        if mode == "connections":
+            if child[0] == hstnode[0] and child[1] == hstnode[1]:
+                canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1), width=2, fill=micro_colors[(child[0])%len(mini_colors)][(child[1])%len(mini_colors[0])])
+            else:
+                canvas.create_line(x, y, x-width/2.0+width/childCount*(0.5+i), 70*(depth+1), fill="black", dash=(3,5))
+        drawSubtree(child, x-width/2.0+width/childCount*(0.5+i), width/childCount, 70*(depth+1), depth+1, startNode, resultNode, mode)
 
 def drawTree(startNode=None, resultNode=None):
-    if rawtree == None:
-        return
     if tree == None:
         return
     canvas.delete("all")
-    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, True)
-    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, False)
+    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, "background")
+    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, "connections")
+    drawSubtree((0,0,0), window.winfo_width()/2.0, window.winfo_width(), 70, 1, startNode, resultNode, "nodes")
 
 def loadTree():
-    global rawtree, tree
-    rawtree = ET.parse(pathValue.get())
+    global tree
     tree = pht_hst.PyHST(pathValue.get(), False, 12, 4)
     drawTree()
 
