@@ -452,7 +452,7 @@ namespace pht {
                     miniTree.microDummyPointers.push_back({false});
                 }
 
-                //Simple Additions for Queries - MicroTrees
+                //Additions for Queries - MicroTrees
                 std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
                 miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn( fmMiniTree->getSize(microRoot,false)));
                 miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot)+1));
@@ -460,36 +460,39 @@ namespace pht {
                 miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
                 miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
                 miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
+
                 if(fmMiniTree->isRoot(microRoot)) {
                     miniTree.microParents.push_back({false});
                 } else {
                     miniTree.microParents.push_back(Bitvector_Utils::encodeNumberReturn(
                             fmMiniTree->getDirectAncestor(microRoot)->getMicroTree() + 1));
                 }
+
                 if(fmMiniTree->isRoot(microRoot)) {
 
                     std::vector<std::shared_ptr<Node<T>>> children = fmMiniTree->getDirectDescendants(microRoot);
                     if(children.empty()) {
                         miniTree.microRootLeafRanks.push_back({false});
+                        miniTree.microChildRanks.push_back({false});
                     } else {
-                        miniTree.microRootLeafRanks.push_back(
-                                Bitvector_Utils::encodeNumberReturn(tree->getLeafRank(children.at(0)) + 1));
+                        miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getLeafRank(children.at(0)) + 1));
+                        miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getChildRank(children.at(0)) + 1));
                     }
                 } else {
-                    miniTree.microRootLeafRanks.push_back(
-                            Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microRoot) + 1));
+                    miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microRoot) + 1));
+                    miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microRoot) + 1));
                 }
                 std::vector<std::shared_ptr<Node<T>>> microChildren = fmMicroTree->getDirectDescendants(microRoot);
                 if(microChildren.empty()) {
-                    miniTree.microExtendedLeafRanks.push_back(
-                            {false});
+                    miniTree.microExtendedLeafRanks.push_back({true});
+                    miniTree.microExtendedChildRanks.push_back({false});
                 } else {
                     bool removeLeafMan = false;
                     if(fmMiniTree->isLeaf(microChildren.at(0))) {
                         removeLeafMan = true;
                     }
-                    miniTree.microExtendedLeafRanks.push_back(
-                            Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microChildren.at(0)) + 1 - removeLeafMan));
+                    miniTree.microExtendedLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microChildren.at(0)) + 1 - removeLeafMan));
+                    miniTree.microExtendedChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microChildren.at(0)) + 1));
                 }
 
                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
@@ -570,6 +573,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer, tree->getLeftmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer, tree->getRightmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniRootLeafRank, tree->getLeafRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniChildRank, tree->getChildRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
 
                 if(tree->isRoot(miniRoot)) {
                     miniTree.miniParent = {false};

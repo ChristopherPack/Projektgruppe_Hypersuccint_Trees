@@ -366,13 +366,13 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     uint32_t res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
 
-    node = {1,1,0};
+    node = {0,1,6};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {0,1,5};
     res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
-
-    node = {0,1,0};
-    res = hyperNath.childRank(node);
-    EXPECT_EQ(2, res);
 
     node = {4,1,4};
     res = hyperNath.childRank(node);
@@ -402,6 +402,10 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     res = hyperNath.childRank(node);
     EXPECT_EQ(1, res);
 
+    node = {1,3,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
     node = {1,4,0};
     res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
@@ -413,6 +417,26 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     node = {6,0,0};
     res = hyperNath.childRank(node);
     EXPECT_EQ(2, res);
+
+    node = {7,0,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {6,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {6,1,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {6,2,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {7,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(3, res);
 }
 
 TEST_F(HypersuccinctTreeTest, getParentTest) {
@@ -824,6 +848,10 @@ TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
     res = hyperNath.leafRank(node);
     EXPECT_EQ(6, res);
 
+    node = {1,3,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(3, res);
+
     node = {3,0,1};
     res = hyperNath.leafRank(node);
     EXPECT_EQ(14, res);
@@ -831,5 +859,21 @@ TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
     node = {4,1,4};
     res = hyperNath.leafRank(node);
     EXPECT_EQ(21, res);
+
+    node = {6,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {6,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(26, res);
+
+    node = {6,2,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(28, res);
+
+    node = {7,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(34, res);
 
 }

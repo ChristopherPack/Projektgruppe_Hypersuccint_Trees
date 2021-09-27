@@ -80,10 +80,20 @@ namespace pht {
         std::vector<Bitvector> microDummyPointers;
         std::vector<succinct_bv::BitVector> microDummyPointersSupport;
 
-        //Reverse Pointer to miniTree with Dummy to this tree
+        //Child Rankd of MiniTrees
+        Bitvector miniChildRank;
+        succinct_bv::BitVector miniChildRankSupport;
+        //Child Ranks of MicroTrees EXCEPT AT INDEX 0: ChildRank of displaced MiniTree
+        std::vector<Bitvector> microChildRanks;
+        std::vector<succinct_bv::BitVector> microChildRanksSupport;
+        //Child Ranks of displaced MicroTrees
+        std::vector<Bitvector> microExtendedChildRanks;
+        std::vector<succinct_bv::BitVector> microExtendedChildRanksSupport;
+
+        //Pointer to direct parent MiniTree
         Bitvector miniParent;
         std::vector<succinct_bv::BitVector> miniParentSupport;
-        //Reverse Pointers to microTree with Dummy to these trees
+        //Pointer to direct parent MicroTree for all MicroTrees
         std::vector<Bitvector> microParents;
         std::vector<succinct_bv::BitVector> microParentsSupport;
 
@@ -138,7 +148,7 @@ namespace pht {
         //Leaf Rank of MiniTree Dummy
         Bitvector miniDummyLeafRank;
         succinct_bv::BitVector miniDummyLeafRankSupport;
-        //Leaf Ranks of MicroTree Roots + 1
+        //Leaf Ranks of MicroTree Roots + 1 EXCEPT AT INDEX 0: There it is the displaced Leaf Rank of the MiniTree
         std::vector<Bitvector> microRootLeafRanks;
         std::vector<succinct_bv::BitVector> microRootLeafRanksSupport;
         //Special Leaf Ranks for displaced microTrees + 1
@@ -493,9 +503,17 @@ namespace pht {
         uint32_t childRank(HstNode node);
 
         /**
+         * Finds the direct Parent of the given Node, ignoring dummies
+         * Important hepler function
+         * TODO: Should be private
+         *
+         * @param node The node as HSTNode
+         * @return The parent as HstNode
+         */
+        HstNode getParentForQuery(HstNode node);
+
+        /**
          * Finds the direct Parent of the given Node
-         * Very important helper function!
-         * TODO: Could be private
          *
          * @param node The node as HSTNode
          * @return The parent as HstNode
