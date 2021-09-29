@@ -16,6 +16,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
     cout << "Hypersuccinct Tree:" << endl;
     cout << "IsHuffman:   ";
     cout << tree.isHuffman() << endl;
+    cout << "TreeSize:  ";
+    printBitvector(tree.getSize());
     cout << "MiniSize:  ";
     printBitvector(tree.getMiniSize());
     cout << "MicroSize:  ";
@@ -24,6 +26,10 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
 
     cout << "Amount of MiniTrees: " << tree.getMiniTrees().size() << endl;
     cout << "MiniFIDs:  ";
+    printBitvector(tree.getMiniFIDs());
+    cout << "FID Top Trees:  ";
+    printBitvector(tree.getMiniFIDs());
+    cout << "FID Low Trees:  ";
     printBitvector(tree.getMiniFIDs());
     cout << "MiniTypeVectors:  ";
     printBitvector(tree.getMiniTypeVectors());
@@ -49,6 +55,10 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).microTopFIDIndices);
         cout << "Micro Low FID Indices:  ";
         printBitvector(tree.getMiniTree(index).microLowFIDIndices);
+        cout << "Micro FID Top Trees:  ";
+        printBitvector(tree.getMiniTree(index).microFIDTopTrees);
+        cout << "Micro FID Low Trees:  ";
+        printBitvector(tree.getMiniTree(index).microFIDLowTrees);
 
         cout << "RootAncestors:  ";
         printBitvector(tree.getMiniTree(index).rootAncestors);
@@ -62,6 +72,19 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).miniDummyPointer);
         cout << "MicroDummyPointers:  ";
         printBitvector(tree.getMiniTree(index).microDummyPointers);
+
+        cout << "Mini Child Rankd:  ";
+        printBitvector(tree.getMiniTree(index).miniChildRank);
+        cout << "Micro Child Ranks:  ";
+        printBitvector(tree.getMiniTree(index).microChildRanks);
+        cout << "Micro extended Child Ranks:  ";
+        printBitvector(tree.getMiniTree(index).microExtendedChildRanks);
+
+        cout << "Mini Parent Pointers:  ";
+        printBitvector(tree.getMiniTree(index).miniParent);
+        cout << "Micro Parent Pointers:  ";
+        printBitvector(tree.getMiniTree(index).microParents);
+
         cout << "Subtree Size at MiniTree Root:  ";
         printBitvector(tree.getMiniTree(index).subTree);
         cout << "SubTreeSize at MicroTree Roots:  ";
@@ -90,13 +113,14 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getMiniTree(index).microTreeLeftmostLeafPointers);
         cout << "Rightmost MicroTree within MiniTree:  ";
         printBitvector(tree.getMiniTree(index).microTreeRightmostLeafPointers);
-
         cout << "LeafRank at MiniTree Root:  ";
         printBitvector(tree.getMiniTree(index).miniRootLeafRank);
         cout << "LeafRank at MiniTree Dummy:  ";
         printBitvector(tree.getMiniTree(index).miniDummyLeafRank);
         cout << "LeafRank at MicroTree Roots:  ";
         printBitvector(tree.getMiniTree(index).microRootLeafRanks);
+        cout << "Extended Leaf Rank of MicroTree Roots:  ";
+        printBitvector(tree.getMiniTree(index).microExtendedLeafRanks);
         cout << "\n";
     }
     for(uint32_t index = 0; index < tree.getLookupTable().size(); index++) {
@@ -108,6 +132,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).ancestorMatrix);
         cout << "ChildMap:   ";
         printBitvector(tree.getLookupTableEntry(index).childMatrix);
+        cout << "Parent Pointers:   ";
+        printBitvector(tree.getLookupTableEntry(index).parentPointers);
         cout << "Degrees:   ";
         printBitvector(tree.getLookupTableEntry(index).degree);
         cout << "Subtrees:   ";
@@ -205,6 +231,8 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
     Bitvector emptySet = {false};
 
     createFileBitvector(tree.getMiniFIDs(), fileBitvector);
+    createFileBitvector(tree.getFIDTopTrees(), fileBitvector);
+    createFileBitvector(tree.getFIDLowTrees(), fileBitvector);
     createFileBitvector(tree.getMiniTypeVectors(), fileBitvector);
     createFileBitvector(tree.getMiniDummys(), fileBitvector);
     for(MiniTree& miniTree : tree.getMiniTrees()) {
@@ -212,13 +240,28 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(miniTree.typeVectors, fileBitvector);
         createFileBitvector(miniTree.dummys, fileBitvector);
         createFileBitvector(miniTree.microTrees, fileBitvector);
+
+        createFileBitvector(miniTree.miniTopFIDIndex, fileBitvector);
+        createFileBitvector(miniTree.miniLowFIDIndex, fileBitvector);
+        createFileBitvector(miniTree.microTopFIDIndices, fileBitvector);
+        createFileBitvector(miniTree.microLowFIDIndices, fileBitvector);
+        createFileBitvector(miniTree.microFIDTopTrees, fileBitvector);
+        createFileBitvector(miniTree.microFIDLowTrees, fileBitvector);
+
         createFileBitvector(miniTree.rootAncestors, fileBitvector);
         createFileBitvector(miniTree.dummyAncestors, fileBitvector);
         createFileBitvector(miniTree.miniDummyTree, fileBitvector);
         createFileBitvector(miniTree.miniDummyIndex, fileBitvector);
         createFileBitvector(miniTree.miniDummyPointer, fileBitvector);
         createFileBitvector(miniTree.microDummyPointers, fileBitvector);
-        createFileBitvector(miniTree.miniAnc, fileBitvector);
+
+        createFileBitvector(miniTree.miniChildRank, fileBitvector);
+        createFileBitvector(miniTree.microChildRanks, fileBitvector);
+        createFileBitvector(miniTree.microExtendedChildRanks, fileBitvector);
+
+        createFileBitvector(miniTree.miniParent, fileBitvector);
+        createFileBitvector(miniTree.microParents, fileBitvector);
+
         createFileBitvector(miniTree.subTree, fileBitvector);
         createFileBitvector(miniTree.microSubTrees, fileBitvector);
         createFileBitvector(miniTree.miniDepth, fileBitvector);
@@ -236,12 +279,14 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(miniTree.miniRootLeafRank, fileBitvector);
         createFileBitvector(miniTree.miniDummyLeafRank, fileBitvector);
         createFileBitvector(miniTree.microRootLeafRanks, fileBitvector);
+        createFileBitvector(miniTree.microExtendedLeafRanks, fileBitvector);
     }
     for(LookupTableEntry& microTreeData : tree.getLookupTable()) {
         createFileBitvector(microTreeData.index, fileBitvector);
         createFileBitvector(microTreeData.bp, fileBitvector);
         createFileBitvector(microTreeData.ancestorMatrix, fileBitvector);
         createFileBitvector(microTreeData.childMatrix, fileBitvector);
+        createFileBitvector(microTreeData.parentPointers, fileBitvector);
         createFileBitvector(microTreeData.degree, fileBitvector);
         createFileBitvector(microTreeData.subTrees, fileBitvector);
         createFileBitvector(microTreeData.nodeDepths, fileBitvector);

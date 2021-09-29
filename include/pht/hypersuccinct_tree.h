@@ -97,9 +97,6 @@ namespace pht {
         std::vector<Bitvector> microParents;
         std::vector<succinct_bv::BitVector> microParentsSupport;
 
-        //Ancestor of MiniTreeRoot
-        Bitvector miniAnc;
-        succinct_bv::BitVector miniAncSupport;
         //SubTree Size MiniTree
         Bitvector subTree;
         succinct_bv::BitVector subTreeSupport;
@@ -251,7 +248,7 @@ namespace pht {
          *
          * @return value of huffmanFlag
          */
-        bool isHuffman() {
+        [[nodiscard]] bool isHuffman() const {
             return huffmanFlag;
         }
 
@@ -273,6 +270,14 @@ namespace pht {
 
         std::vector<Bitvector> getMiniFIDs() {
             return miniFIDs;
+        }
+
+        std::vector<Bitvector> getFIDTopTrees() {
+            return FIDTopTree;
+        }
+
+        std::vector<Bitvector> getFIDLowTrees() {
+            return FIDLowTree;
         }
 
         std::vector<Bitvector> getMiniTypeVectors() {
@@ -384,89 +389,6 @@ namespace pht {
          * @return if node1 is ancestor of node2 as bool
          */
         bool lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index);
-
-        /**
-         * Returns the FID for a given MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param treeNum Number of the Tree as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMiniTree(uint32_t treeNum);
-
-        /**
-         * Returns the FID for a given MicroTree within a MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param miniTree The Minitree as Minitree
-         * @param treeNum the Microtree number as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
-
-        /**
-         * Returns the FID for a given MicroTree within a MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param miniTree The Minitree number as int
-         * @param treeNum the Microtree number as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
-
-        /**
-         * For a fiven FID index, finds all Tree Indices that belong to this FID
-         * For MiniTrees
-         *
-         * @param index The index of the FID
-         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
-         */
-        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
-
-        /**
-         * For a fiven FID index, finds all Tree Indices that belong to this FID
-         * For MicroTrees
-         *
-         * @param miniTree The Minitree containing the FIDs
-         * @param index The index of the FID
-         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
-         */
-        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForMicroFID(MiniTree &miniTree, uint32_t index);
-
-        /**
-         * Index conversion between tree indices and their fid inidces
-         * For MiniTrees
-         *
-         * @param miniTree  The index of the miniTree
-         * @return The indices of its Top and Low FID (if they exist)
-         */
-        std::pair<uint32_t ,uint32_t > convertTreeToFIDIndex(uint32_t miniTree);
-
-        /**
-         * Index conversion between tree indices and their fid inidces
-         * For MicroTrees
-         *
-         * @param miniTree  the miniTree
-         * @param microTree The index of the microTree
-         * @return The indices of its Top and Low FID (if they exist)
-         */
-        std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(MiniTree &miniTree, uint32_t microTree);
-
-
-
-        ////////////////////////////////////////////////////////////////////////////
-        // TODO: Test Methods in this Block
-        //
-        //
-        ////////////////////////////////////////////////////////////////////////////
-
-
-
-        ////////////////////////////////////////////////////////////////////////////
-        //
-        //
-        //TODO: End Test Method Block
-        ////////////////////////////////////////////////////////////////////////////
 
         /**
          * Returns if given Node is ancestor of Dummy within the Node's MiniTree

@@ -96,6 +96,8 @@ namespace pht {
             uint32_t lookupTableSize = Bitvector_Utils::decodeNumber(iter, fullBitvector.cend(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
 
             createBitvectorFromFile(iter, end, hst.miniFIDs);
+            createBitvectorFromFile(iter, end, hst.FIDTopTree);
+            createBitvectorFromFile(iter, end, hst.FIDLowTree);
             createBitvectorFromFile(iter, end, hst.miniTypeVectors);
             createBitvectorFromFile(iter, end, hst.miniDummys);
 
@@ -105,13 +107,28 @@ namespace pht {
                 createBitvectorFromFile(iter, end, mini.typeVectors);
                 createBitvectorFromFile(iter, end, mini.dummys);
                 createBitvectorFromFile(iter, end, mini.microTrees);
+
+                createBitvectorFromFile(iter, end, mini.miniTopFIDIndex);
+                createBitvectorFromFile(iter, end, mini.miniLowFIDIndex);
+                createBitvectorFromFile(iter, end, mini.microTopFIDIndices);
+                createBitvectorFromFile(iter, end, mini.microLowFIDIndices);
+                createBitvectorFromFile(iter, end, mini.microFIDTopTrees);
+                createBitvectorFromFile(iter, end, mini.microFIDLowTrees);
+
                 createBitvectorFromFile(iter, end, mini.rootAncestors);
                 createBitvectorFromFile(iter, end, mini.dummyAncestors);
                 createBitvectorFromFile(iter, end, mini.miniDummyTree);
                 createBitvectorFromFile(iter, end, mini.miniDummyIndex);
                 createBitvectorFromFile(iter, end, mini.miniDummyPointer);
                 createBitvectorFromFile(iter, end, mini.microDummyPointers);
-                createBitvectorFromFile(iter, end, mini.miniAnc);
+
+                createBitvectorFromFile(iter, end, mini.miniChildRank);
+                createBitvectorFromFile(iter, end, mini.microChildRanks);
+                createBitvectorFromFile(iter, end, mini.microExtendedChildRanks);
+
+                createBitvectorFromFile(iter, end, mini.miniParent);
+                createBitvectorFromFile(iter, end, mini.microParents);
+
                 createBitvectorFromFile(iter, end, mini.subTree);
                 createBitvectorFromFile(iter, end, mini.microSubTrees);
                 createBitvectorFromFile(iter, end, mini.miniDepth);
@@ -129,6 +146,7 @@ namespace pht {
                 createBitvectorFromFile(iter, end, mini.miniRootLeafRank);
                 createBitvectorFromFile(iter, end, mini.miniDummyLeafRank);
                 createBitvectorFromFile(iter, end, mini.microRootLeafRanks);
+                createBitvectorFromFile(iter, end, mini.microExtendedLeafRanks);
                 hst.miniTrees.push_back(mini);
             }
             for(uint32_t j=0; j<lookupTableSize; j++) {
@@ -140,6 +158,8 @@ namespace pht {
                 createBitvectorFromFile(iter, end, ancMatrix);
                 Bitvector childMatrix;
                 createBitvectorFromFile(iter, end, childMatrix);
+                std::vector<Bitvector> parents;
+                createBitvectorFromFile(iter, end, parents);
                 std::vector<Bitvector> degree;
                 createBitvectorFromFile(iter, end, degree);
                 std::vector<Bitvector> subTrees;
@@ -168,6 +188,7 @@ namespace pht {
                 LookupTableEntry microTreeData(index, bp);
                 microTreeData.ancestorMatrix = ancMatrix;
                 microTreeData.childMatrix = childMatrix;
+                microTreeData.parentPointers = parents;
                 microTreeData.degree = degree;
                 microTreeData.subTrees = subTrees;
                 microTreeData.nodeDepths = nodeDepths;
@@ -1020,7 +1041,6 @@ namespace pht {
                 assignBitVector(miniTree.miniDummyIndexSupport , miniTree.miniDummyIndex);
                 assignBitVector(miniTree.miniDummyPointerSupport , miniTree.miniDummyPointer);
                 assignBitVector(miniTree.microDummyPointersSupport , miniTree.microDummyPointers);
-                assignBitVector(miniTree.miniAncSupport , miniTree.miniAnc);
                 assignBitVector(miniTree.subTreeSupport , miniTree.subTree);
                 assignBitVector(miniTree.microSubTreesSupport , miniTree.microSubTrees);
                 assignBitVector(miniTree.miniDepthSupport , miniTree.miniDepth);

@@ -8,7 +8,6 @@
 using namespace pht;
 
 bool HypersuccinctTree::isDummyAncestorWithinMiniTree(HstNode node) {
-    //assert(node.micro <= Bitvector_Utils::getEntryCount(miniTrees.at(node.mini).microTrees.cbegin(),miniTrees.at(node.mini).microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator()}));
     MiniTree mini = getMiniTree(node.mini);
     if(mini.rootAncestors.empty()) {
         return false;
@@ -51,7 +50,6 @@ bool HypersuccinctTree::isDummyAncestorWithinMicroTree(HstNode node) {
 }
 
 HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
-    //TODO: Need to adjust checkMicro and checkNode flags
     uint32_t miniRes = 0;
     uint32_t microRes = 0;
     uint32_t nodeRes = 0;
@@ -150,11 +148,11 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 
     if(checkNode) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent,parent.micro));
-        uint32_t size = sqrt(entry.childMatrix.size());
-        uint32_t startRank = entry.childMatrixSupport.Rank(size * parent.node);
+        uint32_t matSize = sqrt(entry.childMatrix.size());
+        uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
         uint32_t startRankSelect = entry.childMatrixSupport.Select(startRank + nodeIndexHelp);
-        nodeRes = startRankSelect % size;
-        if(startRankSelect > (size * (parent.node + 1))) {
+        nodeRes = startRankSelect % matSize;
+        if(startRankSelect > (matSize * (parent.node + 1))) {
             return {};
         }
         if(nodeRes == parent.node) {
@@ -201,9 +199,9 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
 
     if(node.node > 0) {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent, parent.micro));
-            uint32_t size = sqrt(entry.childMatrix.size());
-            uint32_t startRank = entry.childMatrixSupport.Rank(size * parent.node);
-            uint32_t fullRank = entry.childMatrixSupport.Rank(size * parent.node + node.node);
+            uint32_t matSize = sqrt(entry.childMatrix.size());
+            uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
+            uint32_t fullRank = entry.childMatrixSupport.Rank(matSize * parent.node + node.node);
 
         if(parent.node > 0) {
             return fullRank - startRank - 1;
@@ -243,15 +241,6 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
 
         res += Bitvector_Utils::decodeNumber(miniTree.miniChildRank, Bitvector_Utils::NumberEncoding::BINARY);
     }
-
-    /*if (node.node!=0 && (node.micro + node.node <= 1)) {
-        res += Bitvector_Utils::decodeNumber(miniTree.microExtendedChildRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    }
-    else if ((node.micro != 0 || node.node != 0)) {
-        res += Bitvector_Utils::decodeNumber(miniTree.microChildRanks.at(0),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    } else {
-        res += Bitvector_Utils::decodeNumber(miniTree.miniChildRank,Bitvector_Utils::NumberEncoding::BINARY);
-    }*/
     return res;
 }
 
@@ -326,8 +315,9 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
         return Bitvector_Utils::decodeNumber(degreeB,Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
     if(node.micro > 0) {
-        Bitvector fid = getFIDforMicroTree(node.mini, node.micro);
-        return fid.size();
+        MiniTree miniTree = getMiniTree(node.mini);
+        uint32_t fid = Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY);
+        return fid;
     }
     uint32_t fidID = Bitvector_Utils::decodeNumber(getMiniTree(node.mini).miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
     Bitvector fid = miniFIDs.at(fidID);
