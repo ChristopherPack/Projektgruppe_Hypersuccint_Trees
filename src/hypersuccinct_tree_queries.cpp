@@ -316,8 +316,8 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
     }
     if(node.micro > 0) {
         MiniTree miniTree = getMiniTree(node.mini);
-        uint32_t fid = Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY);
-        return fid;
+        uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        return miniTree.FIDs.at(fidIndex).size();
     }
     uint32_t fidID = Bitvector_Utils::decodeNumber(getMiniTree(node.mini).miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
     Bitvector fid = miniFIDs.at(fidID);
