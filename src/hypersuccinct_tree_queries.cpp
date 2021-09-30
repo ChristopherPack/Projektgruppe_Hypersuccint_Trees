@@ -113,7 +113,11 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
             miniRes = firstTopMini + (tvRank - 1);
             checkMicro = true;
         } else {
-            miniRes = firstLowMini + (fidRank - 1) - tvRank;
+            if(index > 0 && fidRank == miniFIDSupport.Rank(index - 1)) {
+                miniRes = firstTopMini + (tvRank - 1);
+            } else {
+                miniRes = firstLowMini + (fidRank - 1) - tvRank;
+            }
         }
         miniTreeParent = getMiniTree(miniRes);
     }
@@ -142,7 +146,11 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
             microRes = firstTopMicro + (tvRank - 1);
             checkNode = true;
         } else {
-            microRes = firstLowMicro + (fidRank - 1) - tvRank;
+            if(microIndexHelp > 0 && fidRank == microFIDSupport.Rank(microIndexHelp - 1)) {
+                microRes = firstTopMicro + (tvRank - 1);
+            } else {
+                microRes = firstLowMicro + (fidRank - 1) - tvRank;
+            }
         }
     }
 

@@ -1,6 +1,11 @@
 //
-// Created by User on 30.07.2021.
+// Created by Christopher Pack on 30.07.2021.
 //
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "gmock/gmock-matchers.h"
+
+
 #define PHT_TEST
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
@@ -13,7 +18,8 @@
 
 #define convertToBitvector pht::Bitvector_Utils::convertToBitvector
 
-int main() {
+class RuntimeTest : public ::testing::Test {
+protected:
     //Laufzeittests:
     /*
      * Queries
@@ -21,27 +27,32 @@ int main() {
      * WriteToFile / ReadFromFile
      */
     std::vector<std::string> fileNames = {"treeNath.xml"};
-    std::vector<pair<std::string& ,std::string&>> factoryTimes;
-    std::vector<pair<std::string& ,std::string&>> childTimes;
-    std::vector<pair<std::string& ,std::string&>> degreeTimes;
-    std::vector<pair<std::string& ,std::string&>> leftmost_leafTimes;
-    std::vector<pair<std::string& ,std::string&>> rightmost_leafTimes;
+    std::vector<pair<std::string &, std::string &>> factoryTimes;
+    std::vector<pair<std::string &, std::string &>> childTimes;
+    std::vector<pair<std::string &, std::string &>> degreeTimes;
+    std::vector<pair<std::string &, std::string &>> leftmost_leafTimes;
+    std::vector<pair<std::string &, std::string &>> rightmost_leafTimes;
 
-    std::vector<pair<std::string& ,std::string&>> childRankTimes;
-    std::vector<pair<std::string& ,std::string&>> subTreeTimes;
-    std::vector<pair<std::string& ,std::string&>> depthTimes;
-    std::vector<pair<std::string& ,std::string&>> heightTimes;
-    std::vector<pair<std::string& ,std::string&>> isDummyAncestorWithinMiniTreeTimes;
-    std::vector<pair<std::string& ,std::string&>> isDummyAncestorWithinMicroTreeTimes;
-    std::vector<pair<std::string& ,std::string&>> leafSizeTimes;
-    std::vector<pair<std::string& ,std::string&>> leafRankTimes;
+    std::vector<pair<std::string &, std::string &>> childRankTimes;
+    std::vector<pair<std::string &, std::string &>> subTreeTimes;
+    std::vector<pair<std::string &, std::string &>> depthTimes;
+    std::vector<pair<std::string &, std::string &>> heightTimes;
+    std::vector<pair<std::string &, std::string &>> isDummyAncestorWithinMiniTreeTimes;
+    std::vector<pair<std::string &, std::string &>> isDummyAncestorWithinMicroTreeTimes;
+    std::vector<pair<std::string &, std::string &>> leafSizeTimes;
+    std::vector<pair<std::string &, std::string &>> leafRankTimes;
     pht::Timer timer;
+};
+
+TEST_F(RuntimeTest, MiniTreesTest) {
     for(std::string &name : fileNames) {
         std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName(name);
         timer.start();
-        pht::HypersuccinctTree hyperTree = pht::HypersuccinctTreeFactory::create(tree);
+        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree,false,12,4);
         timer.stop();
         tree.reset();
+        std::cout << timer.toString() << endl;
+        PHT_LOGGER_INFO("MAIN", std::string("File read in ")+timer.toString());
         factoryTimes.emplace_back(name, timer.toString());
 
         std::vector<pht::HstNode > testNodes = {{0,0,0}};
@@ -52,14 +63,14 @@ int main() {
         degreeTimes.emplace_back(name,timer.toString());
         for(uint32_t i = 0; i<rootdegree; i++) {
             timer.start();
-            //pht::HstNode child = hyperTree.child({0,0,0},i);
+            pht::HstNode child = hyperTree.child({0,0,0},i);
             timer.stop();
             childTimes.emplace_back(name,timer.toString());
-            //testNodes.push_back(child);
+            testNodes.push_back(child);
         }
 
         timer.start();
-        uint32_t rootSubSize = hyperTree.subtree_size({0,0,0});
+        uint32_t rootSubSize = hyperTree.subtreeSize({0,0,0});
         timer.stop();
         subTreeTimes.emplace_back(name,timer.toString());
         uint32_t testSize = 1001;
@@ -67,26 +78,34 @@ int main() {
             testSize = rootSubSize;
         }
 
+        uint32_t i=1;
         while(testNodes.size() < testSize) {
-            uint32_t i=0;
+            if(i > testNodes.size()) {
+                break;
+            }
             uint32_t degree;
             timer.start();
             degree = hyperTree.degree(testNodes.at(i));
             timer.stop();
             degreeTimes.emplace_back(name,timer.toString());
             for(uint32_t j = 0; j<degree; j++) {
+                if(testNodes.size() >= testSize) {
+                    break;
+                }
                 timer.start();
-                //pht::HstNode child = hyperTree.child(testNodes.at(i),j);
+                pht::HstNode child = hyperTree.child(testNodes.at(i),j);
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
-                //testNodes.push_back(child);
+                if(testNodes.size() < testSize) {
+                    testNodes.push_back(child);
+                }
             }
             i++;
         }
 
         for(pht::HstNode &node : testNodes) {
             timer.start();
-            pht::HstNode left_leaf = hyperTree.leftmost_leaf(node);
+            pht::HstNode left_leaf = hyperTree.leftmostLeaf(node);
             timer.stop();
             leftmost_leafTimes.emplace_back(name,timer.toString());
             if(rootSubSize < 1001) {
@@ -96,7 +115,7 @@ int main() {
             }
 
             timer.start();
-            pht::HstNode right_leaf = hyperTree.rightmost_leaf(node);
+            pht::HstNode right_leaf = hyperTree.rightmostLeaf(node);
             timer.stop();
             rightmost_leafTimes.emplace_back(name,timer.toString());
             if(rootSubSize < 1001) {
@@ -107,18 +126,20 @@ int main() {
         }
 
         for(pht::HstNode &node : testNodes) {
-            MEASURE_TIME(hyperTree.child_rank(node),childRankTimes);
-            MEASURE_TIME(hyperTree.subtree_size(node),subTreeTimes);
+            MEASURE_TIME(hyperTree.childRank(node),childRankTimes);
+            MEASURE_TIME(hyperTree.subtreeSize(node),subTreeTimes);
             MEASURE_TIME(hyperTree.depth(node),depthTimes);
             MEASURE_TIME(hyperTree.height(node),heightTimes);
             MEASURE_TIME(hyperTree.isDummyAncestorWithinMiniTree(node),isDummyAncestorWithinMiniTreeTimes);
             MEASURE_TIME(hyperTree.isDummyAncestorWithinMicroTree(node),isDummyAncestorWithinMicroTreeTimes);
-            MEASURE_TIME(hyperTree.leaf_size(node),leafSizeTimes);
-            MEASURE_TIME(hyperTree.leaf_rank(node),leafRankTimes);
+            MEASURE_TIME(hyperTree.leafSize(node),leafSizeTimes);
+            MEASURE_TIME(hyperTree.leafRank(node),leafRankTimes);
         }
+
+        cout << factoryTimes.at(0).second << " Time" << endl;
     }
 
-    std::ofstream file;
+    /*std::ofstream file;
     file.open("testResults.csv");
     file << "Tree, TestName, Result\n";
     for(std::pair<std::string&,std::string&> value : factoryTimes) {
@@ -160,5 +181,5 @@ int main() {
     for(std::pair<std::string&,std::string&> value : leafRankTimes) {
         file << value.first << ", leaf_rank, " << value.second << "\n";
     }
-    file.close();
+    file.close();*/
 }

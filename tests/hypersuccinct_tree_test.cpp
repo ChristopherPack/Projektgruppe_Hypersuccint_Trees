@@ -386,6 +386,22 @@ TEST_F(HypersuccinctTreeTest, childTest) {
     res = hyperNath.child(node,4);
     EXPECT_EQ(pht::HstNode(), res);
 
+    node = {6,2,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,2,1), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,4,0), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(6,2,2), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,3);
+    EXPECT_EQ(pht::HstNode(), res);
+
 }
 
 TEST_F(HypersuccinctTreeTest, child_rankTest) {
