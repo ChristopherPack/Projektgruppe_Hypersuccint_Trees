@@ -116,135 +116,162 @@ TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
 }
 
 TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
-    std::vector<bool> res = hyperNath.getFIDforMiniTree(0);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
-    res = hyperNath.getFIDforMiniTree(1);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = hyperNath.getFIDforMiniTree(2);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    res = hyperNath.getFIDforMiniTree(3);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
-    res = hyperNath.getFIDforMiniTree(4);
+    std::vector<bool> res = hyperNath.getMiniTree(0).miniTopFIDIndex;
     EXPECT_THAT(res, ::testing::ElementsAre(1));
-    res = hyperNath.getFIDforMiniTree(5);
+    res = hyperNath.getMiniTree(1).miniTopFIDIndex;
     EXPECT_THAT(res, ::testing::ElementsAre(1,0));
-    res = hyperNath.getFIDforMiniTree(6);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
-    res = hyperNath.getFIDforMiniTree(7);
-    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0,1));
+    res = hyperNath.getMiniTree(2).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getMiniTree(3).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
+    res = hyperNath.getMiniTree(4).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,1));
+    res = hyperNath.getMiniTree(5).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0));
+    res = hyperNath.getMiniTree(6).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getMiniTree(7).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
 }
 
 TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
-    std::tuple<std::vector<uint32_t >,std::vector<uint32_t >> res = hyperNath.getTreesForFID(0);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(0));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(1,2));
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, 1);
 
-    res = hyperNath.getTreesForFID(1);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(1));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.getTreesForFID(2);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(2));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(3,4));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 3);
 
-    res = hyperNath.getTreesForFID(3);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(3));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(5));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 5);
 
-    res = hyperNath.getTreesForFID(4);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(4));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.getTreesForFID(5);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(5));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 5);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.getTreesForFID(6);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(6,7));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre());
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
 }
 
 TEST_F(HypersuccinctTreeTest, getTreesForMicroFIDTest) {
     pht::MiniTree miniTree = hyperNath.getMiniTree(4);
-    std::tuple<std::vector<uint32_t >,std::vector<uint32_t >> res = hyperNath.getTreesForMicroFID(miniTree, 0);
-    EXPECT_THAT(std::get<0>(res), ::testing::ElementsAre(0));
-    EXPECT_THAT(std::get<1>(res), ::testing::ElementsAre(1));
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDTopTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDLowTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, 1);
 }
 
 TEST_F(HypersuccinctTreeTest, TreeToFIDIndexConversionTest) {
-    std::tuple<uint32_t,uint32_t> res = hyperNath.convertTreeToFIDIndex(0);
-    EXPECT_EQ(std::get<0>(res), 0);
-    EXPECT_EQ(std::get<1>(res), -1);
+    pht::MiniTree miniTree = hyperNath.getMiniTree(0);
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.convertTreeToFIDIndex(1);
-    EXPECT_EQ(std::get<0>(res), 1);
-    EXPECT_EQ(std::get<1>(res), 0);
+    miniTree = hyperNath.getMiniTree(1);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
 
-    res = hyperNath.convertTreeToFIDIndex(2);
-    EXPECT_EQ(std::get<0>(res), 2);
-    EXPECT_EQ(std::get<1>(res), 0);
+    miniTree = hyperNath.getMiniTree(2);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 0);
 
-    res = hyperNath.convertTreeToFIDIndex(3);
-    EXPECT_EQ(std::get<0>(res), 3);
-    EXPECT_EQ(std::get<1>(res), 2);
+    miniTree = hyperNath.getMiniTree(3);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 2);
 
-    res = hyperNath.convertTreeToFIDIndex(4);
-    EXPECT_EQ(std::get<0>(res), 4);
-    EXPECT_EQ(std::get<1>(res), 2);
+    miniTree = hyperNath.getMiniTree(4);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, 2);
 
-    res = hyperNath.convertTreeToFIDIndex(5);
-    EXPECT_EQ(std::get<0>(res), 5);
-    EXPECT_EQ(std::get<1>(res), 3);
+    miniTree = hyperNath.getMiniTree(5);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 5);
+    EXPECT_EQ(res2, 3);
 
-    res = hyperNath.convertTreeToFIDIndex(6);
-    EXPECT_EQ(std::get<0>(res), 6);
-    EXPECT_EQ(std::get<1>(res), -1);
+    miniTree = hyperNath.getMiniTree(6);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.convertTreeToFIDIndex(7);
-    EXPECT_EQ(std::get<0>(res), 6);
-    EXPECT_EQ(std::get<1>(res), -1);
+    miniTree = hyperNath.getMiniTree(7);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
 }
 
 TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
     pht::MiniTree miniTree = hyperNath.getMiniTree(1);
-    std::tuple<uint32_t,uint32_t> res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 0);
-    EXPECT_EQ(std::get<0>(res), 0);
-    EXPECT_EQ(std::get<1>(res), -1);
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
 
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
-    EXPECT_EQ(std::get<0>(res), 1);
-    EXPECT_EQ(std::get<1>(res), 0);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
 
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 2);
-    EXPECT_EQ(std::get<0>(res), 2);
-    EXPECT_EQ(std::get<1>(res), 0);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 0);
 
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 3);
-    EXPECT_EQ(std::get<0>(res), 3);
-    EXPECT_EQ(std::get<1>(res), 2);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 2);
 
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 4);
-    EXPECT_EQ(std::get<0>(res), 4);
-    EXPECT_EQ(std::get<1>(res), -1);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(0);
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
-    EXPECT_EQ(std::get<0>(res), 1);
-    EXPECT_EQ(std::get<1>(res), 0);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(4);
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
-    EXPECT_EQ(std::get<0>(res), 1);
-    EXPECT_EQ(std::get<1>(res), 0);
-
-    miniTree = hyperNath.getMiniTree(0);
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 0);
-    EXPECT_EQ(std::get<0>(res), 0);
-    EXPECT_EQ(std::get<1>(res), -1);
-
-    res = hyperNath.convertMicroTreeToFIDIndex(miniTree, 1);
-    EXPECT_EQ(std::get<0>(res), 1);
-    EXPECT_EQ(std::get<1>(res), 0);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
 }
 
 TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
@@ -359,6 +386,22 @@ TEST_F(HypersuccinctTreeTest, childTest) {
     res = hyperNath.child(node,4);
     EXPECT_EQ(pht::HstNode(), res);
 
+    node = {6,2,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,2,1), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,4,0), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(6,2,2), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,3);
+    EXPECT_EQ(pht::HstNode(), res);
+
 }
 
 TEST_F(HypersuccinctTreeTest, child_rankTest) {
@@ -366,13 +409,13 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     uint32_t res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
 
-    node = {1,1,0};
+    node = {0,1,6};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {0,1,5};
     res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
-
-    node = {0,1,0};
-    res = hyperNath.childRank(node);
-    EXPECT_EQ(2, res);
 
     node = {4,1,4};
     res = hyperNath.childRank(node);
@@ -402,6 +445,10 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     res = hyperNath.childRank(node);
     EXPECT_EQ(1, res);
 
+    node = {1,3,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
     node = {1,4,0};
     res = hyperNath.childRank(node);
     EXPECT_EQ(0, res);
@@ -413,6 +460,26 @@ TEST_F(HypersuccinctTreeTest, child_rankTest) {
     node = {6,0,0};
     res = hyperNath.childRank(node);
     EXPECT_EQ(2, res);
+
+    node = {7,0,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {6,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {6,1,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {6,2,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {7,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(3, res);
 }
 
 TEST_F(HypersuccinctTreeTest, getParentTest) {
@@ -824,6 +891,10 @@ TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
     res = hyperNath.leafRank(node);
     EXPECT_EQ(6, res);
 
+    node = {1,3,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(3, res);
+
     node = {3,0,1};
     res = hyperNath.leafRank(node);
     EXPECT_EQ(14, res);
@@ -831,5 +902,21 @@ TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
     node = {4,1,4};
     res = hyperNath.leafRank(node);
     EXPECT_EQ(21, res);
+
+    node = {6,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {6,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(26, res);
+
+    node = {6,2,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(28, res);
+
+    node = {7,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(34, res);
 
 }

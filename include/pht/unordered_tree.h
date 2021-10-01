@@ -560,6 +560,23 @@ namespace pht {
         }
 
         /**
+         * Returns the Child Rank of the given node
+         * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
+         * @return The child rank of the node
+         */
+        uint32_t getChildRank(const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+            uint32_t res = 0;
+            std::shared_ptr<pht::Node<T>> anc = getDirectAncestor(node);
+            if(anc != nullptr) {
+                auto iter = std::find(descendants.at(anc).begin(), descendants.at(anc).end(), node);
+                res += std::distance(descendants.at(anc).begin(), iter);
+            }
+            return res;
+        }
+
+        /**
          * Checks if the given node is the root. 
          * 
          * @param[in] node A pointer to the node. Cannot be nullptr. Has to be in the tree. 

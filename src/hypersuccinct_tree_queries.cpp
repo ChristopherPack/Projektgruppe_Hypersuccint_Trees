@@ -8,7 +8,6 @@
 using namespace pht;
 
 bool HypersuccinctTree::isDummyAncestorWithinMiniTree(HstNode node) {
-    //assert(node.micro <= Bitvector_Utils::getEntryCount(miniTrees.at(node.mini).microTrees.cbegin(),miniTrees.at(node.mini).microTrees.cend(), Bitvector_Utils::BitvectorEncoding::ELIAS_GAMMA, {2, 0, Bitvector_Utils::nullIterator(), Bitvector_Utils::nullIterator()}));
     MiniTree mini = getMiniTree(node.mini);
     if(mini.rootAncestors.empty()) {
         return false;
@@ -51,7 +50,6 @@ bool HypersuccinctTree::isDummyAncestorWithinMicroTree(HstNode node) {
 }
 
 HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
-    //TODO: Need to adjust checkMicro and checkNode flags
     uint32_t miniRes = 0;
     uint32_t microRes = 0;
     uint32_t nodeRes = 0;
@@ -115,7 +113,11 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
             miniRes = firstTopMini + (tvRank - 1);
             checkMicro = true;
         } else {
-            miniRes = firstLowMini + (fidRank - 1) - tvRank;
+            if(index > 0 && fidRank == miniFIDSupport.Rank(index - 1)) {
+                miniRes = firstTopMini + (tvRank - 1);
+            } else {
+                miniRes = firstLowMini + (fidRank - 1) - tvRank;
+            }
         }
         miniTreeParent = getMiniTree(miniRes);
     }
@@ -144,17 +146,21 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
             microRes = firstTopMicro + (tvRank - 1);
             checkNode = true;
         } else {
-            microRes = firstLowMicro + (fidRank - 1) - tvRank;
+            if(microIndexHelp > 0 && fidRank == microFIDSupport.Rank(microIndexHelp - 1)) {
+                microRes = firstTopMicro + (tvRank - 1);
+            } else {
+                microRes = firstLowMicro + (fidRank - 1) - tvRank;
+            }
         }
     }
 
     if(checkNode) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent,parent.micro));
-        uint32_t size = sqrt(entry.childMatrix.size());
-        uint32_t startRank = entry.childMatrixSupport.Rank(size * parent.node);
+        uint32_t matSize = sqrt(entry.childMatrix.size());
+        uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
         uint32_t startRankSelect = entry.childMatrixSupport.Select(startRank + nodeIndexHelp);
-        nodeRes = startRankSelect % size;
-        if(startRankSelect > (size * (parent.node + 1))) {
+        nodeRes = startRankSelect % matSize;
+        if(startRankSelect > (matSize * (parent.node + 1))) {
             return {};
         }
         if(nodeRes == parent.node) {
@@ -179,55 +185,98 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 }
 
 uint32_t HypersuccinctTree::childRank(HstNode node) {
-    //TODO: DOES NOT WORK
     MiniTree miniTree = getMiniTree(node.mini);
     if(node.mini == 0 && node.micro == 0 && node.node == 0) {
         return 0;
     }
-    HstNode parent = getParent(node);
+    HstNode parent = getParentForQuery(node);
     MiniTree miniTreeParent = getMiniTree(parent.mini);
+    uint32_t res = 0;
 
-    if(parent.node > 0) {
-        if(node.node > 0) {
+    //If given node is child of a dummy, use ChildRank of dummy instead
+    if(Bitvector_Utils::decodeNumber(miniDummys.at(parent.mini),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
+        if(Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) == parent.micro && Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == parent.node ) {
+            return childRank(parent);
+        }
+    }
+    if(parent.node != 0) {
+        if(Bitvector_Utils::decodeNumber(miniTreeParent.dummys.at(parent.micro),Bitvector_Utils::NumberEncoding::BINARY) == parent.node) {
+            return childRank(parent);
+        }
+    }
+
+    if(node.node > 0) {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent, parent.micro));
-            uint32_t size = sqrt(entry.childMatrix.size());
-            uint32_t startRank = entry.childMatrixSupport.Rank(size * parent.node);
-            uint32_t fullRank = entry.childMatrixSupport.Rank(size * parent.node + node.node);
-            return startRank - fullRank;
+            uint32_t matSize = sqrt(entry.childMatrix.size());
+            uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
+            uint32_t fullRank = entry.childMatrixSupport.Rank(matSize * parent.node + node.node);
+
+        if(parent.node > 0) {
+            return fullRank - startRank - 1;
+        } else {
+            res += fullRank - startRank - 1;
         }
-        //if parent.node > 0 and node.node == 0 -> parent HAS to be a dummy!
-        return childRank(parent);
     }
 
-    if(parent.micro > 0) {
-        if(node.micro > 0) {
-            uint32_t microFIDIndex = Bitvector_Utils::decodeNumber(miniTreeParent.microTopFIDIndices.at(parent.micro),
-                                                                   Bitvector_Utils::NumberEncoding::BINARY);
-            uint32_t firstLowMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDLowTrees.at(microFIDIndex),
-                                                                   Bitvector_Utils::NumberEncoding::BINARY);
-            succinct_bv::BitVector microTVSupport = miniTreeParent.typeVectorsSupport.at(microFIDIndex);
-            //Child Rank should be Rank of TypeVector at position of the microTree
-            return microTVSupport.Rank(node.micro - firstLowMicro) - 1;
+    if(node.micro > 0) {
+        if (node.node!=0 && (node.micro + node.node > 1)) {
+            return res + Bitvector_Utils::decodeNumber(miniTree.microExtendedChildRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        } else {
+            res += Bitvector_Utils::decodeNumber(miniTree.microChildRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
         }
-        //if parent.micro > 0 and node.micro == 0 -> parent HAS to be a dummy!
-        return childRank(parent);
 
     }
-    uint32_t miniFIDIndex = Bitvector_Utils::decodeNumber(miniTreeParent.miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t firstLowMini = Bitvector_Utils::decodeNumber(FIDLowTree.at(miniFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t firstTopMini = Bitvector_Utils::decodeNumber(FIDTopTree.at(miniFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    succinct_bv::BitVector miniTVSupport = miniTypeVectorsSupport.at(miniFIDIndex);
-    succinct_bv::BitVector miniFIDSupport = miniFIDsSupport.at(miniFIDIndex);
-    uint32_t tvRank = miniTVSupport.Rank(miniTypeVectors.at(miniFIDIndex).size());
-    uint32_t FIDRank = miniFIDSupport.Rank(miniFIDs.at(miniFIDIndex).size());
-    if(node.mini < firstLowMini) {
-        //TODO:NEED A TOP TREE
-        uint32_t topTreeIndex = node.mini - firstTopMini;
 
+    if(parent.mini == node.mini) {
+        uint32_t microFIDIndex = Bitvector_Utils::decodeNumber(miniTreeParent.microTopFIDIndices.at(parent.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        uint32_t firstMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDTopTrees.at(microFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        if (miniTreeParent.typeVectorsSupport.at(microFIDIndex).Rank(0) == 0) {
+            firstMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDLowTrees.at(microFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+        uint32_t miniFIDIndex =Bitvector_Utils::decodeNumber(miniTreeParent.miniTopFIDIndex, Bitvector_Utils::NumberEncoding::BINARY) -1;
+        uint32_t firstMini =Bitvector_Utils::decodeNumber(FIDTopTree.at(miniFIDIndex), Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        if (miniTypeVectorsSupport.at(miniFIDIndex).Rank(0) == 0) {
+            firstMini = Bitvector_Utils::decodeNumber(FIDLowTree.at(miniFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+
+        if(node.mini != firstMini) {
+            return res + Bitvector_Utils::decodeNumber(miniTree.microChildRanks.at(0),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+        else if(node.micro==0 && node.micro != firstMicro) {
+            res += Bitvector_Utils::decodeNumber(miniTree.microExtendedChildRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+    } else {
+
+        res += Bitvector_Utils::decodeNumber(miniTree.miniChildRank, Bitvector_Utils::NumberEncoding::BINARY);
     }
-    //Child Rank should be Rank of TypeVector at position of the miniTree
-    //return miniTVSupport.Rank(node.mini - firstLowMini);
-    return 0;
+    return res;
+}
+
+HstNode HypersuccinctTree::getParentForQuery(HstNode node) {
+    MiniTree miniTree = getMiniTree(node.mini);
+    if(node.node > 0) {
+        LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTree,node.micro));
+        Bitvector parentBit = entry.parentPointers.at(node.node);
+        uint32_t parent = Bitvector_Utils::decodeNumber(parentBit,Bitvector_Utils::NumberEncoding::BINARY);
+        return {node.mini,node.micro,parent - 1};
+    }
+    if(node.micro > 0) {
+        Bitvector parentBit = miniTree.microParents.at(node.micro);
+        uint32_t parentMicro = Bitvector_Utils::decodeNumber(parentBit,Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        uint32_t parentDummy = Bitvector_Utils::decodeNumber(miniTree.dummys.at(parentMicro),Bitvector_Utils::NumberEncoding::BINARY);
+        uint32_t parentFID = Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY);
+        if(parentFID == 0) {
+            return {node.mini,parentMicro,parentDummy};
+        }
+        return {node.mini,parentMicro,0};
+    }
+    uint32_t parentMini = Bitvector_Utils::decodeNumber(miniTree.miniParent,Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    MiniTree parentMiniTree = getMiniTree(parentMini);
+    uint32_t parentFID = Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,Bitvector_Utils::NumberEncoding::BINARY);
+    if(parentFID == 0) {
+        return {parentMini,Bitvector_Utils::decodeNumber(parentMiniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::decodeNumber(parentMiniTree.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY)};
+    }
+    return {parentMini,0,0};
 }
 
 HstNode HypersuccinctTree::getParent(HstNode node) {
@@ -274,8 +323,9 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
         return Bitvector_Utils::decodeNumber(degreeB,Bitvector_Utils::NumberEncoding::BINARY) - 1;
     }
     if(node.micro > 0) {
-        Bitvector fid = getFIDforMicroTree(node.mini, node.micro);
-        return fid.size();
+        MiniTree miniTree = getMiniTree(node.mini);
+        uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        return miniTree.FIDs.at(fidIndex).size();
     }
     uint32_t fidID = Bitvector_Utils::decodeNumber(getMiniTree(node.mini).miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
     Bitvector fid = miniFIDs.at(fidID);
@@ -501,6 +551,9 @@ uint32_t HypersuccinctTree::leafSize(HstNode node) {
 uint32_t HypersuccinctTree::leafRank(HstNode node) {
     uint32_t res = 0;
     MiniTree miniTree = getMiniTree(node.mini);
+    if(node.mini == 0 && node.micro == 0 && node.node == 0) {
+        return 0;
+    }
 
     if(node.node > 0) {
         uint32_t dummyMarker = 0;
@@ -535,7 +588,6 @@ uint32_t HypersuccinctTree::leafRank(HstNode node) {
         Bitvector leaf_rank_node = entry.leafRank.at(node.node);
         res += Bitvector_Utils::decodeNumber(leaf_rank_node, Bitvector_Utils::NumberEncoding::BINARY) - 1 - dummyMarker;
     }
-
     if(node.micro > 0) {
         if(isDummyAncestorWithinMiniTree({node.mini,0,0})) {
             uint32_t dummyTree = Bitvector_Utils::decodeNumber(miniTree.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY);
@@ -553,11 +605,30 @@ uint32_t HypersuccinctTree::leafRank(HstNode node) {
         }
 
     }
-    if ((node.micro != 0 || node.node != 0)) {
-        res += Bitvector_Utils::decodeNumber(miniTree.microRootLeafRanks.at(0),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    } else {
-        res += Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
+    HstNode parent = getParentForQuery(node);
+    if(parent.mini == node.mini) {
+        MiniTree miniTreeParent = getMiniTree(parent.mini);
+        uint32_t microFIDIndex = Bitvector_Utils::decodeNumber(miniTreeParent.microTopFIDIndices.at(parent.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        uint32_t firstMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDTopTrees.at(microFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        if (miniTreeParent.typeVectorsSupport.at(microFIDIndex).Rank(0) == 0) {
+            firstMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDLowTrees.at(microFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+        uint32_t miniFIDIndex =Bitvector_Utils::decodeNumber(miniTreeParent.miniTopFIDIndex, Bitvector_Utils::NumberEncoding::BINARY) -1;
+        uint32_t firstMini =Bitvector_Utils::decodeNumber(FIDTopTree.at(miniFIDIndex), Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        if (miniTypeVectorsSupport.at(miniFIDIndex).Rank(0) == 0) {
+            firstMini = Bitvector_Utils::decodeNumber(FIDLowTree.at(miniFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+
+        if(node.mini != firstMini) {
+            return res + Bitvector_Utils::decodeNumber(miniTree.microRootLeafRanks.at(0),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
+        else if(node.micro==0 && node.micro != firstMicro) {
+            res += Bitvector_Utils::decodeNumber(miniTree.microExtendedLeafRanks.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
+        }
     }
+
+    res += Bitvector_Utils::decodeNumber(miniTree.miniRootLeafRank, Bitvector_Utils::NumberEncoding::BINARY);
+
     return res;
 }
 

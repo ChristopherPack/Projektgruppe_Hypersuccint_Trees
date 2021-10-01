@@ -80,16 +80,23 @@ namespace pht {
         std::vector<Bitvector> microDummyPointers;
         std::vector<succinct_bv::BitVector> microDummyPointersSupport;
 
-        //Reverse Pointer to miniTree with Dummy to this tree
+        //Child Rankd of MiniTrees
+        Bitvector miniChildRank;
+        succinct_bv::BitVector miniChildRankSupport;
+        //Child Ranks of MicroTrees EXCEPT AT INDEX 0: ChildRank of displaced MiniTree
+        std::vector<Bitvector> microChildRanks;
+        std::vector<succinct_bv::BitVector> microChildRanksSupport;
+        //Child Ranks of displaced MicroTrees
+        std::vector<Bitvector> microExtendedChildRanks;
+        std::vector<succinct_bv::BitVector> microExtendedChildRanksSupport;
+
+        //Pointer to direct parent MiniTree
         Bitvector miniParent;
         std::vector<succinct_bv::BitVector> miniParentSupport;
-        //Reverse Pointers to microTree with Dummy to these trees
+        //Pointer to direct parent MicroTree for all MicroTrees
         std::vector<Bitvector> microParents;
         std::vector<succinct_bv::BitVector> microParentsSupport;
 
-        //Ancestor of MiniTreeRoot
-        Bitvector miniAnc;
-        succinct_bv::BitVector miniAncSupport;
         //SubTree Size MiniTree
         Bitvector subTree;
         succinct_bv::BitVector subTreeSupport;
@@ -138,7 +145,7 @@ namespace pht {
         //Leaf Rank of MiniTree Dummy
         Bitvector miniDummyLeafRank;
         succinct_bv::BitVector miniDummyLeafRankSupport;
-        //Leaf Ranks of MicroTree Roots + 1
+        //Leaf Ranks of MicroTree Roots + 1 EXCEPT AT INDEX 0: There it is the displaced Leaf Rank of the MiniTree
         std::vector<Bitvector> microRootLeafRanks;
         std::vector<succinct_bv::BitVector> microRootLeafRanksSupport;
         //Special Leaf Ranks for displaced microTrees + 1
@@ -241,7 +248,7 @@ namespace pht {
          *
          * @return value of huffmanFlag
          */
-        bool isHuffman() {
+        [[nodiscard]] bool isHuffman() const {
             return huffmanFlag;
         }
 
@@ -263,6 +270,14 @@ namespace pht {
 
         std::vector<Bitvector> getMiniFIDs() {
             return miniFIDs;
+        }
+
+        std::vector<Bitvector> getFIDTopTrees() {
+            return FIDTopTree;
+        }
+
+        std::vector<Bitvector> getFIDLowTrees() {
+            return FIDLowTree;
         }
 
         std::vector<Bitvector> getMiniTypeVectors() {
@@ -376,89 +391,6 @@ namespace pht {
         bool lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index);
 
         /**
-         * Returns the FID for a given MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param treeNum Number of the Tree as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMiniTree(uint32_t treeNum);
-
-        /**
-         * Returns the FID for a given MicroTree within a MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param miniTree The Minitree as Minitree
-         * @param treeNum the Microtree number as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMicroTree(MiniTree &miniTree, uint32_t treeNum);
-
-        /**
-         * Returns the FID for a given MicroTree within a MiniTree
-         * This is more efficient than calling convert + getTrees for FID due to combining both into one loop
-         *
-         * @param miniTree The Minitree number as int
-         * @param treeNum the Microtree number as int
-         * @return FID as Bitvector
-         */
-        Bitvector getFIDforMicroTree(uint32_t miniTree, uint32_t treeNum);
-
-        /**
-         * For a fiven FID index, finds all Tree Indices that belong to this FID
-         * For MiniTrees
-         *
-         * @param index The index of the FID
-         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
-         */
-        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForFID(uint32_t index);
-
-        /**
-         * For a fiven FID index, finds all Tree Indices that belong to this FID
-         * For MicroTrees
-         *
-         * @param miniTree The Minitree containing the FIDs
-         * @param index The index of the FID
-         * @return The Type1 Tree Indices and Type2 Tree Indices in a Tuple of Vectors of uint32_t
-         */
-        std::pair< std::vector<uint32_t >,std::vector<uint32_t > > getTreesForMicroFID(MiniTree &miniTree, uint32_t index);
-
-        /**
-         * Index conversion between tree indices and their fid inidces
-         * For MiniTrees
-         *
-         * @param miniTree  The index of the miniTree
-         * @return The indices of its Top and Low FID (if they exist)
-         */
-        std::pair<uint32_t ,uint32_t > convertTreeToFIDIndex(uint32_t miniTree);
-
-        /**
-         * Index conversion between tree indices and their fid inidces
-         * For MicroTrees
-         *
-         * @param miniTree  the miniTree
-         * @param microTree The index of the microTree
-         * @return The indices of its Top and Low FID (if they exist)
-         */
-        std::pair<uint32_t ,uint32_t > convertMicroTreeToFIDIndex(MiniTree &miniTree, uint32_t microTree);
-
-
-
-        ////////////////////////////////////////////////////////////////////////////
-        // TODO: Test Methods in this Block
-        //
-        //
-        ////////////////////////////////////////////////////////////////////////////
-
-
-
-        ////////////////////////////////////////////////////////////////////////////
-        //
-        //
-        //TODO: End Test Method Block
-        ////////////////////////////////////////////////////////////////////////////
-
-        /**
          * Returns if given Node is ancestor of Dummy within the Node's MiniTree
          * TODO: Look at the Micro Version - This can clearly be optimized
          *
@@ -493,9 +425,17 @@ namespace pht {
         uint32_t childRank(HstNode node);
 
         /**
+         * Finds the direct Parent of the given Node, ignoring dummies
+         * Important hepler function
+         * TODO: Should be private
+         *
+         * @param node The node as HSTNode
+         * @return The parent as HstNode
+         */
+        HstNode getParentForQuery(HstNode node);
+
+        /**
          * Finds the direct Parent of the given Node
-         * Very important helper function!
-         * TODO: Could be private
          *
          * @param node The node as HSTNode
          * @return The parent as HstNode

@@ -3,10 +3,11 @@ set(PHT_TEST_SOURCES
    bitvector_utils_test.cpp
    farzan_munro_test.cpp
    hypersuccinct_tree_test.cpp
-        list_utils_test.cpp
+    list_utils_test.cpp
    node_test.cpp
    unordered_tree_test.cpp
-        huffman_test.cpp
+    huffman_test.cpp
+    runtime_test.cpp
 )
 list(TRANSFORM PHT_TEST_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_executable(pht_test)
