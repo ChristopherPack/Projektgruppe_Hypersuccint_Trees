@@ -26,7 +26,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeNath.xml"};
+    std::vector<std::string> fileNames = {"treeAlex.xml"};
     std::vector<pair<std::string &, std::string &>> factoryTimes;
     std::vector<pair<std::string &, std::string &>> childTimes;
     std::vector<pair<std::string &, std::string &>> degreeTimes;
@@ -136,7 +136,8 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             MEASURE_TIME(hyperTree.leafRank(node),leafRankTimes);
         }
 
-        cout << factoryTimes.at(0).second << " Time" << endl;
+        testNodes.clear();
+        cout << factoryTimes.at(0).second << " Time" << endl << endl << endl;
     }
 
     /*std::ofstream file;
