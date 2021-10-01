@@ -27,20 +27,20 @@ protected:
      * WriteToFile / ReadFromFile
      */
     std::vector<std::string> fileNames = {"treeAlex.xml"};
-    std::vector<pair<std::string &, std::string &>> factoryTimes;
-    std::vector<pair<std::string &, std::string &>> childTimes;
-    std::vector<pair<std::string &, std::string &>> degreeTimes;
-    std::vector<pair<std::string &, std::string &>> leftmost_leafTimes;
-    std::vector<pair<std::string &, std::string &>> rightmost_leafTimes;
+    std::vector<pair<std::string , std::string >> factoryTimes;
+    std::vector<pair<std::string , std::string >> childTimes;
+    std::vector<pair<std::string , std::string >> degreeTimes;
+    std::vector<pair<std::string , std::string >> leftmost_leafTimes;
+    std::vector<pair<std::string , std::string >> rightmost_leafTimes;
 
-    std::vector<pair<std::string &, std::string &>> childRankTimes;
-    std::vector<pair<std::string &, std::string &>> subTreeTimes;
-    std::vector<pair<std::string &, std::string &>> depthTimes;
-    std::vector<pair<std::string &, std::string &>> heightTimes;
-    std::vector<pair<std::string &, std::string &>> isDummyAncestorWithinMiniTreeTimes;
-    std::vector<pair<std::string &, std::string &>> isDummyAncestorWithinMicroTreeTimes;
-    std::vector<pair<std::string &, std::string &>> leafSizeTimes;
-    std::vector<pair<std::string &, std::string &>> leafRankTimes;
+    std::vector<pair<std::string , std::string >> childRankTimes;
+    std::vector<pair<std::string , std::string >> subTreeTimes;
+    std::vector<pair<std::string , std::string >> depthTimes;
+    std::vector<pair<std::string , std::string >> heightTimes;
+    std::vector<pair<std::string , std::string >> isDummyAncestorWithinMiniTreeTimes;
+    std::vector<pair<std::string , std::string >> isDummyAncestorWithinMicroTreeTimes;
+    std::vector<pair<std::string , std::string >> leafSizeTimes;
+    std::vector<pair<std::string , std::string >> leafRankTimes;
     pht::Timer timer;
 };
 
@@ -88,13 +88,17 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             degree = hyperTree.degree(testNodes.at(i));
             timer.stop();
             degreeTimes.emplace_back(name,timer.toString());
+            cout << i << endl;
             for(uint32_t j = 0; j<degree; j++) {
                 if(testNodes.size() >= testSize) {
                     break;
                 }
+                cout << i << ":" << j << endl;
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
                 timer.stop();
+                cout << "Parent: " << testNodes.at(i).mini << "," << testNodes.at(i).mini << "," << testNodes.at(i).mini << " " << ":: ";
+                cout << "Child: " << child.mini << "," << child.micro << "," << child.node << ":" << endl;
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
                     testNodes.push_back(child);
