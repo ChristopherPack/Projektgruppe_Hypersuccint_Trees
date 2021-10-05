@@ -361,14 +361,17 @@ namespace pht {
             enumeratedCache.clear();
             uint32_t i = 1;
             enumeratedCache.insert({root,0});
-            std::list<std::shared_ptr<pht::Node<T>>> nodes;
+            nodes.clear();
+            nodes.push_back(root);
+            std::list<std::shared_ptr<pht::Node<T>>> tempNodes;
             std::vector<std::shared_ptr<pht::Node<T>>> rootDesc = getDirectDescendants(root);
-            nodes.insert(nodes.end(),rootDesc.begin(),rootDesc.end());
-            while(!nodes.empty()) {
-                std::shared_ptr<pht::Node<T>> current = nodes.front();
-                nodes.pop_front();
+            tempNodes.insert(tempNodes.end(), rootDesc.begin(), rootDesc.end());
+            while(!tempNodes.empty()) {
+                std::shared_ptr<pht::Node<T>> current = tempNodes.front();
+                nodes.push_back(tempNodes.front());
+                tempNodes.pop_front();
                 std::vector<std::shared_ptr<pht::Node<T>>> desc = getDirectDescendants(current);
-                nodes.insert(nodes.end(), desc.begin(),desc.end());
+                tempNodes.insert(tempNodes.end(), desc.begin(), desc.end());
                 enumeratedCache.insert({current,i});
                 i++;
             }

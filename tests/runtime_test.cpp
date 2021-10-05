@@ -26,7 +26,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeAlex.xml"};
+    std::vector<std::string> fileNames = {"treeNath.xml","treeAlex.xml"};
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> childTimes;
     std::vector<pair<std::string , std::string >> degreeTimes;
@@ -51,8 +51,6 @@ TEST_F(RuntimeTest, MiniTreesTest) {
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree,false,12,4);
         timer.stop();
         tree.reset();
-        std::cout << timer.toString() << endl;
-        PHT_LOGGER_INFO("MAIN", std::string("File read in ")+timer.toString());
         factoryTimes.emplace_back(name, timer.toString());
 
         std::vector<pht::HstNode > testNodes = {{0,0,0}};
@@ -80,7 +78,7 @@ TEST_F(RuntimeTest, MiniTreesTest) {
 
         uint32_t i=1;
         while(testNodes.size() < testSize) {
-            if(i > testNodes.size()) {
+            if(i >= testNodes.size()) {
                 break;
             }
             uint32_t degree;
@@ -88,17 +86,13 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             degree = hyperTree.degree(testNodes.at(i));
             timer.stop();
             degreeTimes.emplace_back(name,timer.toString());
-            cout << i << endl;
             for(uint32_t j = 0; j<degree; j++) {
                 if(testNodes.size() >= testSize) {
                     break;
                 }
-                cout << i << ":" << j << endl;
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
                 timer.stop();
-                cout << "Parent: " << testNodes.at(i).mini << "," << testNodes.at(i).mini << "," << testNodes.at(i).mini << " " << ":: ";
-                cout << "Child: " << child.mini << "," << child.micro << "," << child.node << ":" << endl;
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
                     testNodes.push_back(child);
@@ -106,6 +100,7 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             }
             i++;
         }
+
 
         for(pht::HstNode &node : testNodes) {
             timer.start();
@@ -141,50 +136,49 @@ TEST_F(RuntimeTest, MiniTreesTest) {
         }
 
         testNodes.clear();
-        cout << factoryTimes.at(0).second << " Time" << endl << endl << endl;
     }
 
-    /*std::ofstream file;
+    std::ofstream file;
     file.open("testResults.csv");
     file << "Tree, TestName, Result\n";
-    for(std::pair<std::string&,std::string&> value : factoryTimes) {
+    for(std::pair<std::string,std::string> &value : factoryTimes) {
         file << value.first << ", Factory::create, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : childTimes) {
+    for(std::pair<std::string,std::string> &value : childTimes) {
         file << value.first << ", child, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : degreeTimes) {
+    for(std::pair<std::string,std::string> &value : degreeTimes) {
         file << value.first << ", degree, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : leftmost_leafTimes) {
+    for(std::pair<std::string,std::string> &value : leftmost_leafTimes) {
         file << value.first << ", leftmost_leaf, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : rightmost_leafTimes) {
+    for(std::pair<std::string,std::string> &value : rightmost_leafTimes) {
         file << value.first << ", rightmost_leaf, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : childRankTimes) {
+    for(std::pair<std::string,std::string> &value : childRankTimes) {
         file << value.first << ", child_rank, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : subTreeTimes) {
+    for(std::pair<std::string,std::string> &value : subTreeTimes) {
         file << value.first << ", subtree_size, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : depthTimes) {
+    for(std::pair<std::string,std::string> &value : depthTimes) {
         file << value.first << ", depth, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : heightTimes) {
+    for(std::pair<std::string,std::string> &value : heightTimes) {
         file << value.first << ", height, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : isDummyAncestorWithinMiniTreeTimes) {
+    for(std::pair<std::string,std::string> &value : isDummyAncestorWithinMiniTreeTimes) {
         file << value.first << ", isDummyAncestorWithinMiniTree, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : isDummyAncestorWithinMicroTreeTimes) {
+    for(std::pair<std::string,std::string> &value : isDummyAncestorWithinMicroTreeTimes) {
         file << value.first << ", isDummyAncestorWithinMicroTree, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : leafSizeTimes) {
+    for(std::pair<std::string,std::string> &value : leafSizeTimes) {
         file << value.first << ", leaf_size, " << value.second << "\n";
     }
-    for(std::pair<std::string&,std::string&> value : leafRankTimes) {
+    for(std::pair<std::string,std::string> &value : leafRankTimes) {
         file << value.first << ", leaf_rank, " << value.second << "\n";
     }
-    file.close();*/
+    file.close();
 }
