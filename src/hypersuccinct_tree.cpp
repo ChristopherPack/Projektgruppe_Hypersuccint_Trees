@@ -59,11 +59,11 @@ LookupTableEntry HypersuccinctTree::getLookupTableEntry(Bitvector indexV) {
 }
 
 bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index) {
-    uint32_t size = sqrt(entry.ancestorMatrix.size());
-    return entry.ancestorMatrix.at(size*anc + node2Index);
+    uint32_t sizeTable = sqrt(entry.ancestorMatrix.size());
+    return entry.ancestorMatrix.at(sizeTable * anc + node2Index);
 }
 
 bool HypersuccinctTree::lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index) {
-    uint32_t size = sqrt(entry.childMatrix.size());
-    return entry.childMatrix.at(size*child + node2Index);
+    uint32_t sizeTable = sqrt(entry.childMatrix.size());
+    return entry.childMatrix.at(sizeTable * child + node2Index);
 }

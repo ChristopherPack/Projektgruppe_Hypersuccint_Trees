@@ -64,6 +64,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     }
 
     //Checks if given Node is a dummy
+    //TODO: is this correct? Should this be done?
     if(Bitvector_Utils::decodeNumber(miniDummys.at(parent.mini),Bitvector_Utils::NumberEncoding::BINARY) != 0) {
         if(Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyTree,Bitvector_Utils::NumberEncoding::BINARY) == parent.micro && Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyIndex,Bitvector_Utils::NumberEncoding::BINARY) == parent.node ) {
             return child({Bitvector_Utils::decodeNumber(miniTreeParent.miniDummyPointer,Bitvector_Utils::NumberEncoding::BINARY), 0, 0}, index);

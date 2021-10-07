@@ -331,6 +331,22 @@ TEST_F(HypersuccinctTreeTest, treeAlexDoubleDummyTest) {
     node = {3,0,0};
     res = hyperAlex.subtreeSize(node);
     EXPECT_EQ(21, res);
+
+    node = {3,0,2};
+    pht::HstNode resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(3,1,0), resN);
+
+    node = {3,0,2};
+    resN = hyperAlex.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,0,0), resN);
+
+    node = {3,0,3};
+    resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(3,1,1), resN);
+
+    node = {3,0,4};
+    resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,1,0), resN);
 }
 
 TEST_F(HypersuccinctTreeTest, childTest) {
