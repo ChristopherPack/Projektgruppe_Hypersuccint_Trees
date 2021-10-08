@@ -362,7 +362,8 @@ namespace pht {
                                 baseTree->insertBetween(dummyNode, children.at(ind), node);
                                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                                 Bitvector num;
-                                Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), fmMicroTree->enumerate(dummyNode),Bitvector_Utils::NumberEncoding::BINARY);
+                                uint32_t enumV = fmMicroTree->enumerate(dummyNode);
+                                Bitvector_Utils::encodeNumber(std::inserter(num, num.end()), enumV ,Bitvector_Utils::NumberEncoding::BINARY);
                                 dummys.push_back(num);
                                 hadDummy = true;
                                 break;
@@ -701,10 +702,8 @@ namespace pht {
                 auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
                 uint32_t dist = std::distance(fmMicroTrees.begin(), iter);
                 Bitvector_Utils::encodeNumber(miniTree.miniDummyTree,dist,Bitvector_Utils::NumberEncoding::BINARY);
-                std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
-                auto iter1 = std::find(nodes.begin(),nodes.end(), fmMiniTree->getDummy());
-                dist = std::distance(nodes.begin(), iter1);
-                Bitvector_Utils::encodeNumber(miniTree.miniDummyIndex,dist,Bitvector_Utils::NumberEncoding::BINARY);
+                uint32_t enumV = fmMicroTree->enumerate(fmMiniTree->getDummy());
+                Bitvector_Utils::encodeNumber(miniTree.miniDummyIndex,enumV,Bitvector_Utils::NumberEncoding::BINARY);
             }
         }
 
