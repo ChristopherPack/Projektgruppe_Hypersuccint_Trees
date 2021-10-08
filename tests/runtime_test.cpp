@@ -26,7 +26,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeNath.xml","treeAlex.xml"};
+    std::vector<std::string> fileNames = {"treeNath.xml","treeAlex.xml","DBLP.xml"};
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> childTimes;
     std::vector<pair<std::string , std::string >> degreeTimes;
@@ -46,6 +46,7 @@ protected:
 
 TEST_F(RuntimeTest, MiniTreesTest) {
     for(std::string &name : fileNames) {
+        PHT_LOGGER_INFO("Runtime Test","Begin: " + name);
         std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName(name);
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree,false,12,4);
@@ -138,6 +139,8 @@ TEST_F(RuntimeTest, MiniTreesTest) {
         testNodes.clear();
     }
 
+
+    PHT_LOGGER_INFO("Runtime Test", "Begin File Output");
     std::ofstream file;
     file.open("testResults.csv");
     file << "Tree, TestName, Result\n";
