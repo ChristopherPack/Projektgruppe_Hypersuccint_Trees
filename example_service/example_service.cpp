@@ -9,9 +9,6 @@
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 #include "bit_vector.h"
-#ifdef NDEBUG
-#include "pht/visualize.h"
-#endif
 
 
 using namespace pht;
@@ -31,10 +28,6 @@ int main() {
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath");
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
-
-#ifdef NDEBUG
-    pht::Visualize::visualize(tree);//Set PYTHONHOME (to python) and PYTHONPATH (to DLLs, Lib and site-packages)
-#endif
 
 
 
