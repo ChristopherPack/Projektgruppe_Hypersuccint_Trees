@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import math
 
 import pht_hst
@@ -105,45 +106,48 @@ def executeQuery():
     if tree == None:
         return
 
-    if queryValue.get() == "isDummyAncestorWithinMiniTree":
-        resultValue.set(tree.isDummyAncestorWithinMiniTree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "isDummyAncestorWithinMicroTree":
-        resultValue.set(tree.isDummyAncestorWithinMicroTree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "child":
-        resultValue.set("---")
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.child(int(miniValue.get()), int(microValue.get()), int(nodeValue.get()), int(indexValue.get())))
-    elif queryValue.get() == "childRank":
-        resultValue.set(tree.childRank(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "getParent":
-        resultValue.set("---")
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.getParent(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-    elif queryValue.get() == "degree":
-        resultValue.set(tree.degree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "subtreeSize":
-        resultValue.set(tree.subtreeSize(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "depth":
-        resultValue.set(tree.depth(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "height":
-        resultValue.set(tree.height(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "leftmostLeaf":
-        resultValue.set("---")
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.leftmostLeaf(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-    elif queryValue.get() == "rightmostLeaf":
-        resultValue.set("---")
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.rightmostLeaf(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-    elif queryValue.get() == "leafSize":
-        resultValue.set(tree.leafSize(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
-    elif queryValue.get() == "leafRank":
-        resultValue.set(tree.leafRank(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
-        drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+    try:
+        if queryValue.get() == "isDummyAncestorWithinMiniTree":
+            resultValue.set(tree.isDummyAncestorWithinMiniTree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "isDummyAncestorWithinMicroTree":
+            resultValue.set(tree.isDummyAncestorWithinMicroTree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "child":
+            resultValue.set("---")
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.child(int(miniValue.get()), int(microValue.get()), int(nodeValue.get()), int(indexValue.get())))
+        elif queryValue.get() == "childRank":
+            resultValue.set(tree.childRank(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "getParent":
+            resultValue.set("---")
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.getParent(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+        elif queryValue.get() == "degree":
+            resultValue.set(tree.degree(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "subtreeSize":
+            resultValue.set(tree.subtreeSize(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "depth":
+            resultValue.set(tree.depth(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "height":
+            resultValue.set(tree.height(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "leftmostLeaf":
+            resultValue.set("---")
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.leftmostLeaf(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+        elif queryValue.get() == "rightmostLeaf":
+            resultValue.set("---")
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), tree.rightmostLeaf(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+        elif queryValue.get() == "leafSize":
+            resultValue.set(tree.leafSize(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+        elif queryValue.get() == "leafRank":
+            resultValue.set(tree.leafRank(int(miniValue.get()), int(microValue.get()), int(nodeValue.get())))
+            drawTree((int(miniValue.get()), int(microValue.get()), int(nodeValue.get())), None)
+    except IndexError:
+        messagebox.showerror("Error", "Index Out Of Bounds - Node probably does not exist.")
 
 window = tk.Tk()
 window.title("HST")
