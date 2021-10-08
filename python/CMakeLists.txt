@@ -9,3 +9,5 @@ add_dependencies(pht_ui pht_lib)
 
 add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/Debug/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/pht_lib.dll)
 add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PHT_UI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+#add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/Release/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/Release/pht_lib.dll)
+#add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PHT_UI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Release)
