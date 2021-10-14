@@ -1,0 +1,13 @@
+from setuptools import setup
+from distutils.core import Extension
+from Cython.Build import cythonize
+
+setup(ext_modules = cythonize(
+        [Extension("pht_hst", 
+            sources=[@PHT_UI_OTHER_SOURCES@],
+            extra_compile_args=[@PHT_UI_COMPILE_ARGS@]
+        )],
+        build_dir="build"
+    ), 
+    include_dirs=[@PHT_UI_INCLUDE_DIRS@]
+)
