@@ -13,6 +13,8 @@
 
 class HypersuccinctTreeTest : public ::testing::Test {
 protected:
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeNathX  = pht::XMLReader::readByName("treeNathX.xml");
+    pht::HypersuccinctTree hyperNathX = *pht::HypersuccinctTreeFactory::create(treeNathX, false, 12, 4);
     std::shared_ptr<pht::UnorderedTree<std::string>> treeNath  = pht::XMLReader::readByName("treeNath.xml");
     pht::HypersuccinctTree hyperNath = *pht::HypersuccinctTreeFactory::create(treeNath, false, 12, 4);
     std::shared_ptr<pht::UnorderedTree<std::string>> treeAlex  = pht::XMLReader::readByName("treeAlex.xml");
@@ -347,6 +349,40 @@ TEST_F(HypersuccinctTreeTest, treeAlexDoubleDummyTest) {
     node = {3,0,4};
     resN = hyperAlex.child(node,0);
     EXPECT_EQ(pht::HstNode(6,1,0), resN);
+}
+
+TEST_F(HypersuccinctTreeTest, treeNathXFIDTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,0,0), resN);
+
+    node = {0,0,0};
+    resN = hyperNathX.child(node,1);
+    EXPECT_EQ(pht::HstNode(3,0,0), resN);
+
+    node = {0,0,0};
+    resN = hyperNathX.child(node,2);
+    EXPECT_EQ(pht::HstNode(0,1,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,1,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,1);
+    EXPECT_EQ(pht::HstNode(1,0,1), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,2);
+    EXPECT_EQ(pht::HstNode(1,2,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,3);
+    EXPECT_EQ(pht::HstNode(2,0,1), resN);
+
+    node = {3,0,0};
+    resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(4,0,0), resN);
 }
 
 TEST_F(HypersuccinctTreeTest, childTest) {
