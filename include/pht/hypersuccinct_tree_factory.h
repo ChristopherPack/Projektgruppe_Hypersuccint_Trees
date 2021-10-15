@@ -655,9 +655,6 @@ namespace pht {
                     hypersuccinctTree.miniFIDLowTree.push_back(
                             Bitvector_Utils::encodeNumberReturn(fIDIndices.second.at(0) + 1));
                 }
-                for(uint32_t index = 0; index < fIDIndices.second.size(); index++) {
-                    hypersuccinctTree.miniFIDLowTreeAmount.push_back(Bitvector_Utils::encodeNumberReturn(fIDIndices.second.at(index)));
-                }
             }
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MiniTrees."));
         }
@@ -885,7 +882,6 @@ namespace pht {
             uint32_t topOffset = 0;
             uint32_t lowOffset = 0;
             uint32_t currentIndex = 0;
-            std::vector<uint32_t > lowTreeSkip;
 
             while(currentIndex < fids.size()) {
                 Bitvector fid = fids.at(currentIndex);
@@ -899,19 +895,6 @@ namespace pht {
                     lowOffset = topTrees;
                 }
 
-                //TODO: count low trees with same roots!
-                for(uint32_t i = lowOffset-1; i<(lowOffset+lowTrees);i++) {
-                    lowTreeSkip.push_back(0);
-                }
-                std::shared_ptr<pht::Node<T>> previous = fmMiniTrees.at(lowOffset)->getRoot();
-                for(uint32_t i = (lowOffset + 1); i <= (lowOffset+lowTrees); i++) {
-                    std::shared_ptr<pht::Node<T>> current = fmMiniTrees.at(i)->getRoot();
-                    if(previous==current) {
-                        lowTreeSkip.at(i)++;
-                    }
-                    previous = current;
-                }
-
                 if(currentIndex == miniTree) {
                     std::vector<uint32_t > topTreeIndices;
                     std::vector<uint32_t > lowTreeIndices;
@@ -921,7 +904,7 @@ namespace pht {
                     }
                     lowTreeIndices.reserve(lowTrees);
                     for(int i = 0; i< lowTrees; i++) {
-                        lowTreeIndices.push_back(lowOffset + i + lowTreeSkip.at(lowOffset+i));
+                        lowTreeIndices.push_back(lowOffset + i);
                     }
                     return {topTreeIndices,lowTreeIndices};
                 }
@@ -932,7 +915,6 @@ namespace pht {
                     }
                 }
                 topOffset += topTrees;
-                //TODO: lowOffset needs to increase with lowTreeSkips!
                 lowOffset += lowTrees;
 
 

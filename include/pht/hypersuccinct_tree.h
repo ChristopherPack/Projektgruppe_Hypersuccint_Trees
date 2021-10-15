@@ -59,7 +59,6 @@ namespace pht {
         //First Low Tree of MicroFIDs
         std::vector<Bitvector> microFIDLowTrees;
         std::vector<succinct_bv::BitVector> microFIDLowTreesSupport;
-        std::vector<Bitvector> microFIDLowTreeAmount;
 
 
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
