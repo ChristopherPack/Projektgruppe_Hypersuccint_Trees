@@ -1,7 +1,7 @@
 #include <iostream>
 #include <filesystem>
 #include <direct.h>
-#define PHT_TEST
+//#define PHT_TEST
 #include <irrXML.h>
 
 using namespace std::filesystem;

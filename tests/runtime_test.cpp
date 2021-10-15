@@ -6,7 +6,7 @@
 #include "gmock/gmock-matchers.h"
 
 
-#define PHT_TEST
+//#define PHT_TEST
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
 #include "pht/xml_reader.h"
@@ -15,6 +15,7 @@
 #include "pht/bitvector_utils.h"
 #include "pht/logger.h"
 #include <fstream>
+#include <filesystem>
 
 #define convertToBitvector pht::Bitvector_Utils::convertToBitvector
 
@@ -26,7 +27,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeNath.xml","treeAlex.xml","DBLP.xml"};
+    std::vector<std::string> fileNames = {"DBLP.xml"};
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> childTimes;
     std::vector<pair<std::string , std::string >> degreeTimes;
@@ -46,10 +47,14 @@ protected:
 
 TEST_F(RuntimeTest, MiniTreesTest) {
     for(std::string &name : fileNames) {
-        PHT_LOGGER_INFO("Runtime Test","Begin: " + name);
-        std::shared_ptr<pht::UnorderedTree<std::string>> tree  = pht::XMLReader::readByName(name);
+        PHT_LOGGER_INFO("Runtime Test", "Begin: " + name);
+        std::cout << "Reading " + name << std::endl;
+        std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
+        PHT_LOGGER_INFO("Runtime Test", "Finished Reading File.");
+        std::cout << "Finished reading " + name << std::endl;
+        std::cout << "Nodes: " + std::to_string(tree->getSize()) << std::endl;
         timer.start();
-        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree,false,12,4);
+        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0);
         timer.stop();
         tree.reset();
         factoryTimes.emplace_back(name, timer.toString());
