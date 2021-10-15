@@ -59,6 +59,7 @@ namespace pht {
         //First Low Tree of MicroFIDs
         std::vector<Bitvector> microFIDLowTrees;
         std::vector<succinct_bv::BitVector> microFIDLowTreesSupport;
+        std::vector<Bitvector> microFIDLowTreeAmount;
 
 
         //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
@@ -273,11 +274,11 @@ namespace pht {
         }
 
         std::vector<Bitvector> getFIDTopTrees() {
-            return FIDTopTree;
+            return miniFIDTopTree;
         }
 
         std::vector<Bitvector> getFIDLowTrees() {
-            return FIDLowTree;
+            return miniFIDLowTree;
         }
 
         std::vector<Bitvector> getMiniTypeVectors() {
@@ -528,9 +529,10 @@ namespace pht {
         std::vector<Bitvector> miniFIDs;
         std::vector<succinct_bv::BitVector> miniFIDsSupport;
         //First Top Tree of FIDs +1
-        std::vector<Bitvector> FIDTopTree;
+        std::vector<Bitvector> miniFIDTopTree;
         //First Low Tree of FIDs +1
-        std::vector<Bitvector> FIDLowTree;
+        std::vector<Bitvector> miniFIDLowTree;
+        std::vector<Bitvector> miniFIDLowTreeAmount;
         std::vector<Bitvector> miniTypeVectors;
         std::vector<succinct_bv::BitVector> miniTypeVectorsSupport;
         std::vector<Bitvector> miniDummys;
