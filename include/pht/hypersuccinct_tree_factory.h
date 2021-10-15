@@ -892,7 +892,8 @@ namespace pht {
                     topTrees = 1;
                 }
                 if(currentIndex==0) {
-                    lowOffset = topTrees;
+                    //TODO: Check multiple 0 trees
+                    lowOffset = 1;
                 }
 
                 if(currentIndex == miniTree) {
