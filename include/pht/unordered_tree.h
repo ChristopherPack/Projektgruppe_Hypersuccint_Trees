@@ -12,6 +12,7 @@
 
 #include "node.h"
 #include "list_utils.h"
+#include "precomputed_function.h"
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
@@ -61,7 +62,7 @@ namespace pht {
             ASSERT(!root || std::find(nodes.begin(), nodes.end(), ancestor) != nodes.end(), "Ancestor not found");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
 
-            refreshEnumerate = true;
+            enumerate.markDirty();
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
             if(root == nullptr) {
@@ -93,7 +94,7 @@ namespace pht {
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
             ASSERT(ancestor == nullptr || index <= descendants.at(ancestor).size() , "Invalid index");
 
-            refreshEnumerate = true;
+            enumerate.markDirty();
             nodes.push_back(node);
             descendants.insert({node, std::vector<std::shared_ptr<pht::Node<T>>>()});
             if(root == nullptr) {
@@ -113,7 +114,7 @@ namespace pht {
             ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
             ASSERT(std::find(descendants.at(ancestor).begin(), descendants.at(ancestor).end(), child) != descendants.at(ancestor).end(), "Ancestor - child mismatch");
 
-            refreshEnumerate = true;
+            enumerate.markDirty();
             nodes.push_back(node);
             descendants.insert({node, {child}});
             if(child == nullptr) {
@@ -146,7 +147,7 @@ namespace pht {
                 ASSERT(std::find(nodes.begin(), nodes.end(), node) == nodes.end(), "Duplicated node");
             }
 
-            refreshEnumerate = true;
+            enumerate.markDirty();
             nodes.insert(nodes.end(), newNodes.begin(), newNodes.end());
             descendants.insert(tree->descendants.begin(), tree->descendants.end());
             ancestors.insert(tree->ancestors.begin(), tree->ancestors.end());
@@ -318,7 +319,7 @@ namespace pht {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
-            refreshEnumerate = true;
+            enumerate.markDirty();
             if(migrateDescendants && root != node) {
                 for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
                     ancestors.erase(desc);
@@ -349,18 +350,17 @@ namespace pht {
             }
         }
 
-        uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
-            if(refreshEnumerate) {
+        /*uint32_t enumerate(const std::shared_ptr<pht::Node<T>> node) {
+            if(enumerateCache.isDirty()) {
                 enumerateCalculator();
-                refreshEnumerate = false;
+                enumerateCache.markDirty(false);
             }
-            return enumeratedCache.at(node);
-        }
+            return enumerateCache.at(node);
+        }*/
 
-        void enumerateCalculator() {
-            enumeratedCache.clear();
+        void enumerateCalculator(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache) {
             uint32_t i = 1;
-            enumeratedCache.insert({root,0});
+            cache.insert({root, 0});
             nodes.clear();
             nodes.push_back(root);
             std::list<std::shared_ptr<pht::Node<T>>> tempNodes;
@@ -372,7 +372,7 @@ namespace pht {
                 tempNodes.pop_front();
                 std::vector<std::shared_ptr<pht::Node<T>>> desc = getDirectDescendants(current);
                 tempNodes.insert(tempNodes.end(), desc.begin(), desc.end());
-                enumeratedCache.insert({current,i});
+                cache.insert({current, i});
                 i++;
             }
         }
@@ -689,15 +689,14 @@ namespace pht {
             this->dummy = dummy;
         }
 
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); });
+
     private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup.
-        std::map<std::shared_ptr<pht::Node<T>>, uint64_t> enumeratedCache; ///Map for enumeration of nodes in tree
         std::shared_ptr<pht::Node<T>> dummy; ///The optional dummy in the tree. 
-
-        bool refreshEnumerate = true;
 
 
 
