@@ -16,7 +16,6 @@ using namespace pht;
 std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
-
 int main() {
     pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_DEBUG);
     pht::Logger::setStdOutEnabled(true);

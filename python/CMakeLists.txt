@@ -39,5 +39,5 @@ list(JOIN PHT_UI_INCLUDE_DIRS "" PHT_UI_INCLUDE_DIRS)
 configure_file("${CMAKE_CURRENT_LIST_DIR}/setup.py.in" ${CMAKE_CURRENT_LIST_DIR}/setup.py)
 add_custom_command(TARGET pht_ui POST_BUILD WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} COMMAND python ARGS setup.py build_ext --inplace)
 
-#add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/pht/$<CONFIG>/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/pht_lib.dll)
+#add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/pht/$<CONFIG>/pht_lib.dll ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/pht_lib.dll)
 #add_custom_command(TARGET pht_ui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PHT_UI_PY_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>)
