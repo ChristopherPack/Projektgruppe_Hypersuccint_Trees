@@ -7,7 +7,7 @@ set(PHT_TEST_SOURCES
    node_test.cpp
    unordered_tree_test.cpp
     huffman_test.cpp
-    runtime_test.cpp
+    caching_test.cpp
 )
 list(TRANSFORM PHT_TEST_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_executable(pht_test)
