@@ -1,0 +1,453 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{forest}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usetikzlibrary{fit}
+\graphicspath{ {./images/} }
+\begin{document}
+\title{An Implementation of Hypersuccinct Trees}
+\author{Christopher Pack, Alexander Auras, Nathanael Stöhr, Charbono Lonyem Tegomo}
+\date{\today}
+\maketitle
+
+%Move figures so they appear at the right position in the text
+%Move figures so they appear at the right position in the text
+%Move figures so they appear at the right position in the text
+\begin{abstract}
+This document describes an implementation of Hypersuccinct Tree encodings in C++.
+
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+...
+
+\section{The tree covering Algorithm}
+Farzan Munro und Universal Succinct - Theorie
+
+\subsection{Functions and Queries of the Hypersuccinct Tree}
+Explains all Queries and roughly their theoretical implementation \cite{farzanMunro} \cite{universalSuccinct}
+
+\subsection{Efficiencies}
+Space Efficiency\\
+Algorithm Efficiencies
+
+\section{Our Implementation}
+Why C++?
+
+\subsection{Goals of the Implementation}
+Proof of concept\\
+Workable library\\
+Basic functions such as implemented queries or file writing
+
+\section{Implementation in Depth}
+Amount of Classes,\\
+Structures of classes.
+\subsection{The Hypersucccinct Tree class}
+The Hypersuccinct Tree class implements the entire hypersuccinct tree encoding. It consists of a struct representing minitrees and one representing the lookup table entries.
+Both of these structs use plenty of bitvectors to store relevant data for queries.\\
+
+Hypersuccinct Nodes:\\
+Nodes within the Hypersuccinct Tree are identified as triplets, where the first value denotes the Minitree, the second the Microtree and the third the Node number within the Microtree.\\
+
+\subsubsection{The FID and identifying trees}
+FIDs represent the interconnections between trees at their roots, their type 1 and type 2 connections \cite{farzanMunro}, together with a Type Vector that shows which kind of connection the tree has.
+Due to the way they are being generated, the FIDs do not share indices with their respective trees (i.e. it is possible for the Minitree with $id = 7$ to be in the FID with $id = 5$).
+This necessitates an index conversion whenever the FID or the type vector is used. Doing this conversion at runtime would not be possible within $O(1)$, since it would be necessary to go through each FID and count the trees contained within it, for both type 0 and type 1 connections.
+This is further complicated by taking into account the fact that each tree without dummies is actually accounted in two different FIDs. Firstly in the FID of its own root as a type 0 connection (Top FID), and secondly in the FID of its parent as type 1 (Low FID). Trees below dummies however have no low FID, as they are not directly below the root of their parent tree.
+\begin{figure}[h]
+	\begin{tabular}{ |p{3.5cm}||p{0.5cm}|p{0.5cm}|p{0.5cm}|p{0.5cm}|p{0.5cm}|p{0.5cm}|p{0.5cm}|p{0.5cm}|  }
+		 \hline
+		 \multicolumn{9}{|c|}{Vector indices for Trees} \\
+		 \hline
+		 %\hline
+		 Minitree Number & 0 & 1& 2 & 3 & 4 & 5 & 6 & 7\\
+		 Minitree Top FID& 0 & 1 & 2 & 3 & 4 & 5 & 6 & 6\\
+		 Minitree Low FID& - & 0 & 0 & 2 & 2 & 3 & - & -\\
+		 \hline
+	\end{tabular}
+\caption{Indices for Minitrees}
+\label{fid:table1}
+\end{figure}
+Therefore we implement a two way index conversion by directly pointing to the type 0 and type 1 FID index for each tree, and pointing to the first type 0 and type 1 tree for each FID. Since this is $O(4 \times |Minitrees|) + O(4 \times |Microtrees|)$, it is still within our required space efficiency. Dummies on the other hand use direct pointers to their children.\\
+\begin{figure}[h]
+	\begin{tabular}{ |p{3.5cm}||p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|  }
+		 %\hline
+		 %\multicolumn{5}{|c|}{Bitvectors} \\
+		 \hline
+		 Bitvector & Bit 1 &Bit 2&Bit 3&Bit 4& Bit 5 &Bit 6&Bit 7&Bit 8\\
+		 \hline
+		 Minitree FID 0 & 1 & 1& 0 & 1 & 0 & 0 & 1 & 1\\
+		 Minitree Typevector 0& 0 & 1 & - & 0 & - & - & 1 & 0\\
+		 Minitree Numbers & 0 & 3 &  0 & 1 & 1 & 1 & 5 & 2\\
+		 \hline
+		 Minitree FID 1 & 1 & 0& 1 & 1 & 0 & 1 & 1 & 1\\
+		 Minitree Typevector 1& 0 & - & 1 & 1 & - & 1 & 1 & 0\\
+		 Minitree Numbers & 3 & 3 &  6 & 7 & 3 & 8 & 9 & 4\\
+		 \hline
+	\end{tabular}
+\caption{FID, Typevector and corresponding trees}
+\label{fid:table2}
+\end{figure}
+The second issue arises when trying to analyze the FID and Typevectors of the Hypersuccinct Tree. Identifying which tree is at which position within even a single FID is not trivial. As demonstrated in \textit{Figure 2}, the second low tree in the first FID is $5$, because the FID of tree $3$ contains tree $4$ already as a top tree, meaning correctly identifying Bit $7$ as tree number $5$ requires analysis of the FID of tree number $3$. Additionally, it is important to note that the FID with the ID of $1$ starts with the tree numbered $3$, which can only be known if all previous FIDs are also analyzed. Both of these analyzations exceed our time requirement of $O(1)$. Finding the first trees of any FID is clearly recursive starting from FID $0$, while correctly identfying low trees requires checking $|Low Trees|$ many additional FIDs. Therefore, the first top and low tree of any FID is pointed to directly.
+This solves both of our issues, as the Rank of the Typevector indicates which FID belongs to which respective lower tree, allowing us to just take their first top tree as a result in $O(1)$. Knowing which tree an FID starts with is trivial with such pointers.
+
+
+\subsubsection{The Hypersuccinct Tree Factory}
+The Hypersuccinct Tree Factory is tasked with generating a hypersuccinct tree from a generic tree. Per our implementation this class implements two functions, one to generate hypersuccinct trees from our own generic tree structure, Unordered Tree, 
+and a second one to generate from an already encoded file reading.\\
+Encoding a generic tree is rather complicated due to the large amount of query related bitvectors that need to be filled with their respective data, a task that is not easily done on the generic tree structure. The complexity is therefore at least $O(|Nodes|^3)$, as we need to iterate through each minitree, within we iterate through each microtree, within we iterate through each node, as generated with the Farzan-Munro Algorithm.
+In contrast recreating a hypersuccinct tree from an encoded file is straightforward and easy. The data values from the file are just copied directly into their expected bitvector fields, which requires a complexity of $O(|Minitrees|) + O(|Lookup table entries|)$.\\
+The Hypersuccinct Tree Factory generates all data necessary for query execution in $O(1)$, therefore fills all vector fields in Hypersuccinct Tree. The function is structured in loops. First, the Farzan Munro algorithm is executed on a base tree with the computed Minitree size of $\lceil log^2( |Nodes| ) \rceil$. Right after this, the Minitree interconnections are handled and Minidummies are generated. Then, the Farzan Munro algorithm is used on all generated Minitrees to generate their respective Microtrees of size $\lceil log( \frac{|Nodes|}{8} ) \rceil$, and their interconnections are handled. At last, for each of these Microtrees, a Lookup table entry is generated if an entry of such a tree sturcture does not already exist.\\
+\textit{Special Cases:}\\
+There are some special occurences that lead to some additional complexity.\\
+$$IMAGES$$
+
+%Move figures up so they appear before the text
+\begin{figure}[h]
+	\begin{subfigure}{2cm}
+		\begin{forest}
+		[m0,name=miniroot0
+			[m0n1,name=miniroot1
+				[m0n2,name=n1
+					[m0n3,name=n2]
+					[m0n4,name=n3]
+				]
+				[m1,name=m1n1
+					[m1n1,name=m1n2
+						[m1n2,name=m1n3]
+					]
+				]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (miniroot1.south east) -- (n3.south east) -- (n2.south west) -- (n2.north west) -- cycle;
+		\draw[blue, rounded corners=4pt] (m1n1.north west) -- (m1n1.north east) -- (m1n3.south east) -- (m1n3.south west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot0.north east) -- (miniroot0.north west) -- (miniroot1.south west) -- (miniroot1.south east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n3.east) -- (n3.south) -- (n2.south) -- (n2.west) -- cycle;
+		\draw[red, rounded corners=4pt] (m1n1.west) -- (m1n1.north) -- (m1n1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Node order without Dummies}
+		\label{factory:subim1}
+	\end{subfigure}
+	\begin{subfigure}{2cm}
+		\begin{forest}
+		[m0,name=miniroot0
+			[m0n1,name=miniroot1
+				[udn1,name=microdummy1,text=red
+					[m0n2,name=n1
+						[m0n3,name=n2]
+						[m0n4,name=n3]
+					]
+				]
+				[mdn1,name=minidummy1,text=blue
+					[m1,name=m1n1
+						[m1n1,name=m1n2
+							[m1n2,name=m1n3]
+						]
+					]
+				]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (minidummy1.north east) -- (minidummy1.south east) -- (minidummy1.south west) -- (n3.south east) -- (n2.south west) -- (n2.north west) -- (microdummy1.north west) -- cycle;
+		\draw[blue, rounded corners=4pt] (m1n1.north west) -- (m1n1.north east) -- (m1n3.south east) -- (m1n3.south west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot0.north east) -- (miniroot0.north west) -- (microdummy1.west) -- (microdummy1.south) -- (minidummy1.south) -- (minidummy1.east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n3.east) -- (n3.south) -- (n2.south) -- (n2.west) -- cycle;
+		\draw[red, rounded corners=4pt] (m1n1.west) -- (m1n1.north) -- (m1n1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Node order with Dummies}
+		\label{factory:subim2}
+	\end{subfigure}
+	\begin{subfigure}{4cm}
+		\begin{forest}
+		[0,name=miniroot0
+			[1,name=miniroot1
+				[2,name=microdummy1,text=red
+					[0,name=n1
+						[1,name=n2
+							[4,name=microdummy2,text=red
+								[0,name=n4
+									[1,name=n5]
+									[2,name=n6]
+								]
+							]
+							[3,name=minidummy1,text=blue
+								[0,name=m1n1
+									[1,name=m1n2
+										[2,name=m1n3]
+									]
+								]
+							]
+						]
+						[2,name=n3]
+					]
+				]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (n3.south east) -- (minidummy1.south east) -- (minidummy1.south west) -- (n6.north east) -- (n6.south east) -- (n5.south west) -- (n5.north west) -- (microdummy2.north west) -- cycle;
+		\draw[blue, rounded corners=4pt] (m1n1.north west) -- (m1n1.north east) -- (m1n3.south east) -- (m1n3.south west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot0.north east) -- (miniroot0.north west) -- (microdummy1.west) -- (microdummy1.south) -- (microdummy1.east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n3.east) -- (minidummy1.east) -- (minidummy1.south) -- (microdummy2.south) -- (microdummy2.west) -- cycle;
+		\draw[red, rounded corners=4pt] (n4.west) -- (n4.north) -- (n4.east) -- (n6.east) -- (n6.south) -- (n5.south) -- (n5.west) -- cycle;
+		\draw[red, rounded corners=4pt] (m1n1.west) -- (m1n1.north) -- (m1n1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Final Node numbers}
+		\label{factory:subim3}
+	\end{subfigure}
+	\begin{subfigure}{4cm}
+		\begin{forest}
+		[0,name=miniroot0
+			[1,name=miniroot1
+				[2,name=microdummy1,text=red
+					[3,name=n1
+						[4,name=n2
+							[6,name=microdummy2,text=red
+								[8,name=n4
+									[9,name=n5]
+									[10,name=n6]
+								]
+							]
+							[7,name=minidummy1,text=blue
+								[0,name=m1n1
+									[1,name=m1n2
+										[2,name=m1n3]
+									]
+								]
+							]
+						]
+						[5,name=n3]
+					]
+				]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (n3.south east) -- (minidummy1.south east) -- (minidummy1.south west) -- (n6.north east) -- (n6.south east) -- (n5.south west) -- (n5.north west) -- (microdummy2.north west) -- cycle;
+		\draw[blue, rounded corners=4pt] (m1n1.north west) -- (m1n1.north east) -- (m1n3.south east) -- (m1n3.south west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot0.north east) -- (miniroot0.north west) -- (microdummy1.west) -- (microdummy1.south) -- (microdummy1.east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n3.east) -- (minidummy1.east) -- (minidummy1.south) -- (microdummy2.south) -- (microdummy2.west) -- cycle;
+		\draw[red, rounded corners=4pt] (n4.west) -- (n4.north) -- (n4.east) -- (n6.east) -- (n6.south) -- (n5.south) -- (n5.west) -- cycle;
+		\draw[red, rounded corners=4pt] (m1n1.west) -- (m1n1.north) -- (m1n1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Minitree specific node numbers}
+		\label{factory:subim4}
+	\end{subfigure}
+
+\caption{Special Cases regarding node order}
+\label{factory:images4}
+\end{figure}
+
+
+
+The first issue originates from the handling of interconnections and the node numbering. Adding dummies in the Unordered Tree class does not retain the original structure of the nodes, especially when the Minidummy is located right after the Microdummy on the same level (\textit{Case 1}). Generating a consistent node numbering requires to sort the nodes within each trees. For this an \textit{enumerate} function is implemented that creates a consistent order for nodes within Mini and Microtrees.\\
+Another issue is the identification of Minitree dummies within Microtrees. Minitree dummies are originally identified by their node number respective to the Minitree. However, due to the structure of Hypersuccinct nodes, it is necessary to translate the Minitree node numbers to Microtrees and Microtree node numbers.
+
+\subsection{Query structures and differences}
+Not all queries represented in the paper are implemented. This is in part due to the simplicity of this implementation, but also because the original paper is rather shortworded when describing the implementation of each query.
+Due to this there are some minor or notable differences to the paper at hand.
+
+\subsubsection{Simple Queries}
+As simple Queries we identify those that only require a single bitvector per level of abstraction. This means that these queries need one bitvector for values of each Minitree, one for each Microtree within the Minitrees and one for each lookuptable entry.
+As a result these queries all follow a similar structure, first handling single nodes, then generalizing the result to Microtrees and at last taking Minitrees into account to arrive at the correct result with an $O(1)$ time complexity.\\
+These queries are:\\
+\begin{itemize}
+	\item[1)] \textit{getParent}
+	\item[2)] \textit{degree}
+	\item[3)] \textit{subtreeSize}
+	\item[4)] \textit{depth}
+	\item[5)] \textit{height}
+	\item[6)] \textit{leftmostLeaf}
+	\item[7)] \textit{rightmostLeaf}
+	\item[8)] \textit{leafSize}
+	\item[9)] \textit{levelSuccessor (Not implemented)}
+	\item[10)] \textit{levelPredecessor (Not implemented)}
+\end{itemize}
+These queries are described as using one bitvector per abstraction in the paper. We therefore believe this implementation to be as described in the paper.\\
+\textit{Depth} is specifically easy, since the depth of a given MicroTree or MiniTree root is just the size of their FIDs, making extra data bitvectors for depth unnecessary on a Minitree and Microtree level. All other queries use their respective bitvectors to determine a result.\\
+On Dummies:\\
+These queries require to handle the dummy in query-specific ways. \textit{Depth} is the simplest query, only adding values from Minitree depth, Microtree depth and Node depth. These do already ignore dummies in their data, so this query does not require any dummy handling. \textit{Height} and \textit{subtreeSize} make use of the \textit{isDummyAncestor} helper queries to subtract the dummy from their calculations. \textit{Degree}, \textit{leftmostLeaf} and \textit{rightmostLeaf} check whether or not the current node is the dummy, and then move along its pointer. \textit{GetParent} simply checks if the result is a dummy, and then returns the parent of that dummy. This is still within $O(1)$, as there are at most two dummies (one Microdummy and one Minidummy) on top of one another.\\
+Despite not being implemented, we can still make some observations about 
+\textit{levelSuccessor} and \textit{levelPredecessor}. Both cannot use the FID to compute their results, as identifying a specific node in the FID is not possible in $O(1)$. We therefore believe that a bitvector pointing to either the FIDs position or directly to the successor/predecessor is necessary, therefore making both of these Simple Queries. For dummies both would use the same handling as getParent, as the value returned by the dummy is the correct one, whereas the dummies child would be effectively one level too low.
+
+\subsubsection{Rank Queries}
+Rank Queries are all queries that return some sort of rank from the tree. These queries are more compicated than Simple Queries since they require more than one bitvector per abstraction.
+Rank queries specifically need two bitvectors for the Minitree and Microtree abstractions, due to special cases.
+They also require use of the FID to identify these special cases.\\
+The Rank Queries are:\\
+\begin{itemize}
+	\item[1)] \textit{childRank}
+	\item[2)] \textit{leafRank}
+	\item[3)] \textit{nodeRank (Not implemented)}
+\end{itemize}
+The special cases are as follows.\\
+%Move figures up so they appear before the text
+
+\begin{figure}[h]
+	\begin{subfigure}{2cm}
+		\begin{forest}
+		[n0,name=n0
+			[n1,name=n1
+				[n3,name=n2]
+				[n4,name=n3]
+			]
+			[n2,name=n4]
+		]
+		\draw[blue, rounded corners=4pt] (n0.north west) -- (n0.north east) -- (n4.north east) -- (n4.south east) -- (n3.south east) -- (n2.south west) -- (n2.north west) -- cycle;
+		\draw[red, rounded corners=4pt] (n0.east) -- (n0.north) -- (n0.west) -- (n4.west) -- (n4.south) -- (n4.east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.east) -- (n1.north) -- (n1.west) -- (n2.west) -- (n2.south) -- (n3.south) -- (n3.east) -- cycle;
+		\end{forest}
+		\caption{Case 1}
+		\label{rank:subim1}
+	\end{subfigure}
+	\begin{subfigure}{2cm}
+		\begin{forest}
+		[m0,name=miniroot
+			[n1,name=n1
+				[n2,name=n2
+					[n4,name=n3]
+					[n5,name=n5]
+				]
+				[n3,name=n4]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot.north west) -- (miniroot.north east) -- (n4.north east) -- (n4.south east) -- (n5.south east) -- (n3.south west) -- (n3.north west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot.north east) -- (miniroot.north west) -- (miniroot.south west) -- (miniroot.south east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.east) -- (n1.north) -- (n1.west) -- (n4.west) -- (n4.south) -- (n4.east) -- cycle;
+		\draw[red, rounded corners=4pt] (n2.east) -- (n2.north) -- (n2.west) -- (n3.west) -- (n3.south) -- (n5.south) -- (n5.east) -- cycle;
+		\end{forest}
+		\caption{Case 2}
+		\label{rank:subim2}
+	\end{subfigure}
+	\begin{subfigure}{4cm}
+		\begin{forest}
+		[m0,name=miniroot0
+			[m1,name=miniroot1
+				[m1n1,name=m1n1
+					[m1n2,name=m1n2
+						[m1n3,name=m1n3]
+					]
+				]
+			]
+			[m0n1,name=n1
+				[m0n1,name=n2]
+				[m0n2,name=n3]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (n1.north east) -- (n3.north east) -- (n3.south east) -- (n2.south west) -- (n2.north west) -- (miniroot0.south west) -- cycle;
+		\draw[blue, rounded corners=4pt] (miniroot1.north west) -- (miniroot1.north east) -- (m1n3.south east) -- (m1n3.south west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot.north east) -- (miniroot.north west) -- (miniroot.south west) -- (miniroot.south east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n3.east) -- (n3.south) -- (n2.south) -- (n2.west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot1.west) -- (miniroot1.north) -- (miniroot1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Case 3}
+		\label{rank:subim3}
+	\end{subfigure}
+	\begin{subfigure}{4cm}
+		\begin{forest}
+		[m0,name=miniroot0
+			[m0n1,name=n1
+				[m0n3,name=n3]
+				[m0n4,name=n4]
+			]
+			[m1,name=miniroot1
+				[m1n1,name=m1n1
+					[m1n2,name=m1n2
+						[m1n3,name=m1n3]
+					]
+				]
+			]
+			[m0n2,name=n2
+				[m0n5,name=n5]
+			]
+		]
+		\draw[blue, rounded corners=4pt] (miniroot0.north west) -- (miniroot0.north east) -- (n2.north east) -- (n5.south east) -- (n5.south west) -- (n2.north west) -- (miniroot0.south east) -- (miniroot0.south west) -- (n4.south east) -- (n3.south west) -- (n3.north west) -- (n1.north west) -- cycle;
+		\draw[blue, rounded corners=4pt] (miniroot1.north east) -- (miniroot1.north west) -- (m1n3.south west) -- (m1n3.south east) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot.north west) -- (miniroot.south west) -- (miniroot.south east) -- (n2.north west) -- (n5.west) -- (n5.south) -- (n5.east) -- (n2.north east) -- (miniroot.north east) -- cycle;
+		\draw[red, rounded corners=4pt] (n1.west) -- (n1.north) -- (n1.east) -- (n4.east) -- (n4.south) -- (n3.south) -- (n3.west) -- cycle;
+		\draw[red, rounded corners=4pt] (miniroot1.west) -- (miniroot1.north) -- (miniroot1.east) -- (m1n3.east) -- (m1n3.south) -- (m1n3.west) -- cycle;
+		\end{forest}
+		\caption{Case 4}
+		\label{rank:subim4}
+	\end{subfigure}
+
+\caption{4 Special Cases for Rank Queries}
+\label{rank:images4}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{tabular}{ |p{4cm}||p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|  }
+		 \hline
+		 \multicolumn{5}{|c|}{Bitvectors} \\
+		 \hline
+		 Bitvector & Case 1 &Case 2&Case 3&Case 4\\
+		 \hline
+		 Minitree FID   & 1    & 1&   11 & 110\\
+		 Minitree Typevector&   0  & 0   & 10 & 010\\
+		 Microtree FID&11 &11&  irrelevant&irrelevant\\
+		 Microtree Typevector&10& 10&  irrelevant&irrelevant\\
+		 \hline
+	\end{tabular}
+\caption{FID and Typevector values for special cases}
+\label{rank:table4}
+\end{figure}
+
+Case 1 and Case 2 describe a situation in which a higher indexed Microtree has a lower rank than the current Microtree. To resolve this, we introduce an extended rank bitvector which notes the rank of the first child of our current Microtree within the Minitree. This resolves this case on a data level, the second issue is to actually read the value of the extended bitvector in the right cases. This is where we differentiate between the two cases. If this problem appears at the Minitree root, we can identify this case by using the FID, resulting in Case 2. If this problem appears further down in the Minitree we can compare values of Microtree and Node indices to identify Case 1. Case 3 describes a similar issue regarding the Minitree. Again, a Minitree with a higher index has a lower rank than our current Minitree. This can also be identified with the FID. The three cases are mutually exclusive since they describe a similar issue.
+Case 4 describes a tree of type 0 that is split by a tree of type 1 in between. This can be identified, since 0s in the FID must belong to the last type 0 tree, meaning after identifying the latest tree as being of type 1, one only needs to check if the index points to a 0 in the FID.\\
+The structure of both queries is similar. First they calculate the result of only the node within the Microtree, using the values from the lookup table. Then, the result is generalized to a Microtree. Here, Case 1 is evaluated. At last, the result is generalized to the Minitree by analyzing key structures of the FID to identify Case 2, or Case 3. In \textit{childRank}, the special cases immediately return the value, as this query only needs to take into account the singular values of the parent FID. For \textit{leafRank}, a generalization to the entire tree is always necessary due to the result being sensitive to the entire tree topology.\\
+Both implemented queries use \textit{getParentForQuery} as a helper query to identify the direct parent of the current node. These queries only check if the current node is a child of a dummy and if that is the case, the dummy is used instead, as the dummy is at the correct position to calculate the correct result.\\
+The special cases are not mentioned in the paper. The description of all Rank Queries are rather short and inconclusive.\\ 
+It is for example correct that we use the FID to compute the childRank. However, we interpret the paper to say that computing the childRank is possible by just using the FID, without any additional data. 
+This is not possible due to the identification of a node within the FID requiring $O(|Trees In FID|)$ time, which violates our time efficiency requirement. Our implementation instead uses the FID to identify the special cases that require additional information and then take that information from the additional bitvectors we implemented. Both implemented Rank Queries also need to take their direct ancestor into account, which is not mentioned for LeafRank.
+We believe our approach to be adequate, since both implemented queries fulfill the $O(1)$ time requirement without violating the space requirement. Additionally, both of our Rank Queries are very similar in their implementation offering easier understandability and openness, since adding nodeRank would most likely just require the exact same steps as taken in our approach to Rank Queries.
+
+\subsubsection{Unique Queries}
+There are queries that do not fit into a category. These are:
+\begin{itemize}
+	\item[1)] \textit{child}
+\end{itemize}
+\textit{Child} is simpler than rank queries, since the index provided by the query is directly related to an FID position, allowing an analysis of the node at that position in $O(1)$. It is important to note that identifying the correct child within the FID can point to a 0 value in the FID.
+This means that we need to identify Microtrees and singular nodes via the distance from the last 1 within the respective FID of the Mini and Microtrees. To implement this, we first just identify the correct Minitree and reduce the remaining index by the position of that Minitree in the FID.
+The process for identifying the Microtree is analogous to that, and at last we use the remaining index to select a specific node via the lookup table. If our starting node is already below the Minitree root, the part for identifying the right Minitree is skipped, same for Microtrees if we are below a Microtree root.
+Dummy-nodes are skipped, both if the starting node is a dummy, in which case child of the direct pointer of the dummy is used instead, or if the result node is a dummy, in which case the direct pointer of the dummy is returned instead.
+
+\subsubsection{Helper Queries}
+Instead of being identified by their algorithmic structure, these queries are identified by the fact, that they are used by other queries to compute their results.\\
+These Helper Queries are:
+\begin{itemize}
+	\item[1)] \textit{isDummyAncestorWithinMiniTree}
+	\item[2)] \textit{isDummyAncestorWithinMicroTree}
+	\item[3)] \textit{getParentForQuery}
+\end{itemize}
+Their implementation is similar to the implementation of Simple Queries.\\
+\textit{GetParentForQuery} is a special version of \textit{getParent} that excludes handling for dummy nodes. This is necessary to identify special dummy cases in the queries that use this Helper Query.
+The \textit{isDummyAncestor} helper queries identify if a given node is an ancestor of a Minidummy or a Microdummy respectively. Both queries only work if their current node is actually in a Minitree or Microtree with a dummy. \textit{IsDummyAncestorWithinMiniTree} has a similar structure to the simple queries, first using specific bitvector data that contains if the Microtree root is an ancestor of the dummy, then if the specific node is the ancestor. \textit{IsDummyAncestorWithinMicroTree} is even simpler, only needing to determine the answer for specific nodes.
+
+\subsubsection{Other Queries / Not implemented queries}
+The following queries are not implemented and are not similar enough to already implemented queries to use those as a template.
+\begin{itemize}
+	\item[1)] \textit{nodeSelect (Not implemented)}
+	\item[2)] \textit{levelAncestor (Not implemented)}
+	\item[3)] \textit{lowestCommonAncestor (Not implemented)}
+	\item[4)] \textit{distance (Not implemented)}
+	\item[5)] \textit{levelLeaftmostNode (Not implemented)}
+	\item[6)] \textit{levelRightmostNode (Not implemented)}
+\end{itemize}
+Moving multiple levels is not trivial with our encoding. Since this is supposed to work in $O(1)$ time we are not sure how to implement a level based query. Moving up one level at a time is $> O(1)$, but adding one bitvector per level for each Microtree violates the space efficiency requirement.\\
+NodeSelect has to call to a mapping of basic node numbers to HstNodes. Again, saving such a map for each Microtree and Minitree violates our space efficiency requirement, but computing it violates the time efficiency requirement.
+
+\subsection{Other Classes}
+There are a variety of other classes within the library that contribute to the Hypersuccinct Tree functionality.
+\subsubsection{Bitvector Utils}
+Bitvector Utils is a basic class that provides utility functions for Bitvectors. Its main function is to typecast Bitvectors to Integers and back, which is possible in O(1) due to the limited size of Integers. (i.e. uint 32 has a maximum of 32 bits.)
+\subsubsection{HST Output}
+The HyperSuccinctTree Output class provides functions for writing and reading a Hypersuccinct Tree class. Therefore this class handles writing Hypersuccinct Trees to Files or reading Hypersuccinct Trees from Files.
+\subsubsection{Unordered Tree}
+Unordered Tree is our basic tree implementation, to which an xml tree is parsed. Unordered Trees are then used to create Hypersuccinct Trees.
+\subsubsection{XML Reader}
+This class reads the actual xml file and creates an Unordered Tree from it.
+\subsubsection{Farzan Munro}
+The Farzan Munro class implements the algorithm as presented in \cite{farzanMunro}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
