@@ -27,7 +27,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"DBLP.xml"};
+    std::vector<std::string> fileNames = {"treeNath2.xml"};
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> childTimes;
     std::vector<pair<std::string , std::string >> degreeTimes;
@@ -82,10 +82,15 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             testSize = rootSubSize;
         }
 
+        PHT_LOGGER_INFO("Runtime Test", "Test Size: " + std::to_string(testSize));
+
         uint32_t i=1;
         while(testNodes.size() < testSize) {
             if(i >= testNodes.size()) {
                 break;
+            }
+            if(i == 28) {
+                uint32_t e = 1;
             }
             uint32_t degree;
             timer.start();
@@ -98,6 +103,9 @@ TEST_F(RuntimeTest, MiniTreesTest) {
                 }
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
+                std::cout << i << std::endl;
+                std::cout << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl;
+                std::cout << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl;
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
@@ -106,6 +114,8 @@ TEST_F(RuntimeTest, MiniTreesTest) {
             }
             i++;
         }
+
+        PHT_LOGGER_INFO("Runtime Test", "Added all children");
 
 
         for(pht::HstNode &node : testNodes) {
@@ -129,6 +139,7 @@ TEST_F(RuntimeTest, MiniTreesTest) {
                 }
             }
         }
+        PHT_LOGGER_INFO("Runtime Test", "Running query Tests...");
 
         for(pht::HstNode &node : testNodes) {
             MEASURE_TIME(hyperTree.childRank(node),childRankTimes);
