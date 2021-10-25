@@ -979,57 +979,15 @@ namespace pht {
         }
 
         static void convertToBitVector(HypersuccinctTree& hst) {
-            //TODO: Extend with current Supports
             assignBitVector(hst.miniFIDsSupport , hst.miniFIDs);
             assignBitVector(hst.miniTypeVectorsSupport , hst.miniTypeVectors);
-            assignBitVector(hst.miniDummysSupport , hst.miniDummys);
             for(MiniTree &miniTree: hst.getMiniTrees()) {
                 assignBitVector(miniTree.FIDsSupport , miniTree.FIDs);
                 assignBitVector(miniTree.typeVectorsSupport , miniTree.typeVectors);
-                assignBitVector(miniTree.dummysSupport , miniTree.dummys);
-                assignBitVector(miniTree.microTreesSupport , miniTree.microTrees);
-                assignBitVector(miniTree.miniTopFIDIndexSupport , miniTree.miniTopFIDIndex);
-                assignBitVector(miniTree.miniLowFIDIndexSupport , miniTree.miniLowFIDIndex);
-                assignBitVector(miniTree.microTopFIDIndicesSupport , miniTree.microTopFIDIndices);
-                assignBitVector(miniTree.microLowFIDIndicesSupport , miniTree.microLowFIDIndices);
-                assignBitVector(miniTree.rootAncestorsSupport , miniTree.rootAncestors);
-                assignBitVector(miniTree.dummyAncestorsSupport , miniTree.dummyAncestors);
-                assignBitVector(miniTree.miniDummyTreeSupport , miniTree.miniDummyTree);
-                assignBitVector(miniTree.miniDummyIndexSupport , miniTree.miniDummyIndex);
-                assignBitVector(miniTree.miniDummyPointerSupport , miniTree.miniDummyPointer);
-                assignBitVector(miniTree.microDummyPointersSupport , miniTree.microDummyPointers);
-                assignBitVector(miniTree.subTreeSupport , miniTree.subTree);
-                assignBitVector(miniTree.microSubTreesSupport , miniTree.microSubTrees);
-                assignBitVector(miniTree.miniDepthSupport , miniTree.miniDepth);
-                assignBitVector(miniTree.miniHeightSupport , miniTree.miniHeight);
-                assignBitVector(miniTree.miniDummyDepthSupport , miniTree.miniDummyDepth);
-                assignBitVector(miniTree.miniDummyHeightSupport , miniTree.miniDummyHeight);
-                assignBitVector(miniTree.rootDepthsSupport , miniTree.rootDepths);
-                assignBitVector(miniTree.rootHeightsSupport , miniTree.rootHeights);
-                assignBitVector(miniTree.miniLeavesSupport , miniTree.miniLeaves);
-                assignBitVector(miniTree.microLeavesSupport , miniTree.microLeaves);
-                assignBitVector(miniTree.miniTreeLeftmostLeafPointerSupport , miniTree.miniTreeLeftmostLeafPointer);
-                assignBitVector(miniTree.miniTreeRightmostLeafPointerSupport , miniTree.miniTreeRightmostLeafPointer);
-                assignBitVector(miniTree.microTreeLeftmostLeafPointersSupport , miniTree.microTreeLeftmostLeafPointers);
-                assignBitVector(miniTree.microTreeRightmostLeafPointersSupport , miniTree.microTreeRightmostLeafPointers);
-                assignBitVector(miniTree.miniRootLeafRankSupport , miniTree.miniRootLeafRank);
-                assignBitVector(miniTree.miniDummyLeafRankSupport , miniTree.miniDummyLeafRank);
-                assignBitVector(miniTree.microRootLeafRanksSupport , miniTree.microRootLeafRanks);
-                assignBitVector(miniTree.microExtendedLeafRanksSupport,miniTree.microExtendedLeafRanks);
             }
             for(LookupTableEntry &entry : hst.lookupTable) {
-                assignBitVector(entry.indexSupport , entry.index);
-                assignBitVector(entry.bpSupport , entry.bp);
                 assignBitVector(entry.ancestorMatrixSupport , entry.ancestorMatrix);
                 assignBitVector(entry.childMatrixSupport , entry.childMatrix);
-                assignBitVector(entry.degreeSupport , entry.degree);
-                assignBitVector(entry.subTreesSupport , entry.subTrees);
-                assignBitVector(entry.nodeDepthsSupport , entry.nodeDepths);
-                assignBitVector(entry.nodeHeightsSupport , entry.nodeHeights);
-                assignBitVector(entry.leavesSupport , entry.leaves);
-                assignBitVector(entry.leftmost_leafSupport , entry.leftmost_leaf);
-                assignBitVector(entry.rightmost_leafSupport , entry.rightmost_leaf);
-                assignBitVector(entry.leafRankSupport , entry.leafRank);
             }
         }
 
