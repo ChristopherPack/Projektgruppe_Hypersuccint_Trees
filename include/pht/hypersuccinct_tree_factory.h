@@ -39,7 +39,7 @@ namespace pht {
          * @param huffman If the MicroTrees should be encoded with Huffman encoding
          * @return HypersuccinctTree class representing the Hypersuccinct code
          */
-        template<class T> static std::unique_ptr<HypersuccinctTree> create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false, uint32_t sizeMiniParam = 0, uint32_t sizeMicroParam = 0) {
+        template<class T> static std::unique_ptr<HypersuccinctTree> create(const std::shared_ptr<UnorderedTree<T>> tree, bool huffman = false, uint32_t sizeMiniParam = 0, uint32_t sizeMicroParam = 0, bool doQueries = true) {
             std::unique_ptr<HypersuccinctTree> hypersuccinctTree = std::unique_ptr<HypersuccinctTree>(new HypersuccinctTree());
             hypersuccinctTree->huffmanFlag = huffman;
 
@@ -58,7 +58,7 @@ namespace pht {
             PHT_LOGGER_INFO("Factory Create", string ("Amount of Minitrees: ") + to_string(fmMiniTrees.size()));
 
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
-            createMiniTrees(*hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences);
+            createMiniTrees(*hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences,doQueries);
 
             if(hypersuccinctTree->huffmanFlag) {
                 std::map<std::vector<bool>,std::vector<bool>> huffmanTable = Huffman::generateTable<std::vector<bool>>(bpsAndOccurrences);
@@ -67,8 +67,10 @@ namespace pht {
 
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
 
+            //hypersuccinctTree->miniFIDs.
+
             //TODO: convert std::bool to BitVector
-            convertToBitVector(*hypersuccinctTree);
+            createBitvectorSupports(*hypersuccinctTree);
 
             return hypersuccinctTree;
         }
@@ -199,6 +201,7 @@ namespace pht {
                 microTreeData.leafRank = leaf_rank;
                 hst.lookupTable.push_back(microTreeData);
             }
+            createBitvectorSupports(hst);
             return hst;
         }
 
@@ -403,7 +406,6 @@ namespace pht {
                 if(fmMicroTree->isRoot(node1)) {
                     lookupTableEntry.parentPointers.push_back({false});
                 } else {
-                    //std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
                     auto iter1 = std::find(nodes.begin(), nodes.end(), fmMicroTree->getDirectAncestor(node1));
                     uint32_t parentNum = std::distance(nodes.begin(), iter1) + 1;
                     lookupTableEntry.parentPointers.push_back(Bitvector_Utils::encodeNumberReturn(parentNum));
@@ -445,7 +447,7 @@ namespace pht {
          * @param fmMicroTrees The Micro Trees to get data from
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
-        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro){
+        template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro, bool doQueries){
             PHT_LOGGER_INFO("Factory Create", string("Creating MicroTrees for a MiniTree..."));
             uint32_t microCount = 0;
             //The actual MicroTree Loop
@@ -453,16 +455,6 @@ namespace pht {
             for(const std::shared_ptr<UnorderedTree<T>>& fmMicroTree : fmMicroTrees) {
 
                 handleMiniDummyInMicroTree(miniTree, fmMiniTree, fmMicroTree, fmMicroTrees);
-
-                //Dummy Ancestory
-                if(fmMiniTree->hasDummy()) {
-                    if(fmMicroTree->hasDummy()) {
-                        miniTree.dummyAncestors.push_back(fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getDummy()));
-                    } else {
-                        miniTree.dummyAncestors.push_back(false);
-                    }
-                    miniTree.rootAncestors.push_back(fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getRoot()));
-                }
 
                 //MicroDummyPointers
                 uint32_t dummySize = floor(log2(2*sizeMicro+1))+1;
@@ -474,47 +466,60 @@ namespace pht {
                     miniTree.microDummyPointers.push_back({false});
                 }
 
-                //Additions for Queries - MicroTrees
-                std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
-                miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn( fmMiniTree->getSize(microRoot,false)));
-                miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot)+1));
-                miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeight(microRoot)+1));
-                miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
-                miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
-                miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
+                if(doQueries) {
+                    //Dummy Ancestory
+                    if (fmMiniTree->hasDummy()) {
+                        if (fmMicroTree->hasDummy()) {
+                            miniTree.dummyAncestors.push_back(
+                                    fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getDummy()));
+                        } else {
+                            miniTree.dummyAncestors.push_back(false);
+                        }
+                        miniTree.rootAncestors.push_back(
+                                fmMiniTree->isAncestor(fmMiniTree->getDummy(), fmMicroTree->getRoot()));
+                    }
 
-                if(fmMiniTree->isRoot(microRoot)) {
-                    miniTree.microParents.push_back({false});
-                } else {
-                    miniTree.microParents.push_back(Bitvector_Utils::encodeNumberReturn(
-                            fmMiniTree->getDirectAncestor(microRoot)->getMicroTree() + 1));
-                }
+                    //Additions for Queries - MicroTrees
+                    std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
+                    miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getSize(microRoot, false)));
+                    miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot) + 1));
+                    miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeight(microRoot) + 1));
+                    miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
+                    miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
+                    miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
 
-                if(fmMiniTree->isRoot(microRoot)) {
-
-                    std::vector<std::shared_ptr<Node<T>>> children = fmMiniTree->getDirectDescendants(microRoot);
-                    if(children.empty()) {
-                        miniTree.microRootLeafRanks.push_back({false});
-                        miniTree.microChildRanks.push_back({false});
+                    if (fmMiniTree->isRoot(microRoot)) {
+                        miniTree.microParents.push_back({false});
                     } else {
-                        miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getLeafRank(children.at(0)) + 1));
-                        miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getChildRank(children.at(0)) + 1));
+                        miniTree.microParents.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDirectAncestor(microRoot)->getMicroTree() + 1));
                     }
-                } else {
-                    miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microRoot) + 1));
-                    miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microRoot) + 1));
-                }
-                std::vector<std::shared_ptr<Node<T>>> microChildren = fmMicroTree->getDirectDescendants(microRoot);
-                if(microChildren.empty()) {
-                    miniTree.microExtendedLeafRanks.push_back({true});
-                    miniTree.microExtendedChildRanks.push_back({false});
-                } else {
-                    bool removeLeafMan = false;
-                    if(fmMiniTree->isLeaf(microChildren.at(0))) {
-                        removeLeafMan = true;
+
+                    if (fmMiniTree->isRoot(microRoot)) {
+
+                        std::vector<std::shared_ptr<Node<T>>> children = fmMiniTree->getDirectDescendants(microRoot);
+                        if (children.empty()) {
+                            miniTree.microRootLeafRanks.push_back({false});
+                            miniTree.microChildRanks.push_back({false});
+                        } else {
+                            miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getLeafRank(children.at(0)) + 1));
+                            miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(tree->getChildRank(children.at(0)) + 1));
+                        }
+                    } else {
+                        miniTree.microRootLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microRoot) + 1));
+                        miniTree.microChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microRoot) + 1));
                     }
-                    miniTree.microExtendedLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microChildren.at(0)) + 1 - removeLeafMan));
-                    miniTree.microExtendedChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microChildren.at(0)) + 1));
+                    std::vector<std::shared_ptr<Node<T>>> microChildren = fmMicroTree->getDirectDescendants(microRoot);
+                    if (microChildren.empty()) {
+                        miniTree.microExtendedLeafRanks.push_back({true});
+                        miniTree.microExtendedChildRanks.push_back({false});
+                    } else {
+                        bool removeLeafMan = false;
+                        if (fmMiniTree->isLeaf(microChildren.at(0))) {
+                            removeLeafMan = true;
+                        }
+                        miniTree.microExtendedLeafRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafRank(microChildren.at(0)) + 1 - removeLeafMan));
+                        miniTree.microExtendedChildRanks.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getChildRank(microChildren.at(0)) + 1));
+                    }
                 }
 
                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
@@ -527,36 +532,39 @@ namespace pht {
 
                 LookupTableEntry microTreeData(bp);
                 if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
-                    fillLookupTableEntry(microTreeData, fmMicroTree);
+                    if(doQueries) {
+                        fillLookupTableEntry(microTreeData, fmMicroTree);
+                    }
                     hypersuccinctTree.lookupTable.push_back(microTreeData);
                 }
 
-
-                //TODO: MOVE TOP TREE GENERATOR
-                std::pair<uint32_t ,uint32_t > microFIDIndices = convertMicroTreeToFIDIndex(hypersuccinctTree,miniTree,microCount);
-                Bitvector microFIDFirst;
-                Bitvector_Utils::encodeNumber(microFIDFirst, microFIDIndices.first+1,Bitvector_Utils::NumberEncoding::BINARY);
-                miniTree.microTopFIDIndices.push_back(microFIDFirst);
-                Bitvector microFIDSecond;
-                Bitvector_Utils::encodeNumber(microFIDSecond, microFIDIndices.second+1,Bitvector_Utils::NumberEncoding::BINARY);
-                miniTree.microLowFIDIndices.push_back(microFIDSecond);
-                microCount++;
-            }
-            std::vector< std::pair<std::vector<uint32_t>,std::vector<uint32_t>>> fIDTreesVector = getTreesForMicroFID(hypersuccinctTree, miniTree);
-            for(std::pair<std::vector<uint32_t>,std::vector<uint32_t>> fIDTrees : fIDTreesVector) {
-                if (fIDTrees.first.empty()) {
-                    miniTree.microFIDTopTrees.push_back({false});
-                } else {
-                    Bitvector topFirst;
-                    Bitvector_Utils::encodeNumber(topFirst, fIDTrees.first.at(0) + 1,Bitvector_Utils::NumberEncoding::BINARY);
-                    miniTree.microFIDTopTrees.push_back(topFirst);
+                if(doQueries) {
+                    std::pair<uint32_t, uint32_t> microFIDIndices = convertMicroTreeToFIDIndex(hypersuccinctTree,miniTree, microCount);
+                    Bitvector microFIDFirst;Bitvector_Utils::encodeNumber(microFIDFirst, microFIDIndices.first + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                    miniTree.microTopFIDIndices.push_back(microFIDFirst);
+                    Bitvector microFIDSecond;
+                    Bitvector_Utils::encodeNumber(microFIDSecond, microFIDIndices.second + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                    miniTree.microLowFIDIndices.push_back(microFIDSecond);
+                    microCount++;
                 }
-                if (fIDTrees.second.empty()) {
-                    miniTree.microFIDLowTrees.push_back({false});
-                } else {
-                    Bitvector lowFirst;
-                    Bitvector_Utils::encodeNumber(lowFirst, fIDTrees.second.at(0) + 1,Bitvector_Utils::NumberEncoding::BINARY);
-                    miniTree.microFIDLowTrees.push_back(lowFirst);
+            }
+            if(doQueries) {
+                std::vector<std::pair<std::vector<uint32_t>, std::vector<uint32_t>>> fIDTreesVector = getTreesForMicroFID(hypersuccinctTree, miniTree);
+                for (std::pair<std::vector<uint32_t>, std::vector<uint32_t>> fIDTrees : fIDTreesVector) {
+                    if (fIDTrees.first.empty()) {
+                        miniTree.microFIDTopTrees.push_back({false});
+                    } else {
+                        Bitvector topFirst;
+                        Bitvector_Utils::encodeNumber(topFirst, fIDTrees.first.at(0) + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                        miniTree.microFIDTopTrees.push_back(topFirst);
+                    }
+                    if (fIDTrees.second.empty()) {
+                        miniTree.microFIDLowTrees.push_back({false});
+                    } else {
+                        Bitvector lowFirst;
+                        Bitvector_Utils::encodeNumber(lowFirst, fIDTrees.second.at(0) + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                        miniTree.microFIDLowTrees.push_back(lowFirst);
+                    }
                 }
             }
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MicroTrees for this MiniTree."));
@@ -571,14 +579,12 @@ namespace pht {
          * @param sizeMicro Average Size of MicroTrees (according to Farzan Munro) for MicroTree generation
          * @param bpsAndOccurrences Count Table of BP forms for Huffman encoding
          */
-        template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences){
+        template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences, bool doQueries){
 
             PHT_LOGGER_INFO("Factory Create", string("Creating MiniTrees..."));
             for(std::shared_ptr<UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<UnorderedTree<T>>> fmMicroTrees = FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
-                std::cout << "Test" << std::endl;
                 MiniTree miniTree = MiniTree();
-                std::cout << "TestEnd" << std::endl;
 
                 //Creating Micro Interconnections and Dummys
                 std::tie(miniTree.FIDs, miniTree.typeVectors) = create1_2_Interconnections(fmMiniTree,fmMicroTrees,sizeMicro);
@@ -588,22 +594,22 @@ namespace pht {
                 enumerateMicroTrees(fmMicroTrees);
 
                 //Simple Additions for Queries - MiniTree
-                std::shared_ptr<Node<T>> miniRoot = fmMiniTree->getRoot();
-                Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSize(miniRoot,false),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(miniRoot), Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(miniRoot), Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer, tree->getLeftmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer, tree->getRightmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniRootLeafRank, tree->getLeafRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniChildRank, tree->getChildRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                if(doQueries) {
+                    std::shared_ptr<Node<T>> miniRoot = fmMiniTree->getRoot();
+                    Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSize(miniRoot, false),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer,tree->getLeftmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer,tree->getRightmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniRootLeafRank, tree->getLeafRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniChildRank, tree->getChildRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
 
-                if(tree->isRoot(miniRoot)) {
-                    miniTree.miniParent = {false};
-                } else {
-                    Bitvector_Utils::encodeNumber(miniTree.miniParent,
-                                                  tree->getDirectAncestor(miniRoot)->getMiniTree() + 1,
-                                                  Bitvector_Utils::NumberEncoding::BINARY);
+                    if (tree->isRoot(miniRoot)) {
+                        miniTree.miniParent = {false};
+                    } else {
+                        Bitvector_Utils::encodeNumber(miniTree.miniParent,tree->getDirectAncestor(miniRoot)->getMiniTree() + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                    }
                 }
 
 
@@ -612,12 +618,14 @@ namespace pht {
                     std::shared_ptr<Node<T>> dummyPoint = tree->getDirectDescendants(fmMiniTree->getDummy()).at(0);
                     uint32_t miniTreePointer = dummyPoint->getMiniTree();
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyPointer, miniTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
-                    Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepth(dummyPoint), Bitvector_Utils::NumberEncoding::BINARY);
-                    Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeight(dummyPoint), Bitvector_Utils::NumberEncoding::BINARY);
-                    Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                    if(doQueries) {
+                        Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepth(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                        Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeight(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                        Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                    }
                 }
 
-                createMicroTrees(hypersuccinctTree, tree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences,sizeMicro);
+                createMicroTrees(hypersuccinctTree, tree, miniTree, fmMiniTree, fmMicroTrees, bpsAndOccurrences,sizeMicro,doQueries);
 
                 //This is done so late because of Huffman checks
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
@@ -644,27 +652,28 @@ namespace pht {
 //                std::cout << std::endl;
             }
 
-            //TODO: CHANGE
-            uint32_t miniSize = hypersuccinctTree.miniTrees.size();
-            for(uint32_t i=0; i<miniSize; i++) {
-                std::pair<uint32_t, uint32_t> miniFIDIndices = convertTreeToFIDIndex(hypersuccinctTree, i);
-                MiniTree &miniTree = hypersuccinctTree.getMiniTree(i);
-                Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.first + 1,Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniLowFIDIndex, miniFIDIndices.second + 1,Bitvector_Utils::NumberEncoding::BINARY);
-            }
-
-
-            std::vector< std::pair<std::vector<uint32_t>,std::vector<uint32_t>>> fIDTreeVector = getTreesForFID(hypersuccinctTree);
-            for(std::pair<std::vector<uint32_t>,std::vector<uint32_t>> fIDTrees : fIDTreeVector) {
-                if (fIDTrees.first.empty()) {
-                    hypersuccinctTree.miniFIDTopTree.push_back({false});
-                } else {
-                    hypersuccinctTree.miniFIDTopTree.push_back(Bitvector_Utils::encodeNumberReturn(fIDTrees.first.at(0) + 1));
+            if(doQueries) {
+                uint32_t miniSize = hypersuccinctTree.miniTrees.size();
+                for (uint32_t i = 0; i < miniSize; i++) {
+                    std::pair<uint32_t, uint32_t> miniFIDIndices = convertTreeToFIDIndex(hypersuccinctTree, i);
+                    MiniTree &miniTree = hypersuccinctTree.getMiniTree(i);
+                    Bitvector_Utils::encodeNumber(miniTree.miniTopFIDIndex, miniFIDIndices.first + 1,Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniLowFIDIndex, miniFIDIndices.second + 1,Bitvector_Utils::NumberEncoding::BINARY);
                 }
-                if (fIDTrees.second.empty()) {
-                    hypersuccinctTree.miniFIDLowTree.push_back({false});
-                } else {
-                    hypersuccinctTree.miniFIDLowTree.push_back(Bitvector_Utils::encodeNumberReturn(fIDTrees.second.at(0) + 1));
+
+
+                std::vector<std::pair<std::vector<uint32_t>, std::vector<uint32_t>>> fIDTreeVector = getTreesForFID(hypersuccinctTree);
+                for (std::pair<std::vector<uint32_t>, std::vector<uint32_t>> fIDTrees : fIDTreeVector) {
+                    if (fIDTrees.first.empty()) {
+                        hypersuccinctTree.miniFIDTopTree.push_back({false});
+                    } else {
+                        hypersuccinctTree.miniFIDTopTree.push_back(Bitvector_Utils::encodeNumberReturn(fIDTrees.first.at(0) + 1));
+                    }
+                    if (fIDTrees.second.empty()) {
+                        hypersuccinctTree.miniFIDLowTree.push_back({false});
+                    } else {
+                        hypersuccinctTree.miniFIDLowTree.push_back(Bitvector_Utils::encodeNumberReturn(fIDTrees.second.at(0) + 1));
+                    }
                 }
             }
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MiniTrees."));
@@ -978,7 +987,7 @@ namespace pht {
             return result;
         }
 
-        static void convertToBitVector(HypersuccinctTree& hst) {
+        static void createBitvectorSupports(HypersuccinctTree& hst) {
             assignBitVector(hst.miniFIDsSupport , hst.miniFIDs);
             assignBitVector(hst.miniTypeVectorsSupport , hst.miniTypeVectors);
             for(MiniTree &miniTree: hst.getMiniTrees()) {
