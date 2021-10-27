@@ -27,7 +27,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeNath2.xml","treeNath3.xml","treeNath4.xml"};
+    std::vector<std::string> fileNames = {"treeNath2.xml"};
     std::string resultFileName = "testResultsFactory.csv";
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> factoryTimesHuffman;
@@ -377,9 +377,11 @@ TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0);
         timer.stop();
+        tree.reset();
         factoryTimes.emplace_back(name, timer.toString());
 
         PHT_LOGGER_INFO("Runtime Test", "Begin Create Huffman.");
+        tree = pht::XMLReader::readByName(name);
         timer.start();
         hyperTree = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
         timer.stop();

@@ -67,7 +67,7 @@ namespace pht {
 
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
 
-            //hypersuccinctTree->miniFIDs.
+            hypersuccinctTree->lookupTable.shrink_to_fit();
 
             //TODO: convert std::bool to BitVector
             createBitvectorSupports(*hypersuccinctTree);
@@ -214,8 +214,9 @@ namespace pht {
          */
         static void createBitvectorFromFile(Bitvector::const_iterator& iter, Bitvector::const_iterator& end, Bitvector& target){
             uint32_t tempSize = Bitvector_Utils::decodeNumber(iter, end, Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+            target.reserve(tempSize);
             for(uint32_t i=0; i<tempSize; i++) {
-                target.push_back(*iter);
+                target.emplace_back(*iter);
                 iter++;
             }
         }
@@ -234,6 +235,7 @@ namespace pht {
                 createBitvectorFromFile(iter, end, part);
                 target.push_back(part);
             }
+            target.shrink_to_fit();
         }
 
         /**
@@ -254,6 +256,7 @@ namespace pht {
                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                 res.push_back(bp);
             }
+            res.shrink_to_fit();
             return res;
         }
 
@@ -278,6 +281,7 @@ namespace pht {
                     std::vector<bool> bp = oldEncodedMicros.at(i);
                     x.microTrees.push_back(huffmanTable.at(bp));
                 }
+                x.microTrees.shrink_to_fit();
                 HypersuccinctTreeOutput::printBitvector(x.microTrees);
             }
         }
@@ -308,25 +312,28 @@ namespace pht {
                 std::vector<std::shared_ptr<Node<T>>> children = baseTree->getDirectDescendants(rootNode);
                 Bitvector fidPart;
                 Bitvector tvPart;
+                fidPart.reserve(children.size());
                 for(std::shared_ptr<Node<T>> node : children) {
                     if(ListUtils::containsAny(rootNodes,{node})) {
-                        fidPart.push_back(true);
+                        fidPart.emplace_back(true);
                         tvPart.push_back(false);
                     }
                     else if(ListUtils::containsAny(firstChildren,{node}))
                     {
-                        fidPart.push_back(true);
+                        fidPart.emplace_back(true);
                         tvPart.push_back(true);
                     }
                     else
                     {
-                        fidPart.push_back(false);
+                        fidPart.emplace_back(false);
                     }
                 }
                 FIDs.push_back(fidPart);
                 typeVectors.push_back(tvPart);
 
             }
+            FIDs.shrink_to_fit();
+            typeVectors.shrink_to_fit();
             return {FIDs, typeVectors};
         }
 
@@ -381,6 +388,7 @@ namespace pht {
                     dummys.push_back({false});
                 }
             }
+            dummys.shrink_to_fit();
             return dummys;
         }
 
@@ -435,6 +443,15 @@ namespace pht {
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
                 lookupTableEntry.leafRank.push_back(Bitvector_Utils::encodeNumberReturn(leafRankNum));
             }
+            lookupTableEntry.parentPointers.shrink_to_fit();
+            lookupTableEntry.leafRank.shrink_to_fit();
+            lookupTableEntry.degree.shrink_to_fit();
+            lookupTableEntry.nodeHeights.shrink_to_fit();
+            lookupTableEntry.rightmost_leaf.shrink_to_fit();
+            lookupTableEntry.leftmost_leaf.shrink_to_fit();
+            lookupTableEntry.nodeDepths.shrink_to_fit();
+            lookupTableEntry.subTrees.shrink_to_fit();
+            lookupTableEntry.leaves.shrink_to_fit();
             PHT_LOGGER_INFO("Factory Create", string("Finished creating LookupTableEntries."));
         }
 
@@ -567,6 +584,25 @@ namespace pht {
                     }
                 }
             }
+            miniTree.FIDs.shrink_to_fit();
+            miniTree.typeVectors.shrink_to_fit();
+            miniTree.dummys.shrink_to_fit();
+            miniTree.microTopFIDIndices.shrink_to_fit();
+            miniTree.microLowFIDIndices.shrink_to_fit();
+            miniTree.microFIDTopTrees.shrink_to_fit();
+            miniTree.microFIDLowTrees.shrink_to_fit();
+            miniTree.microDummyPointers.shrink_to_fit();
+            miniTree.microChildRanks.shrink_to_fit();
+            miniTree.microExtendedChildRanks.shrink_to_fit();
+            miniTree.microParents.shrink_to_fit();
+            miniTree.microSubTrees.shrink_to_fit();
+            miniTree.rootDepths.shrink_to_fit();
+            miniTree.rootHeights.shrink_to_fit();
+            miniTree.microLeaves.shrink_to_fit();
+            miniTree.microTreeLeftmostLeafPointers.shrink_to_fit();
+            miniTree.microTreeRightmostLeafPointers.shrink_to_fit();
+            miniTree.microRootLeafRanks.shrink_to_fit();
+            miniTree.microExtendedLeafRanks.shrink_to_fit();
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MicroTrees for this MiniTree."));
         }
 
@@ -582,6 +618,7 @@ namespace pht {
         template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences, bool doQueries){
 
             PHT_LOGGER_INFO("Factory Create", string("Creating MiniTrees..."));
+            hypersuccinctTree.miniTrees.reserve(fmMiniTrees.size());
             for(std::shared_ptr<UnorderedTree<T>> fmMiniTree : fmMiniTrees) {
                 std::vector<std::shared_ptr<UnorderedTree<T>>> fmMicroTrees = FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
                 MiniTree miniTree = MiniTree();
@@ -629,6 +666,7 @@ namespace pht {
 
                 //This is done so late because of Huffman checks
                 miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
+                miniTree.microTrees.shrink_to_fit();
                 hypersuccinctTree.miniTrees.push_back(miniTree);
 
                 //Output
@@ -676,6 +714,11 @@ namespace pht {
                     }
                 }
             }
+            hypersuccinctTree.miniFIDs.shrink_to_fit();
+            hypersuccinctTree.miniFIDTopTree.shrink_to_fit();
+            hypersuccinctTree.miniFIDLowTree.shrink_to_fit();
+            hypersuccinctTree.miniTypeVectors.shrink_to_fit();
+            hypersuccinctTree.miniDummys.shrink_to_fit();
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MiniTrees."));
         }
 
