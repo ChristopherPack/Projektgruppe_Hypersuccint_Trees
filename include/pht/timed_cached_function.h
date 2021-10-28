@@ -1,6 +1,8 @@
 #ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_TIMED_CACHED_FUNCTION_H_
 #define PROJECTGROUP_HYPERSUCCINCT_TREES_TIMED_CACHED_FUNCTION_H_
 
+#include <cassert>
+
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -19,6 +21,7 @@ namespace pht {
 
     public:
         TimedCachedFunction(std::function<R(Args...)> func, uint32_t validityIntervallMs = 60000, uint32_t garbageCollectorIntervallMs = 1000) : func(func) {
+            assert(validityIntervallMs>=garbageCollectorIntervallMs);
             garbageCollector = std::unique_ptr<std::thread>(new std::thread([this, validityIntervallMs, garbageCollectorIntervallMs](){
                 while(garbageCollectorRunning) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(garbageCollectorIntervallMs));

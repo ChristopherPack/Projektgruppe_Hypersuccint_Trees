@@ -197,9 +197,20 @@ TEST(CachingTest, TimedCachedFunctionControlFlowTest) {
         }
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    EXPECT_CALL(mockFunctions, add(0, 0)).Times(0);
-    EXPECT_NO_THROW({timed_cached_add_func(0, 0);});
+    
+    pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t> timed_cached_add_func_short = pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t>([&mockFunctions](uint32_t a, uint32_t b){return mockFunctions.add(a,b);}, 1000);
+    EXPECT_CALL(mockFunctions, add(30, 40)).Times(1);
+    timed_cached_add_func_short(30, 40);
+    
+    EXPECT_CALL(mockFunctions, add(30, 40)).Times(0);
+    timed_cached_add_func_short(30, 40);
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_CALL(mockFunctions, add(30, 40)).Times(1);
+    timed_cached_add_func_short(30, 40);
+
+    EXPECT_CALL(mockFunctions, add(30, 40)).Times(0);
+    timed_cached_add_func_short(30, 40);
 }
 
 TEST(CachingTest, TimedCachedFunctionDataTest) {
@@ -225,17 +236,9 @@ TEST(CachingTest, TimedCachedFunctionDataTest) {
         }
     }
 
-    pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t> timed_cached_add_func_short = pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t>([](uint32_t a, uint32_t b){return a+b;}, 500);
-    for(uint32_t i = 0; i <= 100; i++) {
-        for(uint32_t j = 0; j <= 100; j++) {
-            EXPECT_EQ(timed_cached_add_func(i, j), i+j);
-        }
-    }
+    pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t> timed_cached_add_func_short = pht::TimedCachedFunction<uint32_t,uint32_t,uint32_t>([](uint32_t a, uint32_t b){return a+b;}, 1000);
+    EXPECT_EQ(timed_cached_add_func_short(30, 40), 70);
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    for(uint32_t i = 0; i <= 100; i++) {
-        for(uint32_t j = 0; j <= 100; j++) {
-            EXPECT_EQ(timed_cached_add_func(i, j), i+j);
-        }
-    }
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    EXPECT_EQ(timed_cached_add_func_short(30, 40), 70);
 }
