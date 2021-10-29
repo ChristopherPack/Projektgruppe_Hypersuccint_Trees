@@ -1,14 +1,14 @@
 #ifndef PROJECTGROUP_HYPERSUCCINCT_TREES_TIMED_CACHED_FUNCTION_H_
 #define PROJECTGROUP_HYPERSUCCINCT_TREES_TIMED_CACHED_FUNCTION_H_
 
+#include <cassert>
+
 #include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
-#include <vector>
 
 namespace pht {
     template<class R, class... Args> class TimedCachedFunction {
@@ -21,6 +21,7 @@ namespace pht {
 
     public:
         TimedCachedFunction(std::function<R(Args...)> func, uint32_t validityIntervallMs = 60000, uint32_t garbageCollectorIntervallMs = 1000) : func(func) {
+            assert(validityIntervallMs>=garbageCollectorIntervallMs);
             garbageCollector = std::unique_ptr<std::thread>(new std::thread([this, validityIntervallMs, garbageCollectorIntervallMs](){
                 while(garbageCollectorRunning) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(garbageCollectorIntervallMs));
@@ -46,8 +47,9 @@ namespace pht {
         
         void invalidate() {
             cacheLock.lock();
-            for(std::pair<std::tuple<Args...>, R> entry : cache) {
-                _add(entry.first);
+            for(std::pair<std::tuple<Args...>, std::tuple<R, std::chrono::time_point<std::chrono::steady_clock>>> entry : cache) {
+                std::tuple<R, std::chrono::time_point<std::chrono::steady_clock>> data = {std::apply(func, entry.first), std::chrono::steady_clock::now()};
+                cache.insert_or_assign(entry.first, data);
             }
             cacheLock.unlock();
         }
@@ -61,7 +63,8 @@ namespace pht {
         R operator()(Args... args) {
             cacheLock.lock();
             if(cache.find(std::tuple(args...)) == cache.end()) {
-                _add(args...);
+                std::tuple<R, std::chrono::time_point<std::chrono::steady_clock>> data = {func(args...), std::chrono::steady_clock::now()};
+                cache.insert_or_assign(std::tuple(args...), data);
             }
             std::tuple<R, std::chrono::time_point<std::chrono::steady_clock>> entry = cache.at(std::tuple(args...));
             cacheLock.unlock();
@@ -71,12 +74,6 @@ namespace pht {
         ~TimedCachedFunction() {
             garbageCollectorRunning = false;
             garbageCollector->join();
-        }
-
-    private:
-        void _add(Args... args) {
-            std::tuple<R, std::chrono::time_point<std::chrono::steady_clock>> data = {func(args...), std::chrono::steady_clock::now()};
-            cache.insert_or_assign(std::tuple(args...), data);
         }
     };
 }

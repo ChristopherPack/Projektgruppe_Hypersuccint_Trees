@@ -12,14 +12,10 @@ namespace pht {
 
     public:
         CachedFunction(std::function<R(Args...)> func) : func(func) {}
-
-        void add(Args... args) {
-            cache.insert_or_assign(std::tuple(args...), func(args...));
-        }
         
         void invalidate() {
             for(std::pair<std::tuple<Args...>, R> entry : cache) {
-                add(entry.first);
+                cache.insert_or_assign(entry.first, std::apply(func, entry.first));
             }
         }
         
@@ -29,7 +25,7 @@ namespace pht {
 
         R operator()(Args... args) {
             if(cache.find(std::tuple(args...)) == cache.end()) {
-                add(args...);
+                cache.insert_or_assign(std::tuple(args...), func(args...));
             }
             return cache.at(std::tuple(args...));
         }
