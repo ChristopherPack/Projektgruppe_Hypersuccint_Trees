@@ -282,7 +282,7 @@ namespace pht {
                     x.microTrees.push_back(huffmanTable.at(bp));
                 }
                 x.microTrees.shrink_to_fit();
-                HypersuccinctTreeOutput::printBitvector(x.microTrees);
+                //HypersuccinctTreeOutput::printBitvector(x.microTrees);
             }
         }
 
@@ -675,19 +675,11 @@ namespace pht {
                 PHT_LOGGER_INFO("FACTORY", "Root of MiniTree: " + fmMiniTree->getRoot()->getValue());
                 PHT_LOGGER_INFO("FACTORY", "Nodes of MiniTree: " + fmMiniTree->toNewickString());
                 PHT_LOGGER_INFO("FACTORY", "Amount of MicroTrees: " + std::to_string(fmMicroTrees.size()));
-//                std::cout << "Size of MiniTree: " << fmMiniTree->getSize() << "\n";
-//                std::cout << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << "\n";
-//                std::cout << "Nodes of MiniTree: " << fmMiniTree->toNewickString() << "\n";
-//                std::cout << "Amount of MicroTrees: " << fmMicroTrees.size() << "\n";
                 for(std::shared_ptr<UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
                     PHT_LOGGER_INFO("FACTORY", "Size of MicroTree: " + std::to_string(fmMicroTree->getSize()));
                     PHT_LOGGER_INFO("FACTORY", "Root of MicroTree: " + fmMicroTree->getRoot()->getValue());
                     PHT_LOGGER_INFO("FACTORY", "Nodes of MicroTree: " + fmMicroTree->toNewickString());
-//                    std::cout << "Size of MicroTree: " << fmMicroTree->getSize() << "\n";
-//                    std::cout << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << "\n";
-//                    std::cout << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << "\n";
                 }
-//                std::cout << std::endl;
             }
 
             if(doQueries) {
