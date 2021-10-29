@@ -28,11 +28,23 @@ namespace pht {
          */
         static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> result = decomposeRaw(tree, idealSize);
-            std::vector<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>> enumResult;
-            enumResult = ListUtils::mapped<std::shared_ptr<pht::UnorderedTree<T>>, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(result, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){return std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>(tree->enumerate(tree1->getRoot()),tree1);});
-            ListUtils::sort<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> treeB){return treeA.first<treeB.first;});
+            std::vector<std::pair< std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>> enumResult;
+            enumResult = ListUtils::mapped<std::shared_ptr<pht::UnorderedTree<T>>, std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>>(result, [&tree](std::shared_ptr<pht::UnorderedTree<T>> tree1){
+                std::pair< uint32_t,uint32_t > pair;
+                pair.first = tree->enumerate(tree1->getRoot());
+                if(tree1->getSize() > 1) {
+                    pair.second = tree->enumerate(tree1->getDirectDescendants(tree1->getRoot()).at(0));
+                } else {
+                    pair.second = 0;
+                }
+                return std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>(pair,tree1);});
+            ListUtils::sort<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> treeA, std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> treeB){
+                if(treeA.first.first == treeB.first.first) {
+                    return treeA.first.second<treeB.first.second;
+                }
+                return treeA.first.first<treeB.first.first;});
             result.clear();
-            result = ListUtils::mapped<std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<uint32_t,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
+            result = ListUtils::mapped<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
         /**

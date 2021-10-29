@@ -653,6 +653,7 @@ namespace pht {
 
         std::vector<bool> toBalancedParenthesis() {
             std::vector<bool> bp;
+            bp.reserve(getSize()*2);
             if(root == nullptr) {
                 return bp;
             }
@@ -749,11 +750,11 @@ namespace pht {
          * @return The subtree as string.
          */
         void toBP(std::shared_ptr<pht::Node<T>> node,std::vector<bool>& bp) const {
-            bp.push_back(true);
+            bp.emplace_back(true);
             for(std::shared_ptr<pht::Node<T>> child : getDirectDescendants(node)) {
                 toBP(child, bp);
             }
-            bp.push_back(false);
+            bp.emplace_back(false);
         }
    };
 
