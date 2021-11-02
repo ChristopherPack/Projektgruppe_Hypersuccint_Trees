@@ -24,7 +24,7 @@ int main() {
     pht::Timer globalTimer;
     PHT_LOGGER_INFO("MAIN", "Reading File...");
     pht::Timer localTimer;
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath2");
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
 
@@ -36,6 +36,7 @@ int main() {
     localTimer.start();
     std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
     localTimer.stop();
+    return 0;
     PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
     PHT_LOGGER_INFO("MAIN", "Saving tree to file...");
     localTimer.start();
