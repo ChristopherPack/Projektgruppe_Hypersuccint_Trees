@@ -9,6 +9,7 @@
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 #include "bit_vector.h"
+#include "pht/thread_pool.h"
 
 
 using namespace pht;

@@ -12,13 +12,14 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <thread>
+//#include <thread>
 #include <mutex>
 
 #include "logger.h"
 #include "huffman.h"
 #include "hypersuccinct_tree.h"
 #include "hst_output.h"
+#include "thread_pool.hpp"
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
@@ -467,7 +468,9 @@ namespace pht {
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
          */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro, bool doQueries,std::vector<std::mutex>& allMutex){
+            std::unique_lock<std::mutex> lockLog(allMutex.at(2));
             PHT_LOGGER_INFO("Factory Create", string("Creating MicroTrees for a MiniTree..."));
+            lockLog.unlock();
             uint32_t microCount = 0;
             //The actual MicroTree Loop
             //Put everything that needs MicroTree Iteration in this loop
@@ -553,16 +556,14 @@ namespace pht {
                 }
 
                 LookupTableEntry microTreeData(bp);
+                std::unique_lock<std::mutex> lockLookup(allMutex.at(1));
                 if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                     if(doQueries) {
-                        allMutex.at(1).lock();
                         fillLookupTableEntry(microTreeData, fmMicroTree);
-                        allMutex.at(1).unlock();
                     }
-                    allMutex.at(2).lock();
                     hypersuccinctTree.lookupTable.push_back(microTreeData);
-                    allMutex.at(2).unlock();
                 }
+                lockLookup.unlock();
             }
             if(doQueries) {
                 std::vector<std::pair<std::vector<uint32_t>, std::vector<uint32_t>>> fIDTreesVector = getTreesForMicroFID(hypersuccinctTree, miniTree);
@@ -610,13 +611,13 @@ namespace pht {
             miniTree.microTreeRightmostLeafPointers.shrink_to_fit();
             miniTree.microRootLeafRanks.shrink_to_fit();
             miniTree.microExtendedLeafRanks.shrink_to_fit();
+            std::unique_lock<std::mutex> lockLog2(allMutex.at(2));
             PHT_LOGGER_INFO("Factory Create", string("Finished Creating MicroTrees for this MiniTree."));
+            lockLog2.unlock();
         }
 
         template<class T> static void createMiniTree(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, uint32_t sizeMicro,std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences, bool doQueries,std::vector<std::mutex>& allMutex,uint32_t miniTreePos) {
-            allMutex.at(0).lock();
-            std::vector<std::shared_ptr<UnorderedTree<T>>> fmMicroTrees = FarzanMunro<T>::decompose(fmMiniTree, sizeMicro);
-            allMutex.at(0).unlock();
+            std::vector<std::shared_ptr<UnorderedTree<T>>> fmMicroTrees = FarzanMunro<T>::decomposeMultiThread(fmMiniTree, sizeMicro, allMutex);
             MiniTree miniTree = MiniTree();
 
             //Creating Micro Interconnections and Dummys
@@ -666,11 +667,12 @@ namespace pht {
             //This is done so late because of Huffman checks
             miniTree.microTrees = createBitVectorforMicroTrees(fmMicroTrees);
             miniTree.microTrees.shrink_to_fit();
-            allMutex.at(3).lock();
+            std::unique_lock<std::mutex> lockMini(allMutex.at(3));
             hypersuccinctTree.miniTrees.at(miniTreePos) = miniTree;
-            allMutex.at(3).unlock();
+            lockMini.unlock();
 
             //Output
+            std::unique_lock<std::mutex> lockLog(allMutex.at(2));
             /*PHT_LOGGER_INFO("FACTORY", "Size of MiniTree: " + std::to_string(fmMiniTree->getSize()));
             PHT_LOGGER_INFO("FACTORY", "Root of MiniTree: " + fmMiniTree->getRoot()->getValue());
             PHT_LOGGER_INFO("FACTORY", "Nodes of MiniTree: " + fmMiniTree->toNewickString());
@@ -680,6 +682,7 @@ namespace pht {
                 PHT_LOGGER_INFO("FACTORY", "Root of MicroTree: " + fmMicroTree->getRoot()->getValue());
                 PHT_LOGGER_INFO("FACTORY", "Nodes of MicroTree: " + fmMicroTree->toNewickString());
             }*/
+            lockLog.unlock();
         }
 
         /**
@@ -695,7 +698,7 @@ namespace pht {
 
             PHT_LOGGER_INFO("Factory Create", string("Creating MiniTrees..."));
             hypersuccinctTree.miniTrees = std::vector<MiniTree>(fmMiniTrees.size());
-            std::vector<std::thread> allThreads;
+            /*std::vector<std::thread> allThreads;
             allThreads.reserve(fmMiniTrees.size());
             std::vector<std::mutex> allMutex(4);
             for(uint32_t i = 0; i < fmMiniTrees.size(); i++) {
@@ -705,7 +708,14 @@ namespace pht {
 
             for(std::thread& t : allThreads) {
                 t.join();
+            }*/
+            thread_pool pool;
+            std::vector<std::mutex> allMutex(4);
+            for(uint32_t i = 0; i < fmMiniTrees.size(); i++) {
+                std::shared_ptr<UnorderedTree<T>>& fmMiniTree = fmMiniTrees.at(i);
+                pool.push_task(createMiniTree<T>,std::ref(hypersuccinctTree),std::cref(tree),std::ref(fmMiniTree),sizeMicro,std::ref(bpsAndOccurrences),doQueries,std::ref(allMutex),i);
             }
+            pool.wait_for_tasks();
 
             std::cout << "All THREADS DONE" << std::endl;
 

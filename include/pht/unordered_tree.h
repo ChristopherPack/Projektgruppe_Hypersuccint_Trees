@@ -32,8 +32,6 @@ namespace pht {
      * 
      * @tparam T The type of data stored in the nodes. 
      */
-    //TODO Caching
-    //Todo: Rewrite tree for consistent ORDER
     template<class T> class UnorderedTree {
         friend class Visualize;
 
