@@ -12,7 +12,6 @@
 #include <map>
 #include <memory>
 #include <set>
-//#include <thread>
 #include <mutex>
 
 #include "logger.h"
@@ -902,19 +901,33 @@ namespace pht {
         }
 
         static void createBitvectorSupports(HypersuccinctTree& hst) {
-            assignBitVector(hst.miniFIDsSupport , hst.miniFIDs);
-            assignBitVector(hst.miniTypeVectorsSupport , hst.miniTypeVectors);
+            thread_pool pool;
+            pool.push_task(assignBitVector,std::ref(hst.miniFIDsSupport),std::cref(hst.miniFIDs));
+            pool.push_task(assignBitVector,std::ref(hst.miniTypeVectorsSupport),std::cref(hst.miniTypeVectors));
+            //assignBitVector(hst.miniFIDsSupport , hst.miniFIDs);
+            //assignBitVector(hst.miniTypeVectorsSupport , hst.miniTypeVectors);
+            /*std::vector<std::mutex> allMutex(4);
+            for(uint32_t i = 0; i < fmMiniTrees.size(); i++) {
+                std::shared_ptr<UnorderedTree<T>>& fmMiniTree = fmMiniTrees.at(i);
+                pool.push_task(createMiniTree<T>,std::ref(hypersuccinctTree),std::cref(tree),std::ref(fmMiniTree),sizeMicro,std::ref(bpsAndOccurrences),doQueries,std::ref(allMutex),i);
+            }
+            pool.wait_for_tasks();*/
             for(MiniTree &miniTree: hst.getMiniTrees()) {
-                assignBitVector(miniTree.FIDsSupport , miniTree.FIDs);
-                assignBitVector(miniTree.typeVectorsSupport , miniTree.typeVectors);
+                pool.push_task(assignBitVector,std::ref(miniTree.FIDsSupport),std::cref(miniTree.FIDs));
+                pool.push_task(assignBitVector,std::ref(miniTree.typeVectorsSupport),std::cref(miniTree.typeVectors));
+                //assignBitVector(miniTree.FIDsSupport , miniTree.FIDs);
+                //assignBitVector(miniTree.typeVectorsSupport , miniTree.typeVectors);
             }
             for(LookupTableEntry &entry : hst.lookupTable) {
-                assignBitVector(entry.ancestorMatrixSupport , entry.ancestorMatrix);
-                assignBitVector(entry.childMatrixSupport , entry.childMatrix);
+                pool.push_task(assignBitvector,std::ref(entry.ancestorMatrixSupport),std::cref(entry.ancestorMatrix));
+                pool.push_task(assignBitvector,std::ref(entry.childMatrixSupport),std::cref(entry.childMatrix));
+                //assignBitvector(entry.ancestorMatrixSupport , entry.ancestorMatrix);
+                //assignBitvector(entry.childMatrixSupport , entry.childMatrix);
             }
+            pool.wait_for_tasks();
         }
 
-        static void assignBitVector(succinct_bv::BitVector& bitVector, const Bitvector& bitvector) {
+        static void assignBitvector(succinct_bv::BitVector& bitVector, const Bitvector& bitvector) {
             if(!bitvector.empty()) {
                 bitVector = bitvector;
             }

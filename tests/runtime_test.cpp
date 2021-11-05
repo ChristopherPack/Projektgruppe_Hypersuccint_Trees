@@ -27,8 +27,8 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"treeNath2.xml","treeNath3.xml","treeNath4.xml","TreeNath5.xml"};
-    std::string resultFileName = "testResultsFactoryOptimizedThreadPooling.csv";
+    std::vector<std::string> fileNames = {"DBLP.xml"};
+    std::string resultFileName = "testResultsFactoryOptimizedThreadPooling3.csv";
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> factoryTimesHuffman;
     std::vector<pair<std::string , std::string >> factoryTimesNoQueries;

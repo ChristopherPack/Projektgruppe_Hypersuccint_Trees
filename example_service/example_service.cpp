@@ -9,7 +9,6 @@
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree_factory.h"
 #include "bit_vector.h"
-#include "pht/thread_pool.h"
 
 
 using namespace pht;
@@ -37,7 +36,6 @@ int main() {
     localTimer.start();
     std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
     localTimer.stop();
-    return 0;
     PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
     PHT_LOGGER_INFO("MAIN", "Saving tree to file...");
     localTimer.start();
