@@ -28,7 +28,7 @@ int main() {
     pht::Timer globalTimer;
     PHT_LOGGER_INFO("MAIN") << "Reading File..." << pht::Logger::endl();
     pht::Timer localTimer;
-    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("BaseBall");
+    std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath2");
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN") << std::string("File read in ") << localTimer.toString() << pht::Logger::endl();
 
