@@ -21,7 +21,7 @@ extern "C" {
 
             void stop();
 
-            std::chrono::duration<uint32_t, std::ratio<1, 1000>> getDuration() const;
+            std::chrono::duration<uint32_t, std::micro> getDuration() const;
 
             std::string toString() const;
 

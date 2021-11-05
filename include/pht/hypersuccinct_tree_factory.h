@@ -57,7 +57,7 @@ namespace pht {
 
             enumerateMiniTrees(fmMiniTrees);
 
-            PHT_LOGGER_INFO("Factory Create", string ("Amount of Minitrees: ") + to_string(fmMiniTrees.size()));
+            PHT_LOGGER_INFO("Factory Create") << "Amount of Minitrees: " << fmMiniTrees.size() << pht::Logger::endl();
 
             std::map<std::vector<bool>,uint32_t> bpsAndOccurrences;
             createMiniTrees(*hypersuccinctTree, tree, fmMiniTrees, sizeMicro, bpsAndOccurrences,doQueries);
@@ -67,7 +67,7 @@ namespace pht {
                 convertToHuffman(*hypersuccinctTree, huffmanTable);
             }
 
-            PHT_LOGGER_INFO("Factory Create", string("Finished Creating Hypersuccinct Tree"));
+            PHT_LOGGER_INFO("Factory Create") << "Finished Creating Hypersuccinct Tree" << pht::Logger::endl();
 
             hypersuccinctTree->lookupTable.shrink_to_fit();
 
@@ -401,7 +401,7 @@ namespace pht {
          * @param fmMicroTree The Micro Tree to get data from
          */
         template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree){
-            PHT_LOGGER_INFO("Factory Create", string("Creating LookupTableEntries..."));
+            PHT_LOGGER_INFO("Factory Create") << "Creating LookupTableEntries..." << pht::Logger::endl();
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
             //Generates LookupTable Entries
             for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
@@ -454,7 +454,7 @@ namespace pht {
             lookupTableEntry.nodeDepths.shrink_to_fit();
             lookupTableEntry.subTrees.shrink_to_fit();
             lookupTableEntry.leaves.shrink_to_fit();
-            PHT_LOGGER_INFO("Factory Create", string("Finished creating LookupTableEntries."));
+            PHT_LOGGER_INFO("Factory Create") << "Finished creating LookupTableEntries." << pht::Logger::endl();
         }
 
         /**
@@ -468,7 +468,7 @@ namespace pht {
          */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro, bool doQueries,std::vector<std::mutex>& allMutex){
             std::unique_lock<std::mutex> lockLog(allMutex.at(2));
-            PHT_LOGGER_INFO("Factory Create", string("Creating MicroTrees for a MiniTree..."));
+            PHT_LOGGER_INFO("Factory Create") << "Creating MicroTrees for a MiniTree..." << pht::Logger::endl();
             lockLog.unlock();
             uint32_t microCount = 0;
             //The actual MicroTree Loop
@@ -672,15 +672,15 @@ namespace pht {
 
             //Output
             std::unique_lock<std::mutex> lockLog(allMutex.at(2));
-            /*PHT_LOGGER_INFO("FACTORY", "Size of MiniTree: " + std::to_string(fmMiniTree->getSize()));
-            PHT_LOGGER_INFO("FACTORY", "Root of MiniTree: " + fmMiniTree->getRoot()->getValue());
-            PHT_LOGGER_INFO("FACTORY", "Nodes of MiniTree: " + fmMiniTree->toNewickString());
-            PHT_LOGGER_INFO("FACTORY", "Amount of MicroTrees: " + std::to_string(fmMicroTrees.size()));
+            PHT_LOGGER_INFO("FACTORY") << "Size of MiniTree: " << fmMiniTree->getSize() << pht::Logger::endl();
+            PHT_LOGGER_INFO("FACTORY") << "Root of MiniTree: " << fmMiniTree->getRoot()->getValue() << pht::Logger::endl();
+            PHT_LOGGER_INFO("FACTORY") << "Nodes of MiniTree: " << fmMiniTree->toNewickString() << pht::Logger::endl();
+            PHT_LOGGER_INFO("FACTORY") << "Amount of MicroTrees: " << fmMicroTrees.size() << pht::Logger::endl();
             for(std::shared_ptr<UnorderedTree<std::string>>& fmMicroTree : fmMicroTrees) {
-                PHT_LOGGER_INFO("FACTORY", "Size of MicroTree: " + std::to_string(fmMicroTree->getSize()));
-                PHT_LOGGER_INFO("FACTORY", "Root of MicroTree: " + fmMicroTree->getRoot()->getValue());
-                PHT_LOGGER_INFO("FACTORY", "Nodes of MicroTree: " + fmMicroTree->toNewickString());
-            }*/
+                PHT_LOGGER_INFO("FACTORY") << "Size of MicroTree: " << fmMicroTree->getSize() << pht::Logger::endl();
+                PHT_LOGGER_INFO("FACTORY") << "Root of MicroTree: " << fmMicroTree->getRoot()->getValue() << pht::Logger::endl();
+                PHT_LOGGER_INFO("FACTORY") << "Nodes of MicroTree: " << fmMicroTree->toNewickString() << pht::Logger::endl();
+            }
             lockLog.unlock();
         }
 
@@ -748,7 +748,7 @@ namespace pht {
             hypersuccinctTree.miniFIDLowTree.shrink_to_fit();
             hypersuccinctTree.miniTypeVectors.shrink_to_fit();
             hypersuccinctTree.miniDummys.shrink_to_fit();
-            PHT_LOGGER_INFO("Factory Create", string("Finished Creating MiniTrees."));
+            PHT_LOGGER_INFO("Factory Create") << "Finished Creating MiniTrees." << pht::Logger::endl();
         }
 
         /**

@@ -10,6 +10,10 @@
 #include "pht/hypersuccinct_tree_factory.h"
 #include "bit_vector.h"
 
+//TODO Speedup SuccinctBV
+//TODO HST-Byte-Counter
+//TODO Compile on *NIX and use Valgrind
+//TODO Fix Warnings from Cython compilation
 
 using namespace pht;
 
@@ -17,42 +21,42 @@ std::shared_ptr<pht::UnorderedTree<char>> createTestTree();
 std::shared_ptr<pht::UnorderedTree<std::string>> createExampleTree();
 
 int main() {
-    pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_DEBUG);
+    pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_INFO);
     pht::Logger::setStdOutEnabled(true);
-    PHT_LOGGER_INFO("MAIN", "Executing example service");
-    PHT_LOGGER_INFO("MAIN", "Current Filesystem:" + std::filesystem::current_path().string());
+    PHT_LOGGER_INFO("MAIN") << "Executing example service" << pht::Logger::endl();
+    PHT_LOGGER_INFO("MAIN") << "Current Filesystem: " << std::filesystem::current_path().string() << pht::Logger::endl();
     pht::Timer globalTimer;
-    PHT_LOGGER_INFO("MAIN", "Reading File...");
+    PHT_LOGGER_INFO("MAIN") << "Reading File..." << pht::Logger::endl();
     pht::Timer localTimer;
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("treeNath2");
     localTimer.stop();
-    PHT_LOGGER_INFO("MAIN", std::string("File read in ")+localTimer.toString());
+    PHT_LOGGER_INFO("MAIN") << std::string("File read in ") << localTimer.toString() << pht::Logger::endl();
 
 
 
 
 
-    PHT_LOGGER_INFO("MAIN", "Creating HST...");
+    PHT_LOGGER_INFO("MAIN") << "Creating HST..." << pht::Logger::endl();
     localTimer.start();
     std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
     localTimer.stop();
-    PHT_LOGGER_INFO("MAIN", std::string("HST created in ")+localTimer.toString());
-    PHT_LOGGER_INFO("MAIN", "Saving tree to file...");
+    PHT_LOGGER_INFO("MAIN") << "HST created in " << localTimer.toString() << pht::Logger::endl();
+    PHT_LOGGER_INFO("MAIN") << "Saving tree to file..." << pht::Logger::endl();
     localTimer.start();
     HypersuccinctTreeOutput::writeToFile(*hst);
     localTimer.stop();
-    PHT_LOGGER_INFO("MAIN", std::string("Tree saved in ")+localTimer.toString());
+    PHT_LOGGER_INFO("MAIN") << "Tree saved in " << localTimer.toString() << pht::Logger::endl();
 
-    PHT_LOGGER_DEBUG("MAIN", "Printing original Tree data:");
-    PHT_LOGGER_DEBUG("TREE", "Size: " + to_string(tree->getSize()));
-    std::cout << tree->toNewickString() << std::endl;
+    PHT_LOGGER_DEBUG("MAIN") << "Printing original Tree data:" << pht::Logger::endl();
+    PHT_LOGGER_DEBUG("TREE") << "Size: " << to_string(tree->getSize());
+    PHT_LOGGER_DEBUG("MAIN") << tree->toNewickString() << "\n" << pht::Logger::endl();
     HypersuccinctTreeOutput::printTree(*hst);
     pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
-    PHT_LOGGER_DEBUG("TREE", "FileTree:");
+    PHT_LOGGER_DEBUG("TREE") << "FileTree:" << pht::Logger::endl();
     HypersuccinctTreeOutput::printTree(fileHst);
 
     globalTimer.stop();
-    PHT_LOGGER_INFO("MAIN", std::string("Example service executed in ")+globalTimer.toString());
+    PHT_LOGGER_INFO("MAIN") << "Example service executed in " << globalTimer.toString() << pht::Logger::endl();
     return 0;
 }
 
