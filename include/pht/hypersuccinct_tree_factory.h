@@ -400,8 +400,10 @@ namespace pht {
          * @param lookupTableEntry The lookupTable Entry to fill
          * @param fmMicroTree The Micro Tree to get data from
          */
-        template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree){
+        template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree,std::vector<std::mutex>& allMutex){
+            std::unique_lock<std::mutex> lockLog(allMutex.at(2));
             PHT_LOGGER_INFO("Factory Create") << "Creating LookupTableEntries..." << pht::Logger::endl();
+            lockLog.unlock();
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
             //Generates LookupTable Entries
             for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
@@ -454,7 +456,9 @@ namespace pht {
             lookupTableEntry.nodeDepths.shrink_to_fit();
             lookupTableEntry.subTrees.shrink_to_fit();
             lookupTableEntry.leaves.shrink_to_fit();
+            std::unique_lock<std::mutex> lockLog2(allMutex.at(2));
             PHT_LOGGER_INFO("Factory Create") << "Finished creating LookupTableEntries." << pht::Logger::endl();
+            lockLog2.unlock();
         }
 
         /**
@@ -554,11 +558,11 @@ namespace pht {
                     bpsAndOccurrences.at(bp)++;
                 }
 
-                LookupTableEntry microTreeData(bp);
                 std::unique_lock<std::mutex> lockLookup(allMutex.at(1));
+                LookupTableEntry microTreeData(bp);
                 if(!ListUtils::containsAny(hypersuccinctTree.lookupTable, {microTreeData})) {
                     if(doQueries) {
-                        fillLookupTableEntry(microTreeData, fmMicroTree);
+                        fillLookupTableEntry(microTreeData, fmMicroTree,allMutex);
                     }
                     hypersuccinctTree.lookupTable.push_back(microTreeData);
                 }
@@ -611,7 +615,7 @@ namespace pht {
             miniTree.microRootLeafRanks.shrink_to_fit();
             miniTree.microExtendedLeafRanks.shrink_to_fit();
             std::unique_lock<std::mutex> lockLog2(allMutex.at(2));
-            PHT_LOGGER_INFO("Factory Create", string("Finished Creating MicroTrees for this MiniTree."));
+            PHT_LOGGER_INFO("Factory Create") << "Finished Creating MicroTrees for this MiniTree." << pht::Logger::endl();
             lockLog2.unlock();
         }
 
@@ -695,7 +699,7 @@ namespace pht {
          */
         template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences, bool doQueries){
 
-            PHT_LOGGER_INFO("Factory Create", string("Creating MiniTrees..."));
+            PHT_LOGGER_INFO("Factory Create") << "Creating MiniTrees..." << pht::Logger::endl();
             hypersuccinctTree.miniTrees = std::vector<MiniTree>(fmMiniTrees.size());
             /*std::vector<std::thread> allThreads;
             allThreads.reserve(fmMiniTrees.size());

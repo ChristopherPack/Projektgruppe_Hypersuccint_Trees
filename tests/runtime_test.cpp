@@ -7,6 +7,9 @@
 
 
 //#define PHT_TEST
+#ifdef NDEBUG
+#define PHT_LOGGER_QUIET
+#endif
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
 #include "pht/xml_reader.h"

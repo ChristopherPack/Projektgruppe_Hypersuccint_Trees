@@ -3,6 +3,9 @@
 #include "gmock/gmock-matchers.h"
 
 #define PHT_TEST
+#ifdef NDEBUG
+#define PHT_LOGGER_QUIET
+#endif
 
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree.h"
@@ -78,10 +81,6 @@ protected:
         example->add(z, r);
         example->add(A, t);
         example->add(B, x);
-
-
-
-
     }
 
 };

@@ -25,8 +25,8 @@ pht::Logger::LogStream* pht::Logger::getCurrentLogStream() {
     return currentLogStream.get();
 }
 
-pht::Logger::LogStream& pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func) {
-    currentLogStream = std::unique_ptr<LogStream>(new LogStream(level, tag, file, line, func));
+pht::Logger::LogStream& pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet) {
+    currentLogStream = std::unique_ptr<LogStream>(new LogStream(level, tag, file, line, func, quiet));
     return *currentLogStream;
 }
 
@@ -85,8 +85,12 @@ void pht::Logger::_log(pht::Logger::LogLevel level, const std::string& tag, cons
         stdOutWrapper << std::string(PHT_LOGGER_MSG_WIDTH-msgLine.length(), ' ');
     }
 
-    std::filesystem::path filePath = file;
-    stdOutWrapper << " (" << filePath.filename().string() << ":" << line << ":" << func << "(...))";
+    if(!file.empty()) {
+        std::filesystem::path filePath = file;
+        stdOutWrapper << " (" << filePath.filename().string() << ":" << line << ":" << func << "(...))";
+    } else {
+        stdOutWrapper << " (" << "???" << ":" << line << ":" << func << "(...))";
+    }
 
     #ifdef PHT_LOGGER_COLORIZE
     stdOutWrapper << "\033[0m" << std::endl;

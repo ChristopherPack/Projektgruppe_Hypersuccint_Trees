@@ -18,11 +18,19 @@
 #define DLL_API __declspec(dllimport)
 #endif
 
+#ifdef PHT_LOGGER_QUIET
+#define PHT_LOGGER_DEBUG(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, __FILE__, __LINE__, __func__,true)
+#define PHT_LOGGER_INFO(tag)    pht::Logger::log(pht::Logger::LogLevel::PHT_INFO,    tag, __FILE__, __LINE__, __func__,true)
+#define PHT_LOGGER_WARNING(tag) pht::Logger::log(pht::Logger::LogLevel::PHT_WARNING, tag, __FILE__, __LINE__, __func__,true)
+#define PHT_LOGGER_ERROR(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_ERROR,   tag, __FILE__, __LINE__, __func__,true)
+#define PHT_LOGGER_FATAL(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, __FILE__, __LINE__, __func__,true)
+#else
 #define PHT_LOGGER_DEBUG(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, __FILE__, __LINE__, __func__)
 #define PHT_LOGGER_INFO(tag)    pht::Logger::log(pht::Logger::LogLevel::PHT_INFO,    tag, __FILE__, __LINE__, __func__)
 #define PHT_LOGGER_WARNING(tag) pht::Logger::log(pht::Logger::LogLevel::PHT_WARNING, tag, __FILE__, __LINE__, __func__)
 #define PHT_LOGGER_ERROR(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_ERROR,   tag, __FILE__, __LINE__, __func__)
 #define PHT_LOGGER_FATAL(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_FATAL,   tag, __FILE__, __LINE__, __func__)
+#endif
 
 namespace pht {
     class __declspec(dllexport) Logger {
@@ -51,7 +59,9 @@ namespace pht {
                     throw std::runtime_error("Invalid log stream");
                 }
                 if(value == Logger::endl()) {
-                    Logger::_log(level, tag, content.str(), file, line, func);
+                    if(!quiet) {
+                        Logger::_log(level, tag, content.str(), file, line, func);
+                    }
                     content.clear();
                 } else {
                     content << value;
@@ -66,12 +76,13 @@ namespace pht {
             const std::string file;
             uint32_t line;
             const std::string func;
+            bool quiet;
 
-            LogStream(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func) : level(level), tag(tag), file(file), line(line), func(func) {}
+            LogStream(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet) : level(level), tag(tag), file(file), line(line), func(func), quiet(quiet) {}
         };
 
     public:
-        static LogStream& log(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func);
+        static LogStream& log(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet = false);
 
         static LogLevel getLogLevel();
         static void setLogLevel(LogLevel level);
