@@ -146,6 +146,17 @@ namespace pht {
             for(std::shared_ptr<pht::Node<T>> node : heavyChildren) {
                 std::cout << node->getValue() << std::endl;
             }*/
+            /*PHT_LOGGER_DEBUG("Farzan") << currentNode->getValue() << std::endl << pht::Logger::endl();
+            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : temporaryComponents) {
+                PHT_LOGGER_DEBUG("Farzan") << tree1->toNewickString() << std::endl << pht::Logger::endl();
+            }
+            PHT_LOGGER_DEBUG("Farzan") << "PERMANENT: " << std::endl << pht::Logger::endl();
+            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : permanentComponents) {
+                PHT_LOGGER_DEBUG("Farzan") << tree1->toNewickString() << std::endl << pht::Logger::endl();
+            }
+            for(std::shared_ptr<pht::Node<T>> node : heavyChildren) {
+                PHT_LOGGER_DEBUG("Farzan") << node->getValue() << std::endl << pht::Logger::endl();
+            }*/
             
             if(heavyChildren.size() <= 1) {
                 return greedilyPack(tree, currentNode, temporaryComponents, idealSize);

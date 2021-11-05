@@ -14,12 +14,23 @@ pht::Timer pht::Logger::timer = pht::Timer();
 std::regex pht::Logger::unifyLinebreakRegex = std::regex("\r\n?");
 std::streambuf* pht::Logger::stdoutBuf = std::cout.rdbuf();
 std::ostream pht::Logger::stdOutWrapper = std::ostream(pht::Logger::stdoutBuf);
+std::unique_ptr<pht::Logger::LogStream> pht::Logger::currentLogStream = nullptr;
 
-void pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const pht::Timer& message, const std::string& file, uint32_t line, const std::string& func) {
-    log(level, tag, timer.toString(), file, line, func);
+void* pht::Logger::endl() {
+    static std::unique_ptr<uint8_t> value = std::make_unique<uint8_t>();
+    return reinterpret_cast<void*>(value.get());
 }
 
-void pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const std::string& message, const std::string& file, uint32_t line, const std::string& func) {
+pht::Logger::LogStream* pht::Logger::getCurrentLogStream() {
+    return currentLogStream.get();
+}
+
+pht::Logger::LogStream& pht::Logger::log(pht::Logger::LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func) {
+    currentLogStream = std::unique_ptr<LogStream>(new LogStream(level, tag, file, line, func));
+    return *currentLogStream;
+}
+
+void pht::Logger::_log(pht::Logger::LogLevel level, const std::string& tag, const std::string& message, const std::string& file, uint32_t line, const std::string& func) {
     if(logLevel > level) {
         return;
     }
