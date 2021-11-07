@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <map>
+#include <mutex>
 
 namespace pht {
     template<class R, class... Args> class PrecomputedFunction {

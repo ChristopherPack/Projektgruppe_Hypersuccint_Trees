@@ -693,17 +693,18 @@ namespace pht {
             return size;
         }
 
-        /*void getSizeCalcStart(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, bool countDummies = true) const {
-            getSizeCalc(cache,root,countDummies);
+        void getSubtreeSizeCalcStart(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache) const {
+            getSubtreeSizeCalc(cache,root);
         }
 
-        void getSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, std::shared_ptr<pht::Node<T>> node, bool countDummies = true) const {
-            uint32_t size = ((!countDummies) && node->isMiniDummy()) ? 0 : 1;
+        uint32_t getSubtreeSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, std::shared_ptr<pht::Node<T>> node) const {
+            uint32_t size = (node->isMiniDummy()) ? 0 : 1;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                size += getSizeCalc(cache,desc,countDummies);
+                size += getSubtreeSizeCalc(cache,desc);
             }
-            cache.insert(node,size);
-        }*/
+            cache.insert({node,size});
+            return size;
+        }
 
         bool hasDummy() {
             return dummy != nullptr;
@@ -721,13 +722,13 @@ namespace pht {
 
         //BUG Call cannot be simplified
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); });
-        //pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSizeCalcStart(cache,true);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalcStart(cache);});
         //pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getLeafSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getLeafSizeCalc(cache);});
         
     private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
-        std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology. 
+        std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology.
         std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup.
         std::shared_ptr<pht::Node<T>> dummy; ///The optional dummy in the tree. 
 
