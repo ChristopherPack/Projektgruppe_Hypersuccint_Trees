@@ -45,8 +45,8 @@ namespace pht {
             std::unique_ptr<HypersuccinctTree> hypersuccinctTree = std::unique_ptr<HypersuccinctTree>(new HypersuccinctTree());
             hypersuccinctTree->huffmanFlag = huffman;
 
-            uint32_t sizeMini = sizeMiniParam == 0 ? ceil(pow(log2(tree->getSize()), 2.0)) : sizeMiniParam;
-            uint32_t sizeMicro = sizeMicroParam == 0 ? ceil((log2(tree->getSize())) / 8.0) : sizeMicroParam;
+            uint32_t sizeMini = sizeMiniParam == 0 ? static_cast<uint32_t>(ceil(pow(log2(tree->getSize()), 2.0))) : sizeMiniParam;
+            uint32_t sizeMicro = sizeMicroParam == 0 ? static_cast<uint32_t>(ceil((log2(tree->getSize())) / 8.0)) : sizeMicroParam;
 
             encodeAllSizesInHST(*hypersuccinctTree, tree->getSize(), sizeMini, sizeMicro);
 
@@ -278,7 +278,7 @@ namespace pht {
             for(MiniTree& x : tree.miniTrees) {
                 std::vector<std::vector<bool>> oldEncodedMicros = x.microTrees;
                 x.microTrees.clear();
-                uint32_t entryCount = oldEncodedMicros.size();
+                uint32_t entryCount = static_cast<uint32_t>(oldEncodedMicros.size());
                 for(uint32_t i = 0; i < entryCount; i++) {
                     std::vector<bool> bp = oldEncodedMicros.at(i);
                     x.microTrees.push_back(huffmanTable.at(bp));
@@ -301,7 +301,7 @@ namespace pht {
         template<class T> static std::tuple<std::vector<Bitvector>,std::vector<Bitvector>> create1_2_Interconnections(std::shared_ptr<UnorderedTree<T>> baseTree, std::vector<std::shared_ptr<UnorderedTree<T>>> subtrees, uint32_t size) {
             std::vector<Bitvector> FIDs;
             std::vector<Bitvector> typeVectors;
-            uint32_t dummySize = floor(log2(2*size+1))+1;
+            uint32_t dummySize = static_cast<uint32_t>(floor(log2(2*size+1)))+1;
             std::vector<std::shared_ptr<Node<T>>> rootNodes = ListUtils::mapped<std::shared_ptr<UnorderedTree<T>>, std::shared_ptr<Node<T>>>(subtrees, [](std::shared_ptr<UnorderedTree<T>> x){return x -> getRoot();});
             std::vector<std::shared_ptr<Node<T>>> distinctRootNodes = ListUtils::distincted(rootNodes);
             std::vector<std::shared_ptr<Node<T>>> firstChildren;
@@ -357,7 +357,7 @@ namespace pht {
          */
         template<class T> static std::vector<Bitvector> createDummyInterconnections(std::shared_ptr<UnorderedTree<T>> baseTree, std::vector<std::shared_ptr<UnorderedTree<T>>> subtrees, uint32_t size) {
             std::vector<Bitvector> dummys;
-            uint32_t dummySize = floor(log2(2*size+1))+1;
+            uint32_t dummySize = static_cast<uint32_t>(floor(log2(2*size+1)))+1;
             //Dummy Nodes
             for(std::shared_ptr<UnorderedTree<T>> fmMicroTree : subtrees) {
                 bool hadDummy = false;
@@ -419,7 +419,7 @@ namespace pht {
                     lookupTableEntry.parentPointers.push_back({false});
                 } else {
                     auto iter1 = std::find(nodes.begin(), nodes.end(), fmMicroTree->getDirectAncestor(node1));
-                    uint32_t parentNum = std::distance(nodes.begin(), iter1) + 1;
+                    uint32_t parentNum = static_cast<uint32_t>(std::distance(nodes.begin(), iter1)) + 1;
                     lookupTableEntry.parentPointers.push_back(Bitvector_Utils::encodeNumberReturn(parentNum));
                 }
 
@@ -438,10 +438,10 @@ namespace pht {
                 uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
                 lookupTableEntry.leaves.push_back(Bitvector_Utils::encodeNumberReturn(leaveNum));
 
-                uint32_t leftmost_leafNum =  std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeaf(node1)));
+                uint32_t leftmost_leafNum =  static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeaf(node1))));
                 lookupTableEntry.leftmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(leftmost_leafNum));
 
-                uint32_t rightmost_leafNum = std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeaf(node1)));
+                uint32_t rightmost_leafNum = static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeaf(node1))));
                 lookupTableEntry.rightmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(rightmost_leafNum));
 
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
@@ -483,7 +483,7 @@ namespace pht {
                 handleMiniDummyInMicroTree(miniTree, fmMiniTree, fmMicroTree, fmMicroTrees);
 
                 //MicroDummyPointers
-                uint32_t dummySize = floor(log2(2*sizeMicro+1))+1;
+                uint32_t dummySize = static_cast<uint32_t>(floor(log2(2*sizeMicro+1)))+1;
                 if(fmMicroTree->hasDummy()) {
                     std::shared_ptr<Node<T>> dummyPoint = fmMiniTree->getDirectDescendants(fmMicroTree->getDummy()).at(0);
                     uint32_t microTreePointer = dummyPoint->getMicroTree();
@@ -804,7 +804,7 @@ namespace pht {
         template<class T> static void handleMiniDummyInMicroTree(MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees){
             if(fmMicroTree->contains(fmMiniTree->getDummy())) {
                 auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
-                uint32_t dist = std::distance(fmMicroTrees.begin(), iter);
+                uint32_t dist = static_cast<uint32_t>(std::distance(fmMicroTrees.begin(), iter));
                 Bitvector_Utils::encodeNumber(miniTree.miniDummyTree,dist,Bitvector_Utils::NumberEncoding::BINARY);
                 uint32_t enumV = fmMicroTree->enumerate(fmMiniTree->getDummy());
                 Bitvector_Utils::encodeNumber(miniTree.miniDummyIndex,enumV,Bitvector_Utils::NumberEncoding::BINARY);
@@ -843,17 +843,17 @@ namespace pht {
                 std::vector<uint32_t > topTreeIndices;
                 std::vector<uint32_t > lowTreeIndices;
                 topTreeIndices.reserve(topTrees);
-                for(int i = 0; i< topTrees; i++) {
+                for(uint32_t i = 0; i< topTrees; i++) {
                     topTreeIndices.push_back(topTree.at(topOffset)+i);
                 }
                 lowTreeIndices.reserve(lowTrees);
-                for(int i = 0; i< lowTrees; i++) {
+                for(uint32_t i = 0; i< lowTrees; i++) {
                     lowTreeIndices.push_back(lowOffset + i);
                 }
                 result.emplace_back(topTreeIndices,lowTreeIndices);
 
 
-                for(int i=1; i<= topTrees; i++) {
+                for(uint32_t i=1; i<= topTrees; i++) {
                     if(topTree.size()<=topOffset+i) {
                         topTree.push_back(topTree.at(topOffset) + topTrees);
                     }
@@ -899,17 +899,17 @@ namespace pht {
                 std::vector<uint32_t > topTreeIndices;
                 std::vector<uint32_t > lowTreeIndices;
                 topTreeIndices.reserve(topTrees);
-                for(int i = 0; i< topTrees; i++) {
+                for(uint32_t i = 0; i< topTrees; i++) {
                     topTreeIndices.push_back(topTree.at(topOffset)+i);
                 }
                 lowTreeIndices.reserve(lowTrees);
-                for(int i = 0; i< lowTrees; i++) {
+                for(uint32_t i = 0; i< lowTrees; i++) {
                     lowTreeIndices.push_back(lowOffset + i);
                 }
                 result.emplace_back(topTreeIndices,lowTreeIndices);
 
 
-                for(int i=1; i<= topTrees; i++) {
+                for(uint32_t i=1; i<= topTrees; i++) {
                     if(topTree.size()<=topOffset+i) {
                         topTree.push_back(topTree.at(topOffset) + topTrees);
                     }

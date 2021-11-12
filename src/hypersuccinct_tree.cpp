@@ -19,7 +19,7 @@ Bitvector HypersuccinctTree::getMicroTree(MiniTree& miniTree,uint32_t index) {
 }
 
 uint32_t HypersuccinctTree::getMicroTreeCount(MiniTree& miniTree) {
-    return miniTree.microTrees.size();
+    return static_cast<uint32_t>(miniTree.microTrees.size());
 }
 
 Bitvector HypersuccinctTree::getMicroFID(MiniTree& miniTree,uint32_t index) {
@@ -59,11 +59,11 @@ LookupTableEntry HypersuccinctTree::getLookupTableEntry(Bitvector indexV) {
 }
 
 bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index) {
-    uint32_t sizeTable = sqrt(entry.ancestorMatrix.size());
+    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.ancestorMatrix.size()));
     return entry.ancestorMatrix.at(sizeTable * anc + node2Index);
 }
 
 bool HypersuccinctTree::lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index) {
-    uint32_t sizeTable = sqrt(entry.childMatrix.size());
+    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
     return entry.childMatrix.at(sizeTable * child + node2Index);
 }

@@ -32,6 +32,7 @@ set(PHT_UI_INCLUDE_DIRS
     ../include
     ../extern/irrxml
     ../extern/succinct_bv/include
+    ../extern/thread-pool-2.0.0
 )
 list(TRANSFORM PHT_UI_INCLUDE_DIRS PREPEND "\"")
 list(TRANSFORM PHT_UI_INCLUDE_DIRS APPEND "\", ")

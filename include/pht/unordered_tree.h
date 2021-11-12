@@ -384,7 +384,7 @@ namespace pht {
         uint32_t getSize() const {
             if(root == nullptr)
                 return 0;
-            return nodes.size();
+            return static_cast<uint32_t>(nodes.size());
         }
 
         /**
@@ -610,7 +610,7 @@ namespace pht {
             std::shared_ptr<pht::Node<T>> anc = getDirectAncestor(node);
             if(anc != nullptr) {
                 auto iter = std::find(descendants.at(anc).begin(), descendants.at(anc).end(), node);
-                res += std::distance(descendants.at(anc).begin(), iter);
+                res += static_cast<uint32_t>(std::distance(descendants.at(anc).begin(), iter));
             }
             return res;
         }

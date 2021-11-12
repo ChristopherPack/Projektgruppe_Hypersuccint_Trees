@@ -70,6 +70,7 @@ namespace pht {
             }
 
         private:
+            #pragma warning(disable:4251)
             std::stringstream content;
             LogLevel level;
             const std::string tag;
@@ -77,6 +78,7 @@ namespace pht {
             uint32_t line;
             const std::string func;
             bool quiet;
+            #pragma warning(default:4251)
 
             LogStream(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet) : level(level), tag(tag), file(file), line(line), func(func), quiet(quiet) {}
         };
@@ -94,12 +96,14 @@ namespace pht {
         static LogStream* getCurrentLogStream();
 
     private:
+        #pragma warning(disable:4251)
         static LogLevel logLevel;
         static Timer timer;
         static std::regex unifyLinebreakRegex;
         static std::ostream stdOutWrapper;
         static std::streambuf* stdoutBuf;
         static std::unique_ptr<LogStream> currentLogStream;
+        #pragma warning(default:4251)
 
         static void _log(LogLevel level, const std::string& tag, const std::string& message, const std::string& file, uint32_t line, const std::string& func);
     };

@@ -29,6 +29,7 @@ namespace pht {
      */
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
+        #pragma warning(disable:4251)
         std::vector<Bitvector> FIDs;
         std::vector<succinct_bv::BitVector> FIDsSupport;
         //MicroTypeVectors
@@ -114,6 +115,7 @@ namespace pht {
         std::vector<Bitvector> microRootLeafRanks;
         //Special Leaf Ranks for displaced microTrees + 1
         std::vector<Bitvector> microExtendedLeafRanks;
+        #pragma warning(default:4251)
     };
 
     /**
@@ -122,6 +124,7 @@ namespace pht {
      * It contains all fields necessary to satisfy the query's need for structural information
      */
     struct __declspec(dllexport) LookupTableEntry {
+        #pragma warning(disable:4251)
         //Index of the LookupTableEntry
         Bitvector index;
         //BP of the Entry. Empty if index is BP
@@ -150,6 +153,7 @@ namespace pht {
         std::vector<Bitvector> rightmost_leaf;
         //Leaf Rank for every node within MicroTree + 1
         std::vector<Bitvector> leafRank;
+        #pragma warning(default:4251)
 
 
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
@@ -472,6 +476,7 @@ namespace pht {
         HypersuccinctTree() = default;
         bool huffmanFlag;
         //sizes
+        #pragma warning(disable:4251)
         std::vector<bool> size;
         std::vector<bool> microSize;
         std::vector<bool> miniSize;
@@ -488,6 +493,7 @@ namespace pht {
         std::vector<Bitvector> miniDummys;
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
+        #pragma warning(default:4251)
 
     };
 }
