@@ -472,6 +472,8 @@ namespace pht {
          */
         HstNode levelAncestor(HstNode node, uint32_t level);
 
+        uint64_t getByteSize();
+
     private:
         HypersuccinctTree() = default;
         bool huffmanFlag;
@@ -494,6 +496,12 @@ namespace pht {
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
         #pragma warning(default:4251)
+
+        //uint64_t calculateMinitreeByteSize(const MiniTree& mt);
+
+        //uint64_t calculateLookupTableEntryByteSize(const LookupTableEntry& lte);
+
+        //uint64_t succinctBitvectorByteSize(const succinct_bv::BitVector& sbv);
 
     };
 }
