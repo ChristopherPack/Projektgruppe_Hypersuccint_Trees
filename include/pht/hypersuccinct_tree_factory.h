@@ -509,7 +509,7 @@ namespace pht {
                     std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
                     miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getSubtreeSize(microRoot)));
                     miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot) + 1));
-                    miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeight(microRoot) + 1));
+                    miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeightFalse(microRoot) + 1));
                     miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
                     miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
                     miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
@@ -647,7 +647,7 @@ namespace pht {
                 std::shared_ptr<Node<T>> miniRoot = fmMiniTree->getRoot();
                 Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSubtreeSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeight(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeightFalse(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer,tree->getLeftmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer,tree->getRightmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
@@ -672,7 +672,7 @@ namespace pht {
                 Bitvector_Utils::encodeNumber(miniTree.miniDummyPointer, miniTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
                 if(doQueries) {
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepth(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
-                    Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeight(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeightFalse(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                 }
             }
@@ -714,7 +714,12 @@ namespace pht {
             PHT_LOGGER_INFO("Factory Create") << "Creating MiniTrees..." << pht::Logger::endl();
             hypersuccinctTree.miniTrees = std::vector<MiniTree>(fmMiniTrees.size());
 
-            tree->getSubtreeSize(tree->getRoot());
+            //TODO: Fix Multithreading issues
+            //These HAVE to be computed ONCE before the multithreading to avoid errors!
+            const std::shared_ptr<pht::Node<T>> treeRoot = tree->getRoot();
+            tree->getSubtreeSize(treeRoot);
+            tree->getHeightFalse(treeRoot);
+            tree->getLeafSize(treeRoot);
 
             thread_pool pool;
             std::vector<std::mutex> allMutex(4);

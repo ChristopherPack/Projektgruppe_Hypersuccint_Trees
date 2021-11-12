@@ -13,6 +13,7 @@
 #include "node.h"
 #include "list_utils.h"
 #include "precomputed_function.h"
+#include "cached_function.h"
 
 #ifdef DLL_EXPORTS
 #define DLL_API __declspec(dllexport)
@@ -458,6 +459,27 @@ namespace pht {
             return max;
         }
 
+        uint32_t getHeightCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+
+            if(descendants.at(node).empty()) {
+                cache.insert({node,0});
+                return 0;
+            }
+            uint32_t max = 0;
+            for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
+                if(desc->isMiniDummy()) {
+                    max = std::max(max, getHeightCalc(cache, desc));
+                }
+                else {
+                    max = std::max(max, getHeightCalc(cache, desc) + 1);
+                }
+            }
+            cache.insert({node,max});
+            return max;
+        }
+
         /**
          * Returns the depth of the given node. 
          * 
@@ -521,7 +543,7 @@ namespace pht {
          * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
          * @return The leaf size of the node
          */
-        uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
+        /*uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
@@ -533,26 +555,23 @@ namespace pht {
                 res += getLeafSize(desc);
             }
             return res;
-        }
+        }*/
 
-        /*void getLeafSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache) const {
-            const std::shared_ptr<pht::Node<T>> node = root;
-            getLeafSizeCalcPart(cache,node);
-        }
-
-        void getLeafSizeCalcPart(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache,const std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getLeafSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache,const std::shared_ptr<pht::Node<T>> node) const {
             //ASSERT(node, "Invalid node");
             //ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
             if(descendants.at(node).empty()) {
                 cache.insert({node,1});
+                return 1;
             }
             uint32_t res = 0;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                res += getLeafSizeOld(desc);
+                res += getLeafSizeCalc(cache,desc);
             }
             cache.insert({node,res});
-        }*/
+            return res;
+        }
 
         /**
          * Returns the leaf Rank (Amount of leaves before) of the given node
@@ -560,7 +579,7 @@ namespace pht {
          * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
          * @return The leaf rank of the node
          */
-        uint32_t getLeafRank(const std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getLeafRank(const std::shared_ptr<pht::Node<T>> node) {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
             uint32_t res = 0;
@@ -693,11 +712,7 @@ namespace pht {
             return size;
         }
 
-        void getSubtreeSizeCalcStart(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache) const {
-            getSubtreeSizeCalc(cache,root);
-        }
-
-        uint32_t getSubtreeSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getSubtreeSizeCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, const std::shared_ptr<pht::Node<T>> node) const {
             uint32_t size = (node->isMiniDummy()) ? 0 : 1;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
                 size += getSubtreeSizeCalc(cache,desc);
@@ -722,14 +737,16 @@ namespace pht {
 
         //BUG Call cannot be simplified
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); });
-        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalcStart(cache);});
-        //pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getLeafSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getLeafSizeCalc(cache);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalc(cache,root);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getHeightFalse = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getHeightCalc(cache,root);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getLeafSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getLeafSizeCalc(cache,root);});
+        pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>> getLeftmostLeafCache = pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getLeftmostLeaf,this,std::placeholders::_1));
         
     private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
         std::vector<std::shared_ptr<pht::Node<T>>> nodes; ///The nodes which are part of this tree topology. 
         std::map<std::shared_ptr<pht::Node<T>>, std::vector<std::shared_ptr<pht::Node<T>>>> descendants; ///The connection info of the topology.
-        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easyer ancestor lookup.
+        std::map<std::shared_ptr<pht::Node<T>>, std::shared_ptr<pht::Node<T>>> ancestors; ///Map for faster and easier ancestor lookup.
         std::shared_ptr<pht::Node<T>> dummy; ///The optional dummy in the tree. 
 
 
