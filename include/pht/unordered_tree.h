@@ -490,7 +490,7 @@ namespace pht {
             }
             uint32_t max = 0;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                max = std::max(max, getHeightCalc(cache, desc) + 1);
+                max = std::max(max, getHeightTrueCalc(cache, desc) + 1);
             }
             cache.insert({node,max});
             return max;
@@ -742,7 +742,7 @@ namespace pht {
         uint32_t getSubtreeSizeTrueCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, const std::shared_ptr<pht::Node<T>> node) const {
             uint32_t size = 1;
             for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
-                size += getSubtreeSizeCalc(cache,desc);
+                size += getSubtreeSizeTrueCalc(cache,desc);
             }
             cache.insert({node,size});
             return size;

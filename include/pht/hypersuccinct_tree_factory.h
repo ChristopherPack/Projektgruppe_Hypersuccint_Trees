@@ -553,10 +553,12 @@ namespace pht {
 
                 Bitvector bp = fmMicroTree->toBalancedParenthesis();
                 if(hypersuccinctTree.huffmanFlag) {
+                    std::unique_lock<std::mutex> huffLock(allMutex.at(4));
                     if(bpsAndOccurrences.find(bp) == bpsAndOccurrences.end()) {
                         bpsAndOccurrences.insert({bp, 0});
                     }
                     bpsAndOccurrences.at(bp)++;
+                    huffLock.unlock();
                 }
 
                 std::unique_lock<std::mutex> lockLookup(allMutex.at(1));
@@ -722,7 +724,7 @@ namespace pht {
             tree->getLeafSize(treeRoot);
 
             thread_pool pool;
-            std::vector<std::mutex> allMutex(4);
+            std::vector<std::mutex> allMutex(5);
             for(uint32_t i = 0; i < fmMiniTrees.size(); i++) {
                 std::shared_ptr<UnorderedTree<T>>& fmMiniTree = fmMiniTrees.at(i);
                 pool.push_task(createMiniTree<T>,std::ref(hypersuccinctTree),std::cref(tree),std::ref(fmMiniTree),sizeMicro,std::ref(bpsAndOccurrences),doQueries,std::ref(allMutex),i);
