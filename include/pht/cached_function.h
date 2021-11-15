@@ -28,11 +28,12 @@ namespace pht {
         }
 
         R operator()(Args... args) {
-            std::scoped_lock<std::mutex> cLock(lock);
+            std::unique_lock<std::mutex> cLock(lock);
             if(cache.find(std::tuple(args...)) == cache.end()) {
                 cache.insert_or_assign(std::tuple(args...), func(args...));
             }
             return cache.at(std::tuple(args...));
+            cLock.unlock();
         }
     };
 }

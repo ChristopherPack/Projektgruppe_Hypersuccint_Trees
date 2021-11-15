@@ -426,22 +426,22 @@ namespace pht {
                 uint32_t degreeNum = fmMicroTree->getDegree(node1) + 1;
                 lookupTableEntry.degree.push_back(Bitvector_Utils::encodeNumberReturn(degreeNum));
 
-                uint32_t subTreeNum = fmMicroTree->getSize(node1,true) + 1;
+                uint32_t subTreeNum = fmMicroTree->getSubtreeSizeTrue(node1) + 1;
                 lookupTableEntry.subTrees.push_back(Bitvector_Utils::encodeNumberReturn(subTreeNum));
 
                 uint32_t nodeDepthNum = fmMicroTree->getDepth(node1, true) + 1;
                 lookupTableEntry.nodeDepths.push_back(Bitvector_Utils::encodeNumberReturn(nodeDepthNum));
 
-                uint32_t nodeHeightNum = fmMicroTree->getHeight(node1, true) + 1;
+                uint32_t nodeHeightNum = fmMicroTree->getHeightTrue(node1) + 1;
                 lookupTableEntry.nodeHeights.push_back(Bitvector_Utils::encodeNumberReturn(nodeHeightNum));
 
                 uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
                 lookupTableEntry.leaves.push_back(Bitvector_Utils::encodeNumberReturn(leaveNum));
 
-                uint32_t leftmost_leafNum =  std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeaf(node1)));
+                uint32_t leftmost_leafNum =  std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeafCache(node1)));
                 lookupTableEntry.leftmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(leftmost_leafNum));
 
-                uint32_t rightmost_leafNum = std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeaf(node1)));
+                uint32_t rightmost_leafNum = std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeafCache(node1)));
                 lookupTableEntry.rightmost_leaf.push_back(Bitvector_Utils::encodeNumberReturn(rightmost_leafNum));
 
                 uint32_t leafRankNum = fmMicroTree->getLeafRank(node1) + 1;
@@ -508,11 +508,11 @@ namespace pht {
                     //Additions for Queries - MicroTrees
                     std::shared_ptr<Node<T>> microRoot = fmMicroTree->getRoot();
                     miniTree.microSubTrees.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getSubtreeSize(microRoot)));
-                    miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepth(microRoot) + 1));
+                    miniTree.rootDepths.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getDepthFalseCache(microRoot) + 1));
                     miniTree.rootHeights.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getHeightFalse(microRoot) + 1));
                     miniTree.microLeaves.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeafSize(microRoot)));
-                    miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeaf(microRoot)->getMicroTree()));
-                    miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeaf(microRoot)->getMicroTree()));
+                    miniTree.microTreeLeftmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getLeftmostLeafCache(microRoot)->getMicroTree()));
+                    miniTree.microTreeRightmostLeafPointers.push_back(Bitvector_Utils::encodeNumberReturn(fmMiniTree->getRightmostLeafCache(microRoot)->getMicroTree()));
 
                     miniTree.microTopFIDIndices.push_back({false});
                     miniTree.microLowFIDIndices.push_back({false});
@@ -646,11 +646,11 @@ namespace pht {
             if(doQueries) {
                 std::shared_ptr<Node<T>> miniRoot = fmMiniTree->getRoot();
                 Bitvector_Utils::encodeNumber(miniTree.subTree, tree->getSubtreeSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepth(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniDepth, tree->getDepthFalseCache(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniHeight, tree->getHeightFalse(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniLeaves, tree->getLeafSize(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer,tree->getLeftmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
-                Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer,tree->getRightmostLeaf(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniTreeLeftmostLeafPointer,tree->getLeftmostLeafCache(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
+                Bitvector_Utils::encodeNumber(miniTree.miniTreeRightmostLeafPointer,tree->getRightmostLeafCache(miniRoot)->getMiniTree(),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniRootLeafRank, tree->getLeafRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
                 Bitvector_Utils::encodeNumber(miniTree.miniChildRank, tree->getChildRank(miniRoot),Bitvector_Utils::NumberEncoding::BINARY);
 
@@ -671,7 +671,7 @@ namespace pht {
                 uint32_t miniTreePointer = dummyPoint->getMiniTree();
                 Bitvector_Utils::encodeNumber(miniTree.miniDummyPointer, miniTreePointer, Bitvector_Utils::NumberEncoding::BINARY);
                 if(doQueries) {
-                    Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepth(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
+                    Bitvector_Utils::encodeNumber(miniTree.miniDummyDepth, tree->getDepthFalseCache(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyHeight, tree->getHeightFalse(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                     Bitvector_Utils::encodeNumber(miniTree.miniDummyLeafRank, tree->getLeafRank(dummyPoint),Bitvector_Utils::NumberEncoding::BINARY);
                 }
