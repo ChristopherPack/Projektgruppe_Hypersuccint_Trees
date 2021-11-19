@@ -1,5 +1,5 @@
 set(PHT_UI_PY_SOURCES
-    ui.py
+    gui.py
 )
 list(TRANSFORM PHT_UI_PY_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_custom_target(pht_ui ALL SOURCES ${PHT_UI_PY_SOURCES})

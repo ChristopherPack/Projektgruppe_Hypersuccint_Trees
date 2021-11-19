@@ -36,7 +36,7 @@ std::string formatByteSize(uint64_t bytes) {
 }
 
 int main() {
-    pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_INFO);
+    pht::Logger::setLogLevel(pht::Logger::LogLevel::PHT_DEBUG);
     pht::Logger::setStdOutEnabled(true);
     PHT_LOGGER_INFO("MAIN") << "Executing example service" << pht::Logger::endl();
     PHT_LOGGER_INFO("MAIN") << "Current Filesystem: " << std::filesystem::current_path().string() << pht::Logger::endl();
@@ -44,6 +44,8 @@ int main() {
     PHT_LOGGER_INFO("MAIN") << "Reading File..." << pht::Logger::endl();
     pht::Timer localTimer;
     std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName("BaseBall");
+    PHT_LOGGER_INFO("MAIN") << tree->getSize() << localTimer.toString() << pht::Logger::endl();
+    return 0;
     localTimer.stop();
     PHT_LOGGER_INFO("MAIN") << std::string("File read in ") << localTimer.toString() << pht::Logger::endl();
 
