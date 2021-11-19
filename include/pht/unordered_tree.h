@@ -480,6 +480,22 @@ namespace pht {
             return max;
         }
 
+        uint32_t getHeightTrueCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, const std::shared_ptr<pht::Node<T>> node) const {
+            ASSERT(node, "Invalid node");
+            ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
+
+            if(descendants.at(node).empty()) {
+                cache.insert({node,0});
+                return 0;
+            }
+            uint32_t max = 0;
+            for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
+                max = std::max(max, getHeightTrueCalc(cache, desc) + 1);
+            }
+            cache.insert({node,max});
+            return max;
+        }
+
         /**
          * Returns the depth of the given node. 
          * 
@@ -493,14 +509,15 @@ namespace pht {
             if(root == node) {
                 return 0;
             }
-            std::shared_ptr<pht::Node<T>> current = node;
-            uint32_t depth = 0;
-            while(current != root) {
+            //std::shared_ptr<pht::Node<T>> current = node;
+            uint32_t depth = ((!countDummies) && node->isMiniDummy()) ? 0 : 1;;
+            depth += getDepth(ancestors.at(node));
+            /*while(current != root) {
                 current = ancestors.at(current);
                 if(!current->isMiniDummy() || countDummies) {
                     depth++;
                 }
-            }
+            }*/
             return depth;
         }
 
@@ -600,6 +617,7 @@ namespace pht {
 
         /**
          * Returns the Child Rank of the given node
+         * TODO: Could be made recursive (for cached function) with a predecessor mapping
          * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
          * @return The child rank of the node
          */
@@ -721,6 +739,15 @@ namespace pht {
             return size;
         }
 
+        uint32_t getSubtreeSizeTrueCalc(std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache, const std::shared_ptr<pht::Node<T>> node) const {
+            uint32_t size = 1;
+            for(std::shared_ptr<pht::Node<T>> desc : descendants.at(node)) {
+                size += getSubtreeSizeTrueCalc(cache,desc);
+            }
+            cache.insert({node,size});
+            return size;
+        }
+
         bool hasDummy() {
             return dummy != nullptr;
         }
@@ -736,11 +763,20 @@ namespace pht {
         }
 
         //BUG Call cannot be simplified
+        //True counts dummies (for Lookuptable); False ignores dummies (For Mini/Microtrees)
+        //TODO: Would it be better to unify the False and True Calcs?
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); });
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalc(cache,root);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSizeTrue = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeTrueCalc(cache,root);});
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getHeightFalse = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getHeightCalc(cache,root);});
+        pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getHeightTrue = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getHeightTrueCalc(cache,root);});
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getLeafSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getLeafSizeCalc(cache,root);});
         pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>> getLeftmostLeafCache = pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getLeftmostLeaf,this,std::placeholders::_1));
+        pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>> getRightmostLeafCache = pht::CachedFunction<std::shared_ptr<pht::Node<T>>, const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getRightmostLeaf,this,std::placeholders::_1));
+        pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>> getDepthFalseCache = pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getDepth,this,std::placeholders::_1,false));
+        //pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>> getDepthTrueCache = pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getDepth,this,std::placeholders::_1,true));
+        //TODO: BUG ENABLING THIS CACHE DESTROYS PERFORMANCE FOR DBLP (CPU from 100% stress down to 5% -> slow down significant)
+        //pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>> getLeafRankCache = pht::CachedFunction<uint32_t , const std::shared_ptr<pht::Node<T>>>(std::bind(&UnorderedTree::getLeafRank,this,std::placeholders::_1));
         
     private:
         std::shared_ptr<pht::Node<T>> root; ///The root of the tree. 
