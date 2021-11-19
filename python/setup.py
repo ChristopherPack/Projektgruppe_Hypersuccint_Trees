@@ -9,5 +9,5 @@ setup(ext_modules = cythonize(
         )],
         build_dir="build"
     ), 
-    include_dirs=["../include", "../extern/irrxml", "../extern/succinct_bv/include", ]
+    include_dirs=["../include", "../extern/irrxml", "../extern/succinct_bv/include", "../extern/thread-pool-2.0.0", ]
 )

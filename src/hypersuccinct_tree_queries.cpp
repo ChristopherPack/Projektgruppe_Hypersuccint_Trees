@@ -94,16 +94,16 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
         uint32_t firstTopMini = Bitvector_Utils::decodeNumber(miniFIDTopTree.at(miniFIDIndex), Bitvector_Utils::NumberEncoding::BINARY) - 1;
         succinct_bv::BitVector miniTVSupport = miniTypeVectorsSupport.at(miniFIDIndex);
         succinct_bv::BitVector miniFIDSupport = miniFIDsSupport.at(miniFIDIndex);
-        uint32_t fidRank = miniFIDSupport.Rank(index);
+        uint32_t fidRank = static_cast<uint32_t>(miniFIDSupport.Rank(index));
         uint32_t fidRankSelect = 0;
         if (fidRank != 0) {
-            fidRankSelect = miniFIDSupport.Select(fidRank - 1);
+            fidRankSelect = static_cast<uint32_t>(miniFIDSupport.Select(fidRank - 1));
         }
-        uint32_t tvRank = miniTVSupport.Rank(fidRank - 1);
+        uint32_t tvRank = static_cast<uint32_t>(miniTVSupport.Rank(fidRank - 1));
         //Illegal value is 0 -> lower than any fidRank (since first entry in FID is always 1)
         uint32_t tvRankSelect = 0;
         if (tvRank != 0) {
-            tvRankSelect = miniTVSupport.Select(tvRank - 1) + 1;
+            tvRankSelect = static_cast<uint32_t>(miniTVSupport.Select(tvRank - 1) + 1);
         }
         if (fidRankSelect != index) {
             checkMicro = true;
@@ -130,15 +130,15 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
         uint32_t firstTopMicro = Bitvector_Utils::decodeNumber(miniTreeParent.microFIDTopTrees.at(microFIDIndex),Bitvector_Utils::NumberEncoding::BINARY) - 1;
         succinct_bv::BitVector microTVSupport = miniTreeParent.typeVectorsSupport.at(microFIDIndex);
         succinct_bv::BitVector microFIDSupport = miniTreeParent.FIDsSupport.at(microFIDIndex);
-        uint32_t fidRank = microFIDSupport.Rank(microIndexHelp);
+        uint32_t fidRank = static_cast<uint32_t>(microFIDSupport.Rank(microIndexHelp));
         uint32_t fidRankSelect = 0;
         if(fidRank != 0) {
-            fidRankSelect = microFIDSupport.Select(fidRank - 1);
+            fidRankSelect = static_cast<uint32_t>(microFIDSupport.Select(fidRank - 1));
         }
-        uint32_t tvRank = microTVSupport.Rank(fidRank - 1);
+        uint32_t tvRank = static_cast<uint32_t>(microTVSupport.Rank(fidRank - 1));
         uint32_t tvRankSelect = 0;
         if(tvRank != 0) {
-            tvRankSelect = microTVSupport.Select(tvRank - 1) + 1;
+            tvRankSelect = static_cast<uint32_t>(microTVSupport.Select(tvRank - 1) + 1);
         }
         if(fidRankSelect != microIndexHelp) {
             checkNode = true;
@@ -160,9 +160,9 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 
     if(checkNode) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent,parent.micro));
-        uint32_t matSize = sqrt(entry.childMatrix.size());
-        uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
-        uint32_t startRankSelect = entry.childMatrixSupport.Select(startRank + nodeIndexHelp);
+        uint32_t matSize = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
+        uint32_t startRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node));
+        uint32_t startRankSelect = static_cast<uint32_t>(entry.childMatrixSupport.Select(startRank + nodeIndexHelp));
         nodeRes = startRankSelect % matSize;
         if(startRankSelect > (matSize * (parent.node + 1))) {
             return {};
@@ -211,9 +211,9 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
 
     if(node.node > 0) {
             LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent, parent.micro));
-            uint32_t matSize = sqrt(entry.childMatrix.size());
-            uint32_t startRank = entry.childMatrixSupport.Rank(matSize * parent.node);
-            uint32_t fullRank = entry.childMatrixSupport.Rank(matSize * parent.node + node.node);
+            uint32_t matSize = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
+            uint32_t startRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node));
+            uint32_t fullRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node + node.node));
 
         if(parent.node > 0) {
             return fullRank - startRank - 1;
@@ -331,11 +331,11 @@ uint32_t HypersuccinctTree::degree(HstNode node) {
     if(node.micro > 0) {
         MiniTree miniTree = getMiniTree(node.mini);
         uint32_t fidIndex = Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(node.micro),Bitvector_Utils::NumberEncoding::BINARY) - 1;
-        return miniTree.FIDs.at(fidIndex).size();
+        return static_cast<uint32_t>(miniTree.FIDs.at(fidIndex).size());
     }
     uint32_t fidID = Bitvector_Utils::decodeNumber(getMiniTree(node.mini).miniTopFIDIndex,Bitvector_Utils::NumberEncoding::BINARY)-1;
     Bitvector fid = miniFIDs.at(fidID);
-    return fid.size();
+    return static_cast<uint32_t>(fid.size());
 }
 
 uint32_t HypersuccinctTree::subtreeSize(HstNode node) {
@@ -642,7 +642,7 @@ HstNode HypersuccinctTree::levelAncestor(HstNode node, uint32_t level) {
     }
     if(node.micro > 0) {
         //TreeSize or microTreeSize???
-        uint32_t delta = ceil(sqrt(log2(Bitvector_Utils::decodeNumber(size, Bitvector_Utils::NumberEncoding::BINARY))));
+        uint32_t delta = static_cast<uint32_t>(ceil(sqrt(log2(Bitvector_Utils::decodeNumber(size, Bitvector_Utils::NumberEncoding::BINARY)))));
         uint32_t depth = 0; //depth of MicroTree in MiniTree
         if(level > depth) {
             return levelAncestor({node.mini, 0, 0}, level - depth);
@@ -651,6 +651,6 @@ HstNode HypersuccinctTree::levelAncestor(HstNode node, uint32_t level) {
     }
     //uint32_t delta =
     //M is miniTree Size?
-    uint32_t delta = ceil(sqrt(Bitvector_Utils::decodeNumber(miniSize,Bitvector_Utils::NumberEncoding::BINARY)));
+    uint32_t delta = static_cast<uint32_t>(ceil(sqrt(Bitvector_Utils::decodeNumber(miniSize,Bitvector_Utils::NumberEncoding::BINARY))));
     return {};
 }

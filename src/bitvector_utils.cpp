@@ -33,7 +33,7 @@ Bitvector Bitvector_Utils::encodeNumberReturn(uint32_t num) {
         res.push_back(false);
         return res;
     }
-    int size = floor(log2(num)) + 1;
+    uint32_t size = static_cast<uint32_t>(floor(log2(num))) + 1;
     for(; i < size; i++) {
         res.push_back((num>>(size-1-i))&1);
     }
@@ -101,9 +101,9 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
     std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
     Bitvector pattern = convertToBitvector(patternString);
     //TODO: Size check does NOT work if vector is too small ???
-    if(end-iterator < pattern.size()) {
+    if(static_cast<size_t>(std::distance(iterator, end)) < pattern.size()) {
         uint32_t patternID = decodeNumber(pattern, NumberEncoding::BINARY);
-        uint32_t patternSize = pattern.size();
+        uint32_t patternSize = static_cast<uint32_t>(pattern.size());
         auto iterStart = iterator;
         auto iterEnd = iterator + patternSize;
         for (; iterEnd >= end; iterStart++, iterEnd++) {
@@ -121,7 +121,7 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
 
 bool Bitvector_Utils::findBeginningMatch(const Bitvector::const_iterator &iterator, const Bitvector::const_iterator& end, const Bitvector& patternBitvector) {
     auto iter = iterator;
-    if(end-iter < patternBitvector.size()) {
+    if(static_cast<size_t>(std::distance(iter, end)) < patternBitvector.size()) {
         return false;
     }
     for(bool i : patternBitvector) {
@@ -186,7 +186,7 @@ uint32_t Bitvector_Utils::encodeBinary(std::insert_iterator<Bitvector>& iterator
         iterator = false;
         return 1;
     }
-    int size = floor(log2(num)) + 1;
+    uint32_t size = static_cast<uint32_t>(floor(log2(num))) + 1;
     for(; i < size; i++) {
         iterator = ((num>>(size-1-i))&1);
     }
@@ -196,7 +196,7 @@ uint32_t Bitvector_Utils::encodeBinary(std::insert_iterator<Bitvector>& iterator
 uint32_t Bitvector_Utils::encodeEliasGamma(std::insert_iterator<Bitvector>& iterator, uint32_t num) {
     //assert(num != 0); TODO
     uint32_t count = 0;
-    int32_t logSize = floor((log2(num)));
+    int32_t logSize = static_cast<uint32_t>(floor((log2(num))));
     for(int i = 0; i < logSize; i++, count++) {
         iterator = false;
     }
@@ -224,7 +224,7 @@ Bitvector Bitvector_Utils::getEntryAtEliasGamma(Bitvector::const_iterator& itera
 }
 
 Bitvector Bitvector_Utils::getEntryAtVectorIndex(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd) {
-    for(int i = 0; i < offset; i++) {
+    for(uint32_t i = 0; i < offset; i++) {
         Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
         uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
         if(end-iterator < indexLength) {
@@ -266,7 +266,7 @@ Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator
     for(uint32_t i = 0; i < offset; i++) {
         for(Bitvector code : huffmanCodes) {
             if(findBeginningMatch(iterator,end, code)) {
-                if(end-iterator < code.size()) {
+                if(static_cast<size_t>(std::distance(iterator, end)) < code.size()) {
                     throw std::runtime_error("Invalid Offset!");
                 }
                 iterator+=code.size();
@@ -277,7 +277,7 @@ Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator
     auto temp = iterator;
     for(Bitvector code : huffmanCodes) {
         if(findBeginningMatch(iterator,end, code)) {
-            if(end-iterator < code.size()) {
+            if(static_cast<size_t>(std::distance(iterator, end)) < code.size()) {
                 throw std::runtime_error("Invalid Offset!");
             }
             iterator+=code.size();
@@ -362,7 +362,7 @@ uint32_t Bitvector_Utils::getEntryCountVectorIndex(const Bitvector::const_iterat
 
 uint32_t Bitvector_Utils::getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size) {
     assert((end-iterator)%size == 0);
-    return (end-iterator)/size;
+    return static_cast<uint32_t>(std::distance(iterator, end))/size;
 }
 
 uint32_t Bitvector_Utils::getEntryCountHuffman(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
@@ -371,7 +371,7 @@ uint32_t Bitvector_Utils::getEntryCountHuffman(const Bitvector::const_iterator& 
     while(it != end) {
         for(Bitvector code : huffmanCodes) {
             if(findBeginningMatch(it,end, code)) {
-                if(end-it < code.size()) {
+                if(static_cast<size_t>(std::distance(it, end)) < code.size()) {
                     throw std::runtime_error("Invalid Code!");
                 }
                 it+=code.size();
