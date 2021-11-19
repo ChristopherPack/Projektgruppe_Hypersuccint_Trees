@@ -7,6 +7,9 @@
 
 
 //#define PHT_TEST
+#ifdef NDEBUG
+#define PHT_LOGGER_QUIET
+#endif
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
 #include "pht/xml_reader.h"
@@ -27,8 +30,8 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"DBLP.xml"};
-    std::string resultFileName = "testResultsFactory.csv";
+    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml","DBLP.xml"};
+    std::string resultFileName = "testResultsFactoryCheck.csv";
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> factoryTimesHuffman;
     std::vector<pair<std::string , std::string >> factoryTimesNoQueries;
@@ -55,12 +58,12 @@ protected:
 
 TEST_F(RuntimeTest, FullTestRaw) {
     for(std::string &name : fileNames) {
-        PHT_LOGGER_INFO("Runtime Test", "Begin: " + name);
-        std::cout << "Reading " + name << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
         std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
-        PHT_LOGGER_INFO("Runtime Test", "Finished Reading File.");
-        std::cout << "Finished reading " + name << std::endl;
-        std::cout << "Nodes: " + std::to_string(tree->getSize()) << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << std::to_string(tree->getSize()) << "\n" << pht::Logger::endl();
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0);
         timer.stop();
@@ -90,7 +93,7 @@ TEST_F(RuntimeTest, FullTestRaw) {
             testSize = rootSubSize;
         }
 
-        PHT_LOGGER_INFO("Runtime Test", "Test Size: " + std::to_string(testSize));
+        PHT_LOGGER_INFO("Runtime Test") << "Test Size: " << testSize << pht::Logger::endl();
 
         uint32_t i=1;
         while(testNodes.size() < testSize) {
@@ -111,9 +114,9 @@ TEST_F(RuntimeTest, FullTestRaw) {
                 }
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
-                /*std::cout << i << std::endl;
-                std::cout << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl;
-                std::cout << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl;*/
+                /*PHT_LOGGER_DEBUG("Test") << i << std::endl << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl << pht::Logger::endl();*/
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
@@ -123,7 +126,7 @@ TEST_F(RuntimeTest, FullTestRaw) {
             i++;
         }
 
-        PHT_LOGGER_INFO("Runtime Test", "Added all children");
+        PHT_LOGGER_INFO("Runtime Test") << "Added all children" << pht::Logger::endl();
 
 
         for(pht::HstNode &node : testNodes) {
@@ -147,7 +150,7 @@ TEST_F(RuntimeTest, FullTestRaw) {
                 }
             }
         }
-        PHT_LOGGER_INFO("Runtime Test", "Running query Tests...");
+        PHT_LOGGER_INFO("Runtime Test") << "Running query Tests..." << pht::Logger::endl();
 
         for(pht::HstNode &node : testNodes) {
             MEASURE_TIME(hyperTree.childRank(node),childRankTimes);
@@ -164,7 +167,7 @@ TEST_F(RuntimeTest, FullTestRaw) {
     }
 
 
-    PHT_LOGGER_INFO("Runtime Test", "Begin File Output");
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
     std::ofstream file;
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimes) {
@@ -211,12 +214,12 @@ TEST_F(RuntimeTest, FullTestRaw) {
 
 TEST_F(RuntimeTest, FullTestHuffman) {
     for(std::string &name : fileNames) {
-        PHT_LOGGER_INFO("Runtime Test", "Begin: " + name);
-        std::cout << "Reading " + name << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
         std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
-        PHT_LOGGER_INFO("Runtime Test", "Finished Reading File.");
-        std::cout << "Finished reading " + name << std::endl;
-        std::cout << "Nodes: " + std::to_string(tree->getSize()) << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
         timer.stop();
@@ -246,7 +249,7 @@ TEST_F(RuntimeTest, FullTestHuffman) {
             testSize = rootSubSize;
         }
 
-        PHT_LOGGER_INFO("Runtime Test", "Test Size: " + std::to_string(testSize));
+        PHT_LOGGER_INFO("Runtime Test") << "Test Size: " << testSize << pht::Logger::endl();
 
         uint32_t i=1;
         while(testNodes.size() < testSize) {
@@ -267,9 +270,9 @@ TEST_F(RuntimeTest, FullTestHuffman) {
                 }
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
-                /*std::cout << i << std::endl;
-                std::cout << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl;
-                std::cout << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl;*/
+                /*PHT_LOGGER_DEBUG("Test") << i << std::endl << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl << pht::Logger::endl();*/
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
@@ -279,7 +282,7 @@ TEST_F(RuntimeTest, FullTestHuffman) {
             i++;
         }
 
-        PHT_LOGGER_INFO("Runtime Test", "Added all children");
+        PHT_LOGGER_INFO("Runtime Test") << "Added all children" << pht::Logger::endl();
 
 
         for(pht::HstNode &node : testNodes) {
@@ -303,7 +306,7 @@ TEST_F(RuntimeTest, FullTestHuffman) {
                 }
             }
         }
-        PHT_LOGGER_INFO("Runtime Test", "Running query Tests...");
+        PHT_LOGGER_INFO("Runtime Test") << "Running query Tests..." << pht::Logger::endl();
 
         for(pht::HstNode &node : testNodes) {
             MEASURE_TIME(hyperTree.childRank(node),childRankTimes);
@@ -320,7 +323,7 @@ TEST_F(RuntimeTest, FullTestHuffman) {
     }
 
 
-    PHT_LOGGER_INFO("Runtime Test", "Begin File Output");
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
     std::ofstream file;
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimesHuffman) {
@@ -367,20 +370,20 @@ TEST_F(RuntimeTest, FullTestHuffman) {
 
 TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
     for(std::string &name : fileNames) {
-        PHT_LOGGER_INFO("Runtime Test", "Begin: " + name);
-        std::cout << "Reading " + name << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
         std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
-        PHT_LOGGER_INFO("Runtime Test", "Finished Reading File.");
-        std::cout << "Finished reading " + name << std::endl;
-        std::cout << "Nodes: " + std::to_string(tree->getSize()) << std::endl;
-        PHT_LOGGER_INFO("Runtime Test", "Begin Create Raw.");
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create Raw." << pht::Logger::endl();
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0);
         timer.stop();
         tree.reset();
         factoryTimes.emplace_back(name, timer.toString());
 
-        PHT_LOGGER_INFO("Runtime Test", "Begin Create Huffman.");
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create Huffman." << pht::Logger::endl();
         tree = pht::XMLReader::readByName(name);
         timer.start();
         hyperTree = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
@@ -390,7 +393,7 @@ TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
     }
 
 
-    PHT_LOGGER_INFO("Runtime Test", "Begin File Output");
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
     std::ofstream file;
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimes) {
@@ -404,19 +407,19 @@ TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
 
 TEST_F(RuntimeTest, FactoryOnlyNoQueries) {
     for(std::string &name : fileNames) {
-        PHT_LOGGER_INFO("Runtime Test", "Begin: " + name);
-        std::cout << "Reading " + name << std::endl;
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
         std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
-        PHT_LOGGER_INFO("Runtime Test", "Finished Reading File.");
-        std::cout << "Finished reading " + name << std::endl;
-        std::cout << "Nodes: " + std::to_string(tree->getSize()) << std::endl;
-        PHT_LOGGER_INFO("Runtime Test", "Begin Create without Queries.");
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create without Queries." << pht::Logger::endl();
         timer.start();
         pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0,false);
         timer.stop();
         factoryTimesNoQueries.emplace_back(name, timer.toString());
 
-        PHT_LOGGER_INFO("Runtime Test", "Begin Create Huffman without Queries.");
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create Huffman without Queries." << pht::Logger::endl();
         timer.start();
         hyperTree = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0,false);
         timer.stop();
@@ -425,7 +428,7 @@ TEST_F(RuntimeTest, FactoryOnlyNoQueries) {
     }
 
 
-    PHT_LOGGER_INFO("Runtime Test", "Begin File Output");
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
     std::ofstream file;
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimesNoQueries) {
