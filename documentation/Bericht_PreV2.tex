@@ -42,6 +42,19 @@ Proof of concept\\
 Workable library\\
 Basic functions such as implemented queries or file writing
 
+\subsection{External Libraries}
+We use four external libraries in our project.
+The first one, called Irrxml, serves an implementation to read efficiently from an xml file. We use this library to generate a basic tree structure from xml files which is then used for our encoding.\\
+%Solve _ issue
+We make use of a small library which provides an implementation of space efficient Fully Indexable Dictionaries 
+\cite{universalSuccinct}, called succinct-bv.
+%Provide Sources for all libraries
+This library is very lightweight and has been modified personally by us to suit our needs.\\
+%Provide links?
+To increase the performance of our encoding process (see section 4.2), we utilize a multithreading library. This library is called thread-pool, an was created by
+\cite{threading} to provide an efficient multithreading library.\\
+Lastly, we utilise the googletest library for unit tests.
+
 \section{Implementation in Depth}
 Amount of Classes,\\
 Structures of classes.
@@ -98,7 +111,7 @@ This solves both of our issues, as the Rank of the Typevector indicates which FI
 \subsubsection{The Hypersuccinct Tree Factory}
 The Hypersuccinct Tree Factory is tasked with generating a hypersuccinct tree from a generic tree. Per our implementation this class implements two functions, one to generate hypersuccinct trees from our own generic tree structure, Unordered Tree, 
 and a second one to generate from an already encoded file reading.\\
-Encoding a generic tree is rather complicated due to the large amount of query related bitvectors that need to be filled with their respective data, a task that is not easily done on the generic tree structure. The complexity is therefore at least $O(|Nodes|^3)$, as we need to iterate through each minitree, within we iterate through each microtree, within we iterate through each node, as generated with the Farzan-Munro Algorithm.
+Encoding a generic tree is rather complicated due to the large amount of query related bitvectors that need to be filled with their respective data, a task that is not easily done on the generic tree structure. The complexity is therefore at least $O(|Nodes|^3)$, as we need to iterate through each minitree, within we iterate through each microtree, within we iterate through each node, as generated with the Farzan-Munro Algorithm. To increase the performance of this function, we make use of the multithreading library by \cite{threading}.
 In contrast recreating a hypersuccinct tree from an encoded file is straightforward and easy. The data values from the file are just copied directly into their expected bitvector fields, which requires a complexity of $O(|Minitrees|) + O(|Lookup table entries|)$.\\
 The Hypersuccinct Tree Factory generates all data necessary for query execution in $O(1)$, therefore fills all vector fields in Hypersuccinct Tree. The function is structured in loops. First, the Farzan Munro algorithm is executed on a base tree with the computed Minitree size of $\lceil log^2( |Nodes| ) \rceil$. Right after this, the Minitree interconnections are handled and Minidummies are generated. Then, the Farzan Munro algorithm is used on all generated Minitrees to generate their respective Microtrees of size $\lceil log( \frac{|Nodes|}{8} ) \rceil$, and their interconnections are handled. At last, for each of these Microtrees, a Lookup table entry is generated if an entry of such a tree sturcture does not already exist.\\
 \textit{Special Cases:}\\
