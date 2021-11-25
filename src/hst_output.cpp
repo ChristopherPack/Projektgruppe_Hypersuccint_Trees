@@ -191,7 +191,7 @@ string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const s
                     iterator++;
                 }
                 Bitvector num;
-                for (int j = 0; j <= size; j++) {
+                for (uint32_t j = 0; j <= size; j++) {
                     num.push_back(*iterator);
                     result.append(to_string(*iterator));
                     iterator++;
@@ -229,8 +229,8 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getMiniTrees().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), tree.getLookupTable().size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getMiniTrees().size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getLookupTable().size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
     Bitvector emptySet = {false};
 
     createFileBitvector(tree.getMiniFIDs(), fileBitvector);
@@ -327,7 +327,7 @@ void HypersuccinctTreeOutput::createFileBitvector(Bitvector bitvector, Bitvector
         target.push_back(false);
     } else {
         Bitvector_Utils::encodeNumber(std::inserter(target, target.end()),
-                                      bitvector.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+                                      static_cast<uint32_t>(bitvector.size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
         ListUtils::combine(target, bitvector);
     }
 }
@@ -341,7 +341,7 @@ void HypersuccinctTreeOutput::createFileBitvector(std::vector<Bitvector> bitvect
         for(Bitvector& part : bitvector) {
             createFileBitvector(part,partFileBit);
         }
-        Bitvector_Utils::encodeNumber(std::inserter(target,target.end()), bitvector.size(), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        Bitvector_Utils::encodeNumber(std::inserter(target,target.end()), static_cast<uint32_t>(bitvector.size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
         ListUtils::combine(target,partFileBit);
     }
 }

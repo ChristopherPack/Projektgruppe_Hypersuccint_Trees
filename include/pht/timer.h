@@ -28,8 +28,10 @@ extern "C" {
             friend std::ostream &::operator<<(std::ostream &out, const Timer &timer);
 
         private:
+            #pragma warning(disable:4251)
             std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
             std::chrono::time_point<std::chrono::high_resolution_clock> stopTime = std::chrono::high_resolution_clock::now();
+            #pragma warning(default:4251)
         };
     }
 

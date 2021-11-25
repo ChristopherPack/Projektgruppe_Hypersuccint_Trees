@@ -1,5 +1,5 @@
 set(PHT_UI_PY_SOURCES
-    ui.py
+    gui.py
 )
 list(TRANSFORM PHT_UI_PY_SOURCES PREPEND "${CMAKE_CURRENT_LIST_DIR}/")
 add_custom_target(pht_ui ALL SOURCES ${PHT_UI_PY_SOURCES})
@@ -32,6 +32,7 @@ set(PHT_UI_INCLUDE_DIRS
     ../include
     ../extern/irrxml
     ../extern/succinct_bv/include
+    ../extern/thread-pool-2.0.0
 )
 list(TRANSFORM PHT_UI_INCLUDE_DIRS PREPEND "\"")
 list(TRANSFORM PHT_UI_INCLUDE_DIRS APPEND "\", ")
