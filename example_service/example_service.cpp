@@ -56,25 +56,25 @@ int main() {
     localTimer.start();
     std::unique_ptr<pht::HypersuccinctTree> hst = pht::HypersuccinctTreeFactory::create(tree, true, 0, 0);
     localTimer.stop();
-//    PHT_LOGGER_INFO("MAIN") << "HST created in " << localTimer.toString() << pht::Logger::endl();
-//    std::string size = formatByteSize(hst->getByteSize());
-//    PHT_LOGGER_INFO("MAIN") << "HST uses " << size << " RAM" << pht::Logger::endl();
-//    PHT_LOGGER_INFO("MAIN") << "Saving tree to file..." << pht::Logger::endl();
-//    localTimer.start();
-//    HypersuccinctTreeOutput::writeToFile(*hst);
-//    localTimer.stop();
-//    PHT_LOGGER_INFO("MAIN") << "Tree saved in " << localTimer.toString() << pht::Logger::endl();
-//
-//    PHT_LOGGER_DEBUG("MAIN") << "Printing original Tree data:" << pht::Logger::endl();
-//    PHT_LOGGER_DEBUG("TREE") << "Size: " << to_string(tree->getSize());
-//    PHT_LOGGER_DEBUG("MAIN") << tree->toNewickString() << "\n" << pht::Logger::endl();
-//    HypersuccinctTreeOutput::printTree(*hst);
-//    pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
-//    PHT_LOGGER_DEBUG("TREE") << "FileTree:" << pht::Logger::endl();
-//    HypersuccinctTreeOutput::printTree(fileHst);
-//
-//    globalTimer.stop();
-//    PHT_LOGGER_INFO("MAIN") << "Example service executed in " << globalTimer.toString() << pht::Logger::endl();
+    PHT_LOGGER_INFO("MAIN") << "HST created in " << localTimer.toString() << pht::Logger::endl();
+    std::string size = formatByteSize(hst->getByteSize());
+    PHT_LOGGER_INFO("MAIN") << "HST uses " << size << " RAM" << pht::Logger::endl();
+    PHT_LOGGER_INFO("MAIN") << "Saving tree to file..." << pht::Logger::endl();
+    localTimer.start();
+    HypersuccinctTreeOutput::writeToFile(*hst);
+    localTimer.stop();
+    PHT_LOGGER_INFO("MAIN") << "Tree saved in " << localTimer.toString() << pht::Logger::endl();
+
+    PHT_LOGGER_DEBUG("MAIN") << "Printing original Tree data:" << pht::Logger::endl();
+    PHT_LOGGER_DEBUG("TREE") << "Size: " << to_string(tree->getSize());
+    PHT_LOGGER_DEBUG("MAIN") << tree->toNewickString() << "\n" << pht::Logger::endl();
+    HypersuccinctTreeOutput::printTree(*hst);
+    pht::HypersuccinctTree fileHst = HypersuccinctTreeOutput::readFromFile("tree.txt");
+    PHT_LOGGER_DEBUG("TREE") << "FileTree:" << pht::Logger::endl();
+    HypersuccinctTreeOutput::printTree(fileHst);
+
+    globalTimer.stop();
+    PHT_LOGGER_INFO("MAIN") << "Example service executed in " << globalTimer.toString() << pht::Logger::endl();
     return 0;
 }
 
