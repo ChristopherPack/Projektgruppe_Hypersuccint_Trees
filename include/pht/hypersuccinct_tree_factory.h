@@ -724,13 +724,15 @@ namespace pht {
             tree->getHeightFalse(treeRoot);
             tree->getLeafSize(treeRoot);
 
-            thread_pool pool;
-            std::vector<std::mutex> allMutex(5);
-            for(uint32_t i = 0; i < fmMiniTrees.size(); i++) {
-                std::shared_ptr<UnorderedTree<T>>& fmMiniTree = fmMiniTrees.at(i);
-                pool.push_task(createMiniTree<T>,std::ref(hypersuccinctTree),std::cref(tree),std::ref(fmMiniTree),sizeMicro,std::ref(bpsAndOccurrences),doQueries,std::ref(allMutex),i);
+            {
+                thread_pool pool;
+                std::vector<std::mutex> allMutex(5);
+                for (uint32_t i = 0; i < fmMiniTrees.size(); i++) {
+                    std::shared_ptr<UnorderedTree<T>> &fmMiniTree = fmMiniTrees.at(i);
+                    pool.push_task(createMiniTree<T>, std::ref(hypersuccinctTree), std::cref(tree),std::ref(fmMiniTree), sizeMicro, std::ref(bpsAndOccurrences), doQueries,std::ref(allMutex), i);
+                }
+                pool.wait_for_tasks();
             }
-            pool.wait_for_tasks();
 
             if(doQueries) {
                 std::vector<std::pair<std::vector<uint32_t>, std::vector<uint32_t>>> fIDTreeVector = getTreesForFID(hypersuccinctTree);
