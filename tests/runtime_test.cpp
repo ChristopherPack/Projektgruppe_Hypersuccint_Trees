@@ -53,7 +53,7 @@ protected:
 
     //TODO:
     std::vector<pair<std::string , std::string >> writeToFileTimes;
-    std::vector<pair<std::string , std::string >> ReadFromFileTimes;
+    std::vector<pair<std::string , std::string >> readFromFileTimes;
     pht::Timer timer;
 };
 
@@ -444,6 +444,44 @@ TEST_F(RuntimeTest, FactoryOnlyNoQueries) {
     }
     for(std::pair<std::string,std::string> &value : factoryTimesHuffmanNoQueries) {
         file << value.first << ", Factory::create Huffman+NoQueries, " << value.second << "\n";
+    }
+    file.close();
+}
+
+TEST_F(RuntimeTest, WriteToAndLoadFromFile) {
+    for(std::string &name : fileNames) {
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
+        std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create without Queries." << pht::Logger::endl();
+        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0,false);
+
+
+        PHT_LOGGER_INFO("Runtime Test") << "Begin writing to file." << pht::Logger::endl();
+        timer.start();
+        pht::HypersuccinctTreeOutput::writeToFile(hyperTree);
+        timer.stop();
+        writeToFileTimes.emplace_back(name, timer.toString());
+
+        PHT_LOGGER_INFO("Runtime Test") << "Begin reading from file." << pht::Logger::endl();
+        timer.start();
+        hyperTree = pht::HypersuccinctTreeOutput::readFromFile("tree.txt");
+        timer.stop();
+        readFromFileTimes.emplace_back(name, timer.toString());
+        tree.reset();
+    }
+
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
+    std::ofstream file;
+    file.open(resultFileName,std::iostream::app);
+    for(std::pair<std::string,std::string> &value : writeToFileTimes) {
+        file << value.first << ", Factory::create WriteToFile, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : readFromFileTimes) {
+        file << value.first << ", Factory::create ReadFromFile, " << value.second << "\n";
     }
     file.close();
 }
