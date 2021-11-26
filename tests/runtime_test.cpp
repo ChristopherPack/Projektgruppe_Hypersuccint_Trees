@@ -71,10 +71,15 @@ TEST_F(RuntimeTest, FullTestRaw) {
         tree.reset();
         factoryTimes.emplace_back(name, timer.toString());
 
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Creating HST" << pht::Logger::endl();
+
         std::vector<pht::HstNode > testNodes = {{0,0,0}};
         uint32_t rootdegree;
         timer.start();
         rootdegree = hyperTree.degree({0,0,0});
+        if(rootdegree > 1001) {
+            rootdegree = 1001;
+        }
         timer.stop();
         degreeTimes.emplace_back(name,timer.toString());
         for(uint32_t i = 0; i<rootdegree; i++) {
@@ -84,6 +89,8 @@ TEST_F(RuntimeTest, FullTestRaw) {
             childTimes.emplace_back(name,timer.toString());
             testNodes.push_back(child);
         }
+
+        PHT_LOGGER_INFO("Runtime Test") << "Finished reading root children" << pht::Logger::endl();
 
         timer.start();
         uint32_t rootSubSize = hyperTree.subtreeSize({0,0,0});
@@ -115,9 +122,9 @@ TEST_F(RuntimeTest, FullTestRaw) {
                 }
                 timer.start();
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
-                /*PHT_LOGGER_DEBUG("Test") << i << std::endl << pht::Logger::endl();
-                PHT_LOGGER_DEBUG("Test") << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << std::endl << pht::Logger::endl();
-                PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl << pht::Logger::endl();*/
+                PHT_LOGGER_DEBUG("Test") << i << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << pht::Logger::endl();
+                PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << pht::Logger::endl();
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {

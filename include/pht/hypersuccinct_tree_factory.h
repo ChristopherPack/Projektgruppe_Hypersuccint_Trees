@@ -518,6 +518,7 @@ namespace pht {
                     miniTree.microTopFIDIndices.push_back({false});
                     miniTree.microLowFIDIndices.push_back({false});
 
+                    //TODO:
                     if (fmMiniTree->isRoot(microRoot)) {
                         miniTree.microParents.push_back({false});
                     } else {
@@ -643,6 +644,7 @@ namespace pht {
             std::vector<Bitvector> dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
             miniTree.dummys = dummys;
 
+            //TODO:
             enumerateMicroTrees(fmMicroTrees);
 
             //Simple Additions for Queries - MiniTree
@@ -838,6 +840,10 @@ namespace pht {
                 if(topTrees == 0) {
                     topTrees = 1;
                 }
+                if(lowOffset <= topOffset) {
+                    lowOffset = topOffset;
+                    lowOffset +=topTrees;
+                }
                 if(currentIndex==0) {
                     lowOffset = topTrees;
                 }
@@ -893,6 +899,10 @@ namespace pht {
 
                 if(topTrees == 0) {
                     topTrees = 1;
+                }
+                if(lowOffset <= topOffset) {
+                    lowOffset = topOffset;
+                    lowOffset +=topTrees;
                 }
                 if(currentIndex==0) {
                     lowOffset = topTrees;

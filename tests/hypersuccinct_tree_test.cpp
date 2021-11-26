@@ -357,7 +357,7 @@ TEST_F(HypersuccinctTreeTest, treeNathXFIDTest) {
 
     node = {0,0,0};
     resN = hyperNathX.child(node,1);
-    EXPECT_EQ(pht::HstNode(3,0,0), resN);
+    EXPECT_EQ(pht::HstNode(2,0,0), resN);
 
     node = {0,0,0};
     resN = hyperNathX.child(node,2);
