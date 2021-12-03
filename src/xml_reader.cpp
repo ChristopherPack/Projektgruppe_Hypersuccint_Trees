@@ -1,7 +1,7 @@
 #include <iostream>
 #include <filesystem>
 #include <direct.h>
-
+//#define PHT_TEST
 #include <irrXML.h>
 
 using namespace std::filesystem;
@@ -19,14 +19,26 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     do {
         element++;
         if(reader->getNodeType() == irr::io::EXN_ELEMENT) {
+            #ifdef PHT_TEST
             std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(reader->getNodeName());
+            #else
+            std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>("x");
+            #endif
             xmlTree->add(node, current);
             if(!reader->isEmptyElement())
                 current = node;
             for(int i = 0; i < reader->getAttributeCount(); i++) {
+                #ifdef PHT_TEST
                 std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeName(i)));
+                #else
+                std::shared_ptr<pht::Node<std::string>> attributeName = std::make_shared<pht::Node<std::string>>("x");
+                #endif
                 xmlTree->add(attributeName, current);
+                #ifdef PHT_TEST
                 std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>(std::string(reader->getAttributeValue(i)));
+                #else
+                std::shared_ptr<pht::Node<std::string>> attributeValue = std::make_shared<pht::Node<std::string>>("x");
+                #endif
                 xmlTree->add(attributeValue, attributeName);
             }
         } else if(reader->getNodeType() == irr::io::EXN_ELEMENT_END) {
@@ -36,7 +48,11 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
         } else if(reader->getNodeType() == irr::io::EXN_TEXT) {
             std::string text = std::string(reader->getNodeData());
             if(!std::all_of(text.begin(), text.end(), isspace)) {
+                #ifdef PHT_TEST
                 std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>(text);
+                #else
+                std::shared_ptr<pht::Node<std::string>> node = std::make_shared<pht::Node<std::string>>("x");//text);
+                #endif
                 xmlTree->add(node, current);
             }
         }
@@ -62,7 +78,7 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(cons
         directory = directory.parent_path();
     }
 
-    directory /= "example_service\\";
+    directory /= "resources\\";
 
 
     std::string xml = ".xml";

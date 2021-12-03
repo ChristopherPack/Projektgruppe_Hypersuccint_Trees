@@ -3,6 +3,9 @@
 #include "gmock/gmock-matchers.h"
 
 #define PHT_TEST
+#ifdef NDEBUG
+#define PHT_LOGGER_QUIET
+#endif
 
 #include "pht/xml_reader.h"
 #include "pht/hypersuccinct_tree.h"
@@ -13,8 +16,12 @@
 
 class HypersuccinctTreeTest : public ::testing::Test {
 protected:
-    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath;
-    pht::HypersuccinctTree<std::string> hyperNath;
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeNathX  = pht::XMLReader::readByName("treeNathX.xml");
+    pht::HypersuccinctTree hyperNathX = *pht::HypersuccinctTreeFactory::create(treeNathX, false, 12, 4);
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeNath  = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hyperNath = *pht::HypersuccinctTreeFactory::create(treeNath, false, 12, 4);
+    std::shared_ptr<pht::UnorderedTree<std::string>> treeAlex  = pht::XMLReader::readByName("treeAlex.xml");
+    pht::HypersuccinctTree hyperAlex = *pht::HypersuccinctTreeFactory::create(treeAlex, false, 12, 4);
     std::shared_ptr<pht::UnorderedTree<char>> example = std::make_shared<pht::UnorderedTree<char>>();
     std::shared_ptr<pht::Node<char>> a = std::make_shared<pht::Node<char>>('a');
     std::shared_ptr<pht::Node<char>> b = std::make_shared<pht::Node<char>>('b');
@@ -74,148 +81,985 @@ protected:
         example->add(z, r);
         example->add(A, t);
         example->add(B, x);
-
-        treeNath  = pht::XMLReader::readByName("treeNath.xml");
-        hyperNath = pht::HypersuccinctTreeFactory::create(treeNath);
-
     }
 
 };
 
-TEST_F(HypersuccinctTreeTest, TreeDataTest) {
-    EXPECT_EQ(77, treeNath->getSize());
-    EXPECT_EQ("((((((((24)23,(26)25)22)21)20,((29,30,31,32)28,(34,35)33)27)19,(37,38)36)18,(((42,43,44)41,(46,47)45,(((51,52,53)50,(55,56)54)49,(58,59)57,(61,(63,64,65,66)62,(68)67)60,(70)69)48)40)39)17,((((14,15)13)12,16)11,((((7,8)6,(10)9)5)4)3)2,((73,74)72,(76,77)75)71)1;",
-              treeNath->toNewickString());
-    pht::Bitvector miniSize = convertToBitvector("1100");
-    pht::Bitvector microSize = convertToBitvector("100");
-    EXPECT_EQ(miniSize, hyperNath.getMiniSize());
-    EXPECT_EQ(microSize, hyperNath.getMicroSize());
-}
-
 TEST_F(HypersuccinctTreeTest, MiniTreesTest){
-    pht::Bitvector miniFIDs = convertToBitvector("0111110101001011010111101010001001001");
-    pht::Bitvector miniConnectionTypeVectors = convertToBitvector("001100011111");
-    pht::Bitvector miniDummys = convertToBitvector("0000000000000000000000100000000000000000");
+    std::vector<pht::Bitvector> miniFIDs = {{true,true,true},{true,false},{true,true},{true,true},{true},{true,false},{true,false,false,true}};
+    std::vector<pht::Bitvector> miniConnectionTypeVectors = {{0,0,1},{1},{0,0},{0,1},{1},{1},{1,1}};
+    std::vector<pht::Bitvector> miniDummys = {{0},{0},{0},{0},{1,0,0},{0},{0},{0}};
     EXPECT_EQ(8, hyperNath.getMiniTrees().size());
     EXPECT_EQ(miniFIDs, hyperNath.getMiniFIDs());
-    EXPECT_EQ(miniConnectionTypeVectors, hyperNath.getminiTypeVectors());
+    EXPECT_EQ(miniConnectionTypeVectors, hyperNath.getMiniTypeVectors());
     EXPECT_EQ(miniDummys, hyperNath.getMiniDummys());
 }
 
-TEST_F(HypersuccinctTreeTest, MicroTreesTest){
-    // MiniTree 0
-    EXPECT_EQ(hyperNath.getMiniTree(0).microTrees, convertToBitvector("1100011111101001101000"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).FIDs, convertToBitvector("1101010"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).typeVectors, convertToBitvector("01"));
-    EXPECT_EQ(hyperNath.getMiniTree(0).dummys, convertToBitvector("00000000"));
+TEST_F(HypersuccinctTreeTest, SupportTest) {
+    try {
+        pht::MiniTree miniTree = hyperNath.getMiniTree(1);
+        miniTree.FIDsSupport.at(0).Rank(0);
+        miniTree.FIDsSupport.at(0).Select(0);
+    }
+    catch (runtime_error) {
+        EXPECT_EQ(0,1);
+    }
+}
 
-    // MiniTree 1
-    EXPECT_EQ(hyperNath.getMiniTree(1).microTrees, convertToBitvector("1100111110000101100001001110100000110111010011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).FIDs, convertToBitvector("0101111010111101010"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).typeVectors, convertToBitvector("0010111"));
-    EXPECT_EQ(hyperNath.getMiniTree(1).dummys, convertToBitvector("00000010000000000000"));
+TEST_F(HypersuccinctTreeTest, getMicroTreeTest) {
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = *pht::HypersuccinctTreeFactory::create(xmlTree,true, 12, 4);
+    pht::MiniTree mini = hst.getMiniTree(4);
+    std::vector<bool> res = hst.getMicroTree(mini, 0);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hst.getMicroTree(mini, 1);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1,0,1,0,0,1,0,0));
+    res = hst.getMicroTree(mini, 2);
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0,1,0,1,0,0));
+}
 
-    // MiniTree 2
-    EXPECT_EQ(hyperNath.getMiniTree(2).microTrees, convertToBitvector("110"));
-    EXPECT_EQ(hyperNath.getMiniTree(2).FIDs, convertToBitvector(""));
-    EXPECT_EQ(hyperNath.getMiniTree(2).typeVectors, convertToBitvector(""));
-    EXPECT_EQ(hyperNath.getMiniTree(2).dummys, convertToBitvector("0000"));
+TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
+    std::vector<bool> res = hyperNath.getMiniTree(0).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1));
+    res = hyperNath.getMiniTree(1).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0));
+    res = hyperNath.getMiniTree(2).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1));
+    res = hyperNath.getMiniTree(3).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
+    res = hyperNath.getMiniTree(4).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,0,1));
+    res = hyperNath.getMiniTree(5).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,0));
+    res = hyperNath.getMiniTree(6).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+    res = hyperNath.getMiniTree(7).miniTopFIDIndex;
+    EXPECT_THAT(res, ::testing::ElementsAre(1,1,1));
+}
 
-    // MiniTree 3
-    EXPECT_EQ(hyperNath.getMiniTree(3).microTrees, convertToBitvector("0010011101000"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).FIDs, convertToBitvector("11"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).typeVectors, convertToBitvector("1"));
-    EXPECT_EQ(hyperNath.getMiniTree(3).dummys, convertToBitvector("0000"));
+TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, 1);
 
-    // MiniTree 4
-    EXPECT_EQ(hyperNath.getMiniTree(4).microTrees, convertToBitvector("1100010111101001000010011010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).FIDs, convertToBitvector("11011110011100"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).typeVectors, convertToBitvector("0011"));
-    EXPECT_EQ(hyperNath.getMiniTree(4).dummys, convertToBitvector("000000000000"));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, -1);
 
-    // MiniTree 5
-    EXPECT_EQ(hyperNath.getMiniTree(5).microTrees, convertToBitvector("1100111110000010011101000001011101010100001011110011000"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).FIDs, convertToBitvector("01011110101100100100001010"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).typeVectors, convertToBitvector("0010111"));
-    EXPECT_EQ(hyperNath.getMiniTree(5).dummys, convertToBitvector("00000010000000000000"));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 3);
 
-    // MiniTree 6
-    EXPECT_EQ(hyperNath.getMiniTree(6).microTrees, convertToBitvector("0010011101000001001110100000100110110000010011010100001011101010100"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).FIDs, convertToBitvector("01111101011011110011100001001000"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).typeVectors, convertToBitvector("010011011"));
-    EXPECT_EQ(hyperNath.getMiniTree(6).dummys, convertToBitvector("00000000000000000000"));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 5);
 
-    // MiniTree 7
-    EXPECT_EQ(hyperNath.getMiniTree(7).microTrees, convertToBitvector("011111000"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).FIDs, convertToBitvector("11"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).typeVectors, convertToBitvector("1"));
-    EXPECT_EQ(hyperNath.getMiniTree(7).dummys, convertToBitvector("0000"));
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, -1);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 5);
+    EXPECT_EQ(res2, -1);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
+}
+
+TEST_F(HypersuccinctTreeTest, getTreesForMicroFIDTest) {
+    pht::MiniTree miniTree = hyperNath.getMiniTree(4);
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDTopTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDLowTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, 1);
+}
+
+TEST_F(HypersuccinctTreeTest, TreeToFIDIndexConversionTest) {
+    pht::MiniTree miniTree = hyperNath.getMiniTree(0);
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
+
+    miniTree = hyperNath.getMiniTree(1);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
+
+    miniTree = hyperNath.getMiniTree(2);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 0);
+
+    miniTree = hyperNath.getMiniTree(3);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 2);
+
+    miniTree = hyperNath.getMiniTree(4);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, 2);
+
+    miniTree = hyperNath.getMiniTree(5);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 5);
+    EXPECT_EQ(res2, 3);
+
+    miniTree = hyperNath.getMiniTree(6);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
+
+    miniTree = hyperNath.getMiniTree(7);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 6);
+    EXPECT_EQ(res2, -1);
+}
+
+TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
+    pht::MiniTree miniTree = hyperNath.getMiniTree(1);
+    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 2);
+    EXPECT_EQ(res2, 0);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 3);
+    EXPECT_EQ(res2, 2);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 4);
+    EXPECT_EQ(res2, -1);
+
+    miniTree = hyperNath.getMiniTree(0);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
+
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 0);
+    EXPECT_EQ(res2, -1);
+
+    miniTree = hyperNath.getMiniTree(4);
+    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    EXPECT_EQ(res1, 1);
+    EXPECT_EQ(res2, 0);
+}
+
+TEST_F(HypersuccinctTreeTest, isDummyAncestorWithinMiniTreeTest) {
+    pht::HstNode node = {4,1,1};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,0,0};
+    EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,0};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,2};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,2};
+    EXPECT_TRUE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,4};
+    EXPECT_FALSE(hyperNath.isDummyAncestorWithinMiniTree(node));
+    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeNath.xml");
+    pht::HypersuccinctTree hst = *pht::HypersuccinctTreeFactory::create(xmlTree,true, 12, 4);
+    node = {4,0,0};
+    EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,0};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,2,2};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,2};
+    EXPECT_TRUE(hst.isDummyAncestorWithinMiniTree(node));
+    node = {4,1,4};
+    EXPECT_FALSE(hst.isDummyAncestorWithinMiniTree(node));
+}
+
+TEST_F(HypersuccinctTreeTest, treeAlexDoubleDummyTest) {
+    pht::HstNode node = {6,0,0};
+    uint32_t res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(12, res);
+
+    node = {3,0,4};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(12, res);
+
+    node = {3,0,3};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(6, res);
+
+    node = {3,1,0};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(6, res);
+
+    node = {3,0,2};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(19, res);
+
+    node = {3,0,1};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(1, res);
+
+    node = {3,0,0};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(21, res);
+
+    node = {3,0,2};
+    pht::HstNode resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(3,1,0), resN);
+
+    node = {3,0,2};
+    resN = hyperAlex.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,0,0), resN);
+
+    node = {3,0,3};
+    resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(3,1,1), resN);
+
+    node = {3,0,4};
+    resN = hyperAlex.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,1,0), resN);
+}
+
+TEST_F(HypersuccinctTreeTest, treeNathXFIDTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,0,0), resN);
+
+    node = {0,0,0};
+    resN = hyperNathX.child(node,1);
+    EXPECT_EQ(pht::HstNode(2,0,0), resN);
+
+    node = {0,0,0};
+    resN = hyperNathX.child(node,2);
+    EXPECT_EQ(pht::HstNode(0,1,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,1,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,1);
+    EXPECT_EQ(pht::HstNode(1,0,1), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,2);
+    EXPECT_EQ(pht::HstNode(1,2,0), resN);
+
+    node = {1,0,0};
+    resN = hyperNathX.child(node,3);
+    EXPECT_EQ(pht::HstNode(2,0,1), resN);
+
+    node = {3,0,0};
+    resN = hyperNathX.child(node,0);
+    EXPECT_EQ(pht::HstNode(4,0,0), resN);
+}
+
+TEST_F(HypersuccinctTreeTest, childTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,0,0), res);
+
+    node = {1,1,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,1,1), res);
+
+    node = {0,1,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(0,1,1), res);
+
+    node = {4,1,2};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,1,0), res);
+
+    node = {4,2,3};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(), res);
+
+    node = {4,1,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(4,2,0), res);
+
+    node = {4,1,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(4,1,1), res);
+
+    node = {4,1,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(7,0,0), res);
+
+    node = {1,1,2};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,4,1), res);
+
+    node = {1,1,1};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,4,0), res);
+
+    node = {1,2,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,3,0), res);
+
+    node = {1,2,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {1,2,1};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(), res);
+
+    node = {1,4,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(1,4,1), res);
+
+    node = {3,0,1};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(3,0,2), res);
+
+    node = {6,0,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,1,0), res);
+
+    node = {7,0,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,1,0), res);
+
+    node = {6,0,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,0,1), res);
+
+    node = {6,0,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(6,2,0), res);
+
+    node = {6,0,0};
+    res = hyperNath.child(node,3);
+    EXPECT_EQ(pht::HstNode(7,0,1), res);
+
+    node = {6,0,0};
+    res = hyperNath.child(node,4);
+    EXPECT_EQ(pht::HstNode(), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,0);
+    EXPECT_EQ(pht::HstNode(6,2,1), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,1);
+    EXPECT_EQ(pht::HstNode(6,4,0), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,2);
+    EXPECT_EQ(pht::HstNode(6,2,2), res);
+
+    node = {6,2,0};
+    res = hyperNath.child(node,3);
+    EXPECT_EQ(pht::HstNode(), res);
 
 }
 
-TEST_F(HypersuccinctTreeTest, CreateViaFactoryAlexTest) {
-    std::shared_ptr<pht::UnorderedTree<std::string>> xmlTree = pht::XMLReader::readByName("treeAlex.xml");
-    pht::HypersuccinctTree<std::string> hst = pht::HypersuccinctTreeFactory::create(xmlTree);
+TEST_F(HypersuccinctTreeTest, child_rankTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
 
-    EXPECT_THAT(hst.getMiniSize(), ::testing::ElementsAre(1,1,0,0));
-    EXPECT_THAT(hst.getMicroSize(), ::testing::ElementsAre(1,0,0));
+    node = {0,1,6};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
 
-    EXPECT_EQ(hst.getMiniTrees().size(), 9);
-    EXPECT_THAT(hst.getMiniFIDs(), ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,1,1,0,1));
-    EXPECT_THAT(hst.getminiTypeVectors(), ::testing::ElementsAre(0,0,1,0,0,1,0,1,1,1,1));
-    EXPECT_THAT(hst.getMiniDummys(), ::testing::ElementsAre(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+    node = {0,1,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
 
-    pht::MiniTree miniTree = hst.getMiniTree(0);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+    node = {0,1,5};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
 
-    miniTree = hst.getMiniTree(1);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1,0,1,1,1,0,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,1,1,0,0,0,0,0));
+    node = {4,1,2};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
 
-    miniTree = hst.getMiniTree(2);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+    node = {4,1,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
 
-    miniTree = hst.getMiniTree(3);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,1,1,1,0,1,1,0,1,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,1,1,0,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,1,1,0,0,0,0));
+    node = {4,2,3};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
 
-    miniTree = hst.getMiniTree(4);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre());
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+    node = {1,1,2};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
 
-    miniTree = hst.getMiniTree(5);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,0,1,0,0,1,1,1,0,0,1,0,0,0,0,1,1,0,1,1,0,1,1,1,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,1,1,0,1,0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1,0,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,1,0,1,0,0,0,0));
+    node = {1,2,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
 
-    miniTree = hst.getMiniTree(6);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0,1,1,0,0,0,1,0,0,1,1,0,1,0,1,0,0,0,0,1,1,0,1,1,0,1,0,1,1,0,1,0,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,1,1,1,0,1,1,1,0,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(0,0,0,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+    node = {1,1,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
 
-    miniTree = hst.getMiniTree(7);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(1,1,0,0,1,0,1,1,0,0,0,0,1,1,1,1,1,1,0,1,0,0,1,1,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,0,1,1,1,0,0));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(0,0,0,1,1,1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+    node = {1,2,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
 
-    miniTree = hst.getMiniTree(8);
-    EXPECT_THAT(miniTree.microTrees, ::testing::ElementsAre(0,1,0,1,1,0,0));
-    EXPECT_THAT(miniTree.FIDs, ::testing::ElementsAre(1,1));
-    EXPECT_THAT(miniTree.typeVectors, ::testing::ElementsAre(1));
-    EXPECT_THAT(miniTree.dummys, ::testing::ElementsAre(0,0,0,0));
+    node = {1,3,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {3,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {1,4,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {6,0,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {6,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(1, res);
+
+    node = {7,0,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {6,1,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {6,2,0};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(2, res);
+
+    node = {7,0,1};
+    res = hyperNath.childRank(node);
+    EXPECT_EQ(3, res);
+}
+
+TEST_F(HypersuccinctTreeTest, getParentTest) {
+    pht::HstNode node = {6,1,0};
+    pht::HstNode resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(6,0,0),resNode);
+
+    node = {6,0,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(4,1,0),resNode);
+
+    node = {1,3,3};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,3,1),resNode);
+
+    node = {1,3,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,2,0),resNode);
+
+    node = {1,4,0};
+    resNode = hyperNath.getParent(node);
+    EXPECT_EQ(pht::HstNode(1,1,1),resNode);
+}
+
+TEST_F(HypersuccinctTreeTest, degreeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {0,1,6};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(0, res);
+
+    node = {2,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {7,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {4,1,1};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {4,1,2};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {1,1,2};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {6,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {2,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {3,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,1,1};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(1, res);
+
+    node = {7,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(4, res);
+
+    node = {0,0,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(3, res);
+
+    node = {0,1,0};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+    node = {0,1,1};
+    res = hyperNath.degree(node);
+    EXPECT_EQ(2, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, subtree_sizeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(77, res);
+
+    node = {1,1,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(8, res);
+
+    node = {0,1,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(7, res);
+
+    node = {4,1,2};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(23, res);
+
+    node = {4,1,1};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {4,2,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(31, res);
+
+    node = {6,0,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(23, res);
+
+    node = {1,1,2};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,4,0};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,1,1};
+    res = hyperNath.subtreeSize(node);
+    EXPECT_EQ(7, res);
+
+    node = {6,0,0};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(12, res);
+
+    node = {3,0,4};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(12, res);
+
+    node = {3,0,2};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(19, res);
+
+    node = {3,0,1};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(1, res);
+
+    node = {3,0,0};
+    res = hyperAlex.subtreeSize(node);
+    EXPECT_EQ(21, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, depthTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.depth(node);
+    EXPECT_EQ(0, res);
+
+    node = {1,1,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(2, res);
+
+    node = {0,1,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(1, res);
+
+    node = {4,1,2};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(3, res);
+
+    node = {6,0,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
+
+    node = {1,1,2};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
+
+    node = {1,1,1};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,4,0};
+    res = hyperNath.depth(node);
+    EXPECT_EQ(4, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, heightTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.height(node);
+    EXPECT_EQ(8, res);
+
+    node = {1,1,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(4, res);
+
+    node = {0,1,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(2, res);
+
+    node = {4,1,2};
+    res = hyperNath.height(node);
+    EXPECT_EQ(3, res);
+
+    node = {4,1,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(4, res);
+
+    node = {6,0,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,1,2};
+    res = hyperNath.height(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,4,0};
+    res = hyperNath.height(node);
+    EXPECT_EQ(2, res);
+
+    node = {1,1,1};
+    res = hyperNath.height(node);
+    EXPECT_EQ(3, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, leaf_sizeTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.leafSize(node);
+    EXPECT_EQ(39, res);
+
+    node = {1,1,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {0,1,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(4, res);
+
+    node = {4,1,2};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(14, res);
+
+    node = {4,1,1};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(2, res);
+
+    node = {4,2,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {4,1,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(19, res);
+
+    node = {6,0,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(14, res);
+
+    node = {4,2,3};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(1, res);
+
+    node = {1,1,2};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,4,0};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,1,1};
+    res = hyperNath.leafSize(node);
+    EXPECT_EQ(3, res);
+
+}
+
+TEST_F(HypersuccinctTreeTest, rightmost_leafTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,6), res);
+    //EXPECT_THAT(res, ::testing::ElementsAre(1,0,0));
+
+    node = {1,1,0};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {0,1,0};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,6), res);
+
+    node = {4,1,2};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(7,0,2), res);
+
+    node = {6,0,0};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(7,0,2), res);
+
+    node = {4,2,3};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,3), res);
+
+    node = {4,1,0};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(7,0,2), res);
+
+    node = {1,1,2};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {1,1,1};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,5), res);
+
+    node = {1,2,0};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {1,2,1};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {3,0,1};
+    res = hyperNath.rightmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(3,0,3), res);
+
+}
+
+TEST_F(HypersuccinctTreeTest,leftmost_leafTest) {
+    pht::HstNode node = {0,0,0};
+    pht::HstNode res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,1,0};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {0,1,0};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(0,1,2), res);
+
+    node = {4,1,2};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(6,3,1), res);
+
+    node = {6,0,0};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(6,3,1), res);
+
+    node = {4,2,3};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,3), res);
+
+    node = {4,1,0};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(4,2,1), res);
+
+    node = {1,1,2};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,1,1};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,4,2), res);
+
+    node = {1,2,0};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,3,2), res);
+
+    node = {1,2,1};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(1,2,1), res);
+
+    node = {3,0,1};
+    res = hyperNath.leftmostLeaf(node);
+    EXPECT_EQ(pht::HstNode(3,0,2), res);
+
+}
+
+TEST_F(HypersuccinctTreeTest,leaf_rankTest) {
+    pht::HstNode node = {0,0,0};
+    uint32_t res = hyperNath.leafRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {1,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {2,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(6, res);
+
+    node = {3,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(6, res);
+
+    node = {4,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(16, res);
+
+    node = {5,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(6, res);
+
+    node = {6,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {7,0,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {1,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {0,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(35, res);
+
+    node = {0,1,6};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(39, res);
+
+    node = {4,2,3};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(19, res);
+
+    node = {4,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(16, res);
+
+    node = {1,4,5};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,1,2};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {1,1,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(0, res);
+
+    node = {1,2,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(3, res);
+
+    node = {1,2,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(6, res);
+
+    node = {1,3,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(3, res);
+
+    node = {3,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(14, res);
+
+    node = {4,1,2};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {4,1,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(19, res);
+
+    node = {6,1,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(21, res);
+
+    node = {6,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(26, res);
+
+    node = {6,2,0};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(28, res);
+
+    node = {7,0,1};
+    res = hyperNath.leafRank(node);
+    EXPECT_EQ(34, res);
+
 }

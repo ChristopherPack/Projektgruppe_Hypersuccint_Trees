@@ -5,6 +5,11 @@
 #include <functional>
 #include <vector>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
 namespace pht {
     /**
      * Provides list utility functions.
@@ -71,10 +76,14 @@ namespace pht {
          */
         template<class T> static std::vector<T> combined(const std::vector<T>& vectorA, const std::initializer_list<T> vectorB) {
             if(vectorB.size() == 0) {
-                return std::vector<T>();
+                return std::vector<T>(vectorA);
             }
             std::vector<T> result = vectorA;
-            result.insert(vectorA.end(), vectorB.begin(), vectorB.end());
+            auto iter = vectorB.begin();
+            while(iter != vectorB.end()) {
+                result.push_back(*iter);
+                iter++;
+            }
             return result;
         }
 
@@ -496,4 +505,5 @@ namespace pht {
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_LISTUTILS

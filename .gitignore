@@ -6,7 +6,13 @@ XML/
 .idea/
 cmake-build-debug/
 cmake-build-release/
+cmake-build-relwithdebinfo/
+python_visualize/
+venv/
 
 /build/
 /.vscode/
 /resources/
+
+/python/build/
+/python/*.pyd

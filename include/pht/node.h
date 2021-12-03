@@ -6,6 +6,12 @@
 #include <sstream>
 #include <algorithm>
 
+#ifdef DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+
 namespace pht {
     /**
      * Stores information for use in a tree.
@@ -46,9 +52,37 @@ namespace pht {
             return value;
         }
 
+        bool isMiniDummy() {
+            return miniDummy;
+        }
+
+        void setMiniDummy(bool val = true) {
+            miniDummy = val;
+        }
+
+        void setMiniTree(uint32_t val = -1) {
+            miniTree = val;
+        }
+
+        uint32_t getMiniTree() {
+            return miniTree;
+        }
+
+        void setMicroTree(uint32_t val = -1) {
+            microTree = val;
+        }
+
+        uint32_t getMicroTree() {
+            return microTree;
+        }
+
     private:
         T value;///The stored value of the node 
+        bool miniDummy = false;
+        uint32_t miniTree;
+        uint32_t microTree;
     };
 }
 
+#undef DLL_API
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_NODE_H_
