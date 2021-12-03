@@ -155,7 +155,7 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
     }
 
     if(checkNode) {
-        LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent,parent.micro));
+        LookupTableEntry entry = getLookupTableEntry(getMicroTree(getMiniTree(miniRes),microRes));
         uint32_t matSize = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
         uint32_t startRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node));
         uint32_t startRankSelect = static_cast<uint32_t>(entry.childMatrixSupport.Select(startRank + nodeIndexHelp));

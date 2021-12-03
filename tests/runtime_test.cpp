@@ -30,9 +30,10 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"DBLP.xml"};
-            //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml","DBLP.xml"};
-    std::string resultFileName = "testResultsFactoryOptimizedPrecompCheck6.csv";
+    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
+            //{"DBLP.xml"};
+            //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
+    std::string resultFileName = "testResultsFactoryOptimizedPrecompCheckARR.csv";
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> factoryTimesHuffman;
     std::vector<pair<std::string , std::string >> factoryTimesNoQueries;
