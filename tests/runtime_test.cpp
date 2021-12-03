@@ -30,9 +30,10 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"DBLP.xml"};
-            //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml","DBLP.xml"};
-    std::string resultFileName = "testResultsFactoryOptimizedPrecompCheck6.csv";
+    std::vector<std::string> fileNames = {"TreeNath2.xml"};
+            //{"DBLP.xml"};
+            //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
+    std::string resultFileName = "testResultsFactoryOptimizedPrecompCheckARR.csv";
     std::vector<pair<std::string , std::string >> factoryTimes;
     std::vector<pair<std::string , std::string >> factoryTimesHuffman;
     std::vector<pair<std::string , std::string >> factoryTimesNoQueries;
@@ -121,10 +122,16 @@ TEST_F(RuntimeTest, FullTestRaw) {
                     break;
                 }
                 timer.start();
+                if(i == 29) {
+                    std::cout << "HERE" << std::endl;
+                }
                 pht::HstNode child = hyperTree.child(testNodes.at(i),j);
                 PHT_LOGGER_DEBUG("Test") << i << pht::Logger::endl();
                 PHT_LOGGER_DEBUG("Test") << "Current Node: " << testNodes.at(i).mini << ", " << testNodes.at(i).micro << ", " << testNodes.at(i).node << ";" << pht::Logger::endl();
                 PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << pht::Logger::endl();
+                if(child.mini == -1) {
+                    std::cout << "HERE" <<std::endl;
+                }
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
                 if(testNodes.size() < testSize) {
