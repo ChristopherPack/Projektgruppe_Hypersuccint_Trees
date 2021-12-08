@@ -30,7 +30,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
+    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml","XMark2.xml","DBLP.xml"};
             //{"DBLP.xml"};
             //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
     std::string resultFileName = "testResultsFactoryOptimizedPrecompCheckARR.csv";
@@ -525,25 +525,25 @@ TEST_F(RuntimeTest, HuffmanSizeTest) {
         if (ec) {
             std::cout << " : " << ec.message() << '\n';
         } else {
-            normalFileSizes.emplace_back("TreeNormal",std::to_string(size));
+            normalFileSizes.emplace_back(name,std::to_string(size));
         }
         size = std::filesystem::file_size("hyperTreeNormalALL.txt",ec);
         if (ec) {
             std::cout << " : " << ec.message() << '\n';
         } else {
-            normalFileSizes.emplace_back("TreeNormal::All",std::to_string(size));
+            normalFileSizes.emplace_back(name,std::to_string(size));
         }
         size = std::filesystem::file_size("hyperTreeHuff.txt",ec);
         if (ec) {
             std::cout << " : " << ec.message() << '\n';
         } else {
-            huffmanFileSizes.emplace_back("TreeHuff",std::to_string(size));
+            huffmanFileSizes.emplace_back(name,std::to_string(size));
         }
         size = std::filesystem::file_size("hyperTreeHuffALL.txt",ec);
         if (ec) {
             std::cout << " : " << ec.message() << '\n';
         } else {
-            huffmanFileSizes.emplace_back("TreeHuff::All",std::to_string(size));
+            huffmanFileSizes.emplace_back(name,std::to_string(size));
         }
     }
 
