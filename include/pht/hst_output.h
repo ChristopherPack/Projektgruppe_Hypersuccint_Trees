@@ -63,7 +63,6 @@ namespace pht {
         /**
          * Reads an entire hypersuccinct tree from a file
          * TODO: Has to conform to WriteToFile encoding
-         * TODO: Needs to figure out how to even manipulate a hst object from here (via Factory?)
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
@@ -99,7 +98,6 @@ namespace pht {
         /**
          * Duplicates every instance of the given separator in a given Bitvector
          * Helper function for writeToFile
-         * TODO: Currently unused
          * @param bitvector the given Bitvector
          * @param separator the separator as string
          * @return the modified Bitvector

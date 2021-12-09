@@ -219,8 +219,6 @@ string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const s
 }
 
 void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree,const std::string& filename) {
-    //todo: implementing some sort of file explorer would be nice
-    //todo: need to think about how to make the bitvector
     //encode mit Elias Gamma
     std::ofstream file;
     file.open(filename, std::ofstream::binary);
@@ -344,7 +342,7 @@ HypersuccinctTree HypersuccinctTreeOutput::readFromFile(string path) {
     Bitvector fileBitvector = readBitvectorFromFile(file);
     file.close();
     //funktion in Factory:
-    return HypersuccinctTreeFactory::createFromFile(fileBitvector);
+    return HypersuccinctTreeFactory::createFromBitvector(fileBitvector);
 }
 
 void HypersuccinctTreeOutput::createFileBitvector(Bitvector bitvector, Bitvector& target) {
@@ -415,14 +413,13 @@ Bitvector HypersuccinctTreeOutput::readBitvectorFromFile(std::ifstream &file) {
     return bitvector;
 }
 
-Bitvector HypersuccinctTreeOutput::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
+[[maybe_unused]] Bitvector HypersuccinctTreeOutput::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
     Bitvector temp = bitvector;
     Bitvector sep = Bitvector_Utils::convertToBitvector(separator);
     uint32_t sepNum = Bitvector_Utils::decodeNumber(sep, Bitvector_Utils::NumberEncoding::BINARY);
     std::vector<std::pair<Bitvector::const_iterator, Bitvector::const_iterator>> patternMatches = Bitvector_Utils::findMatches(temp.cbegin(),temp.cend(), separator);
 
     for(std::pair<Bitvector::const_iterator, Bitvector::const_iterator> match : patternMatches) {
-        //TODO: This is apparently optimal - other option is to advance to the const_iter
         auto iterMin = temp.erase(match.first,match.first);
         uint32_t add = Bitvector_Utils::encodeNumber(std::inserter(temp, iterMin), sepNum, Bitvector_Utils::NumberEncoding::BINARY);
         assert(match.first+add < match.second);

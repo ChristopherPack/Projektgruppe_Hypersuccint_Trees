@@ -74,7 +74,6 @@ namespace pht {
         }
 
         /**
-         * Todo: Rewrite tree for consistent ORDER
          * Adds a node to the tree.
          *
          * This method will add a new node to the tree. The node will be a child of the given ancestor.
@@ -555,7 +554,6 @@ namespace pht {
 
         /**
          * Returns the leaf size (Amount of Leaves) of the given node
-         * TODO: This one really needs caching
          *
          * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
          * @return The leaf size of the node
@@ -764,7 +762,6 @@ namespace pht {
 
         //BUG Call cannot be simplified
         //True counts dummies (for Lookuptable); False ignores dummies (For Mini/Microtrees)
-        //TODO: Would it be better to unify the False and True Calcs?
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); });
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalc(cache,root);});
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSizeTrue = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeTrueCalc(cache,root);});

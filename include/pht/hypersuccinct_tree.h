@@ -25,7 +25,6 @@ namespace pht {
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
-     * TODO: ALL vectors get +1 to their numbers - so 0 is clear illegal value!
      */
     struct __declspec(dllexport) MiniTree {
         //MicroFIDs
@@ -156,9 +155,7 @@ namespace pht {
         #pragma warning(default:4251)
 
 
-        //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
         LookupTableEntry(const Bitvector& index) : index(index) {}
-        //TODO: Extend constructor as more fields are added!
         LookupTableEntry(const Bitvector& index, const Bitvector& bp) : index(index), bp(bp) {}
         bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
@@ -171,7 +168,6 @@ namespace pht {
      * as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro.
      * All code is represented as Bitvectors
      * It can be encoded with huffman encoding for MicroTrees
-     * TODO: Need Complexity for all functions
      *
      * It contains:
      * The FarzanMunro Algorithm Sizes of MiniTrees and MicroTrees
@@ -348,7 +344,6 @@ namespace pht {
 
         /**
          * Returns if given Node is ancestor of Dummy within the Node's MiniTree
-         * TODO: Look at the Micro Version - This can clearly be optimized
          *
          * @param node The Node as HstNode
          * @return if Node is ancestor of MiniDummy as bool
@@ -462,15 +457,6 @@ namespace pht {
          * @return the Leaf Size as uint32_t
          */
          uint32_t leafRank(HstNode node);
-
-        /**
-         * TODO: Unfinished
-         *
-         * @param level
-         * @param node
-         * @return
-         */
-        HstNode levelAncestor(HstNode node, uint32_t level);
 
         uint64_t getByteSize();
 

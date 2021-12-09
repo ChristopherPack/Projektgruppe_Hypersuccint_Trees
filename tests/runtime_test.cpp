@@ -52,7 +52,6 @@ protected:
     std::vector<pair<std::string , std::string >> leafSizeTimes;
     std::vector<pair<std::string , std::string >> leafRankTimes;
 
-    //TODO:
     std::vector<pair<std::string , std::string >> writeToFileTimes;
     std::vector<pair<std::string , std::string >> readFromFileTimes;
 
