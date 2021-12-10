@@ -25,96 +25,56 @@ namespace pht {
     /**
      * MiniTree represents MiniTree of the HypersuccinctTree
      * It contains all information needed to query a single MiniTree.
-     * TODO: ALL vectors get +1 to their numbers - so 0 is clear illegal value!
      */
+    //TODO: ALL vectors get +1 to their numbers - so 0 is clear illegal value!
     struct __declspec(dllexport) MiniTree {
-        //MicroFIDs
         #pragma warning(disable:4251)
-        std::vector<Bitvector> FIDs;
-        std::vector<succinct_bv::BitVector> FIDsSupport;
-        //MicroTypeVectors
-        std::vector<Bitvector> typeVectors;
-        std::vector<succinct_bv::BitVector> typeVectorsSupport;
-        //MicroDummys: Static Size Encoding
-        std::vector<Bitvector> dummys;
-        //MircoTrees as encoded (BP if no encoding, huffman code if huffman encoding)
-        std::vector<Bitvector> microTrees;
+        std::vector<Bitvector> FIDs; ///MicroFIDs
+        std::vector<succinct_bv::BitVector> FIDsSupport; //TODO Documentation
+        std::vector<Bitvector> typeVectors; ///MicroTypeVectors
+        std::vector<succinct_bv::BitVector> typeVectorsSupport; //TODO Documentation
+        std::vector<Bitvector> dummys; ///MicroDummys: Static Size Encoding
+        std::vector<Bitvector> microTrees; ///MicroTrees as encoded (BP if no encoding, huffman code if huffman encoding)
 
-        //MiniTree Top FID Index + 1
-        Bitvector miniTopFIDIndex;
-        //MiniTree Low FID Index + 1
-        Bitvector miniLowFIDIndex;
-        //MicroTree Top FID Indices + 1
-        std::vector<Bitvector> microTopFIDIndices;
-        //MicroTree Low FID Indices + 1
-        std::vector<Bitvector> microLowFIDIndices;
-        //First Top Tree of MicroFIDs
-        std::vector<Bitvector> microFIDTopTrees;
-        //First Low Tree of MicroFIDs
-        std::vector<Bitvector> microFIDLowTrees;
+        Bitvector miniTopFIDIndex; ///MiniTree Top FID Index + 1
+        Bitvector miniLowFIDIndex; ///MiniTree Low FID Index + 1
+        std::vector<Bitvector> microTopFIDIndices; ///MicroTree Top FID Indices + 1
+        std::vector<Bitvector> microLowFIDIndices; ///MicroTree Low FID Indices + 1
+        std::vector<Bitvector> microFIDTopTrees; ///First Top Tree of MicroFIDs
+        std::vector<Bitvector> microFIDLowTrees; ///First Low Tree of MicroFIDs
+        
+        Bitvector rootAncestors; ///Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
+        Bitvector dummyAncestors; ///Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
+        Bitvector miniDummyTree; ///If MiniTree has Dummy: Which MicroTree contains this Dummy?
+        Bitvector miniDummyIndex; ///If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
+        Bitvector miniDummyPointer; ///If MiniTree has Dummy: To which Tree does the pointer lead?
+        std::vector<Bitvector> microDummyPointers; ///MicroTree Dummy Pointer: Static Size Encoding
 
+        Bitvector miniChildRank; ///Child Rank of MiniTrees
+        std::vector<Bitvector> microChildRanks; ///Child Ranks of MicroTrees EXCEPT AT INDEX 0: ChildRank of displaced MiniTree
+        std::vector<Bitvector> microExtendedChildRanks; ///Child Ranks of displaced MicroTrees
 
-        //Is MicroTree root ancestor of MiniTreeDummy? empty/0 if no MiniDummy exists
-        Bitvector rootAncestors;
-        //Is MicroTreeDummy ancestor of MiniTreeDummy? 0 per entry if no MicroDummy exists, empty/0 if no MiniDummy exists
-        Bitvector dummyAncestors;
-        //If MiniTree has Dummy: Which MicroTree contains this Dummy?
-        Bitvector miniDummyTree;
-        //If MiniTree has Dummy: Which Index within the MicroTree is this Dummy?
-        Bitvector miniDummyIndex;
-        //If MiniTree has Dummy: To which Tree does the pointer lead?
-        Bitvector miniDummyPointer;
-        //MicroTree Dummy Pointer: Static Size Encoding
-        std::vector<Bitvector> microDummyPointers;
+        Bitvector miniParent; ///Pointer to direct parent MiniTree
+        std::vector<Bitvector> microParents; ///Pointer to direct parent MicroTree for all MicroTrees
 
-        //Child Rankd of MiniTrees
-        Bitvector miniChildRank;
-        //Child Ranks of MicroTrees EXCEPT AT INDEX 0: ChildRank of displaced MiniTree
-        std::vector<Bitvector> microChildRanks;
-        //Child Ranks of displaced MicroTrees
-        std::vector<Bitvector> microExtendedChildRanks;
-
-        //Pointer to direct parent MiniTree
-        Bitvector miniParent;
-        //Pointer to direct parent MicroTree for all MicroTrees
-        std::vector<Bitvector> microParents;
-
-        //SubTree Size MiniTree
-        Bitvector subTree;
-        //SubTree Size for MicroTree roots
-        std::vector<Bitvector> microSubTrees;
-        //Depth of the MiniTree root
-        Bitvector miniDepth;
-        //Height of the MiniTree root
-        Bitvector miniHeight;
-        //Depth of the MiniTree Dummy
-        Bitvector miniDummyDepth;
-        //Height of the MiniTree Dummy
-        Bitvector miniDummyHeight;
-        //Depths for MicroTree roots + 1
-        std::vector<Bitvector> rootDepths;
-        //Heights for MicroTree roots + 1
-        std::vector<Bitvector> rootHeights;
-        //Amount of Leaves in MiniTree
-        Bitvector miniLeaves;
-        //Amount of Leaves within MicroTrees
-        std::vector<Bitvector> microLeaves;
-        //Leftmost Leaf Pointer for MiniTree
-        Bitvector miniTreeLeftmostLeafPointer;
-        //Rightmost Leaf Pointer for MiniTree
-        Bitvector miniTreeRightmostLeafPointer;
-        //Leftmost Leaf Pointers for MicroTrees
-        std::vector<Bitvector> microTreeLeftmostLeafPointers;
-        //Rightmost Leaf Pointers for MicroTrees
-        std::vector<Bitvector> microTreeRightmostLeafPointers;
-        //Leaf Rank of MiniTree Root
-        Bitvector miniRootLeafRank;
-        //Leaf Rank of MiniTree Dummy
-        Bitvector miniDummyLeafRank;
-        //Leaf Ranks of MicroTree Roots + 1 EXCEPT AT INDEX 0: There it is the displaced Leaf Rank of the MiniTree
-        std::vector<Bitvector> microRootLeafRanks;
-        //Special Leaf Ranks for displaced microTrees + 1
-        std::vector<Bitvector> microExtendedLeafRanks;
+        Bitvector subTree; ///SubTree Size MiniTree
+        std::vector<Bitvector> microSubTrees; ///SubTree Size for MicroTree roots
+        Bitvector miniDepth; ///Depth of the MiniTree root
+        Bitvector miniHeight; ///Height of the MiniTree root
+        Bitvector miniDummyDepth; ///Depth of the MiniTree Dummy
+        Bitvector miniDummyHeight; ///Height of the MiniTree Dummy
+        std::vector<Bitvector> rootDepths; ///Depths for MicroTree roots + 1
+        std::vector<Bitvector> rootHeights; ///Heights for MicroTree roots + 1
+        Bitvector miniLeaves; ///Amount of Leaves in MiniTree
+        std::vector<Bitvector> microLeaves; ///Amount of Leaves within MicroTrees
+        Bitvector miniTreeLeftmostLeafPointer; ///Leftmost Leaf Pointer for MiniTree
+        Bitvector miniTreeRightmostLeafPointer; ///Rightmost Leaf Pointer for MiniTree
+        std::vector<Bitvector> microTreeLeftmostLeafPointers; ///Leftmost Leaf Pointers for MicroTrees
+        std::vector<Bitvector> microTreeRightmostLeafPointers; ///Rightmost Leaf Pointers for MicroTrees
+        Bitvector miniRootLeafRank; ///Leaf Rank of MiniTree Root
+        Bitvector miniDummyLeafRank; ///Leaf Rank of MiniTree Dummy
+        std::vector<Bitvector> microRootLeafRanks; ///Leaf Ranks of MicroTree Roots + 1 EXCEPT AT INDEX 0: There it is the displaced Leaf Rank of the MiniTree
+        std::vector<Bitvector> microExtendedLeafRanks; ///Special Leaf Ranks for displaced microTrees + 1
         #pragma warning(default:4251)
     };
 
@@ -125,41 +85,32 @@ namespace pht {
      */
     struct __declspec(dllexport) LookupTableEntry {
         #pragma warning(disable:4251)
-        //Index of the LookupTableEntry
-        Bitvector index;
-        //BP of the Entry. Empty if index is BP
-        Bitvector bp;
-        //Ancestor Matrix
-        Bitvector ancestorMatrix;
-        succinct_bv::BitVector ancestorMatrixSupport;
-        //Child Matrix
-        Bitvector childMatrix;
-        succinct_bv::BitVector childMatrixSupport;
-        //ParentPointers + 1
-        std::vector<Bitvector> parentPointers;
-        //degree for every node + 1
-        std::vector<Bitvector> degree;
-        //subTree for every node within MicroTree (at least 1)
-        std::vector<Bitvector> subTrees;
-        //Depths of nodes + 1
-        std::vector<Bitvector> nodeDepths;
-        //Heights of nodes + 1
-        std::vector<Bitvector> nodeHeights;
-        //Amount of Leaves for every node within MicroTree (at least 1)
-        std::vector<Bitvector> leaves;
-        //Rightmost leaves for every node within MicroTree
-        std::vector<Bitvector> leftmost_leaf;
-        //Leftmose leaves for every node within MicroTree
-        std::vector<Bitvector> rightmost_leaf;
-        //Leaf Rank for every node within MicroTree + 1
-        std::vector<Bitvector> leafRank;
+        Bitvector index; ///Index of the LookupTableEntry
+        Bitvector bp; ///BP of the Entry. Empty if index is BP
+        Bitvector ancestorMatrix;//Ancestor Matrix
+        succinct_bv::BitVector ancestorMatrixSupport; //TODO Documentation
+        Bitvector childMatrix; ///Child Matrix
+        succinct_bv::BitVector childMatrixSupport; //TODO Documentation
+        std::vector<Bitvector> parentPointers; ///ParentPointers + 1
+        std::vector<Bitvector> degree; ///degree for every node + 1
+        std::vector<Bitvector> subTrees; ///subTree for every node within MicroTree (at least 1)
+        std::vector<Bitvector> nodeDepths; ///Depths of nodes + 1
+        std::vector<Bitvector> nodeHeights; ///Heights of nodes + 1
+        std::vector<Bitvector> leaves; ///Amount of Leaves for every node within MicroTree (at least 1)
+        std::vector<Bitvector> leftmost_leaf; ///Rightmost leaves for every node within MicroTree
+        std::vector<Bitvector> rightmost_leaf; ///Leftmose leaves for every node within MicroTree
+        std::vector<Bitvector> leafRank; ///Leaf Rank for every node within MicroTree + 1
         #pragma warning(default:4251)
 
-
         //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
+        //TODO Documentation
         LookupTableEntry(const Bitvector& index) : index(index) {}
+        
         //TODO: Extend constructor as more fields are added!
+        //TODO Documentation
         LookupTableEntry(const Bitvector& index, const Bitvector& bp) : index(index), bp(bp) {}
+
+        //TODO Documentation
         bool operator==(const LookupTableEntry& mtd) const {
             return index == mtd.index;
         }
@@ -171,7 +122,6 @@ namespace pht {
      * as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro.
      * All code is represented as Bitvectors
      * It can be encoded with huffman encoding for MicroTrees
-     * TODO: Need Complexity for all functions
      *
      * It contains:
      * The FarzanMunro Algorithm Sizes of MiniTrees and MicroTrees
@@ -183,6 +133,7 @@ namespace pht {
      * Get functions for all Bitvectors
      * Queries as specified in 'A Uniform Paradigm to Succinctly Encode Various Families of Trees' by Arash Farzan; J. Ian Munro
      */
+    //TODO: Need Complexity for all functions
     class __declspec(dllexport) HypersuccinctTree {
         friend class HypersuccinctTreeFactory;
     public:
@@ -208,42 +159,52 @@ namespace pht {
             return huffmanFlag;
         }
 
+        //TODO Documentation
         Bitvector getSize() {
             return size;
         }
 
+        //TODO Documentation
         Bitvector getMicroSize() {
             return microSize;
         }
 
+        //TODO Documentation
         Bitvector getMiniSize() {
             return miniSize;
         }
 
+        //TODO Documentation
         std::vector<MiniTree>& getMiniTrees() {
             return miniTrees;
         }
 
+        //TODO Documentation
         std::vector<Bitvector> getMiniFIDs() {
             return miniFIDs;
         }
 
+        //TODO Documentation
         std::vector<Bitvector> getFIDTopTrees() {
             return miniFIDTopTree;
         }
 
+        //TODO Documentation
         std::vector<Bitvector> getFIDLowTrees() {
             return miniFIDLowTree;
         }
 
+        //TODO Documentation
         std::vector<Bitvector> getMiniTypeVectors() {
             return miniTypeVectors;
         }
 
+        //TODO Documentation
         std::vector<Bitvector> getMiniDummys() {
             return miniDummys;
         }
 
+        //TODO Documentation
         std::vector<LookupTableEntry> getLookupTable() {
             return lookupTable;
         }
@@ -258,6 +219,7 @@ namespace pht {
          */
         Bitvector getMicroTree(MiniTree& miniTree,uint32_t index);
 
+        //TODO Documentation
         uint32_t getMicroTreeCount(MiniTree& miniTree);
 
         /**
@@ -340,7 +302,7 @@ namespace pht {
          * Both nodes only need their index inside the MicroTree (HstNode index 2)
          *
          * @param entry The LookupTable Entry
-         * @param anc Index of Node 1
+         * @param child Index of Node 1
          * @param node2Index Index of Node 2
          * @return if node1 is ancestor of node2 as bool
          */
@@ -348,11 +310,11 @@ namespace pht {
 
         /**
          * Returns if given Node is ancestor of Dummy within the Node's MiniTree
-         * TODO: Look at the Micro Version - This can clearly be optimized
          *
          * @param node The Node as HstNode
          * @return if Node is ancestor of MiniDummy as bool
          */
+        //TODO: Look at the Micro Version - This can clearly be optimized
         bool isDummyAncestorWithinMiniTree(HstNode node);
 
         /**
@@ -383,11 +345,11 @@ namespace pht {
         /**
          * Finds the direct Parent of the given Node, ignoring dummies
          * Important hepler function
-         * TODO: Should be private
          *
          * @param node The node as HSTNode
          * @return The parent as HstNode
          */
+        //TODO: Should be private
         HstNode getParentForQuery(HstNode node);
 
         /**
@@ -463,8 +425,8 @@ namespace pht {
          */
          uint32_t leafRank(HstNode node);
 
+        //TODO Unfinished
         /**
-         * TODO: Unfinished
          *
          * @param level
          * @param node
@@ -472,6 +434,10 @@ namespace pht {
          */
         HstNode levelAncestor(HstNode node, uint32_t level);
 
+        /**
+         * Returns the size of this Hypersuccinct Tree in bytes. 
+         * @return uint64_t The size in bytes. 
+         */
         uint64_t getByteSize();
 
     private:

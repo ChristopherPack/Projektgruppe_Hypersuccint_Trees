@@ -51,8 +51,8 @@ namespace pht {
         /**
          * Combines the two vectors into a new one. 
          * 
-         * @param[in] vector One vector to combine. 
-         * @param[in] values The second vector to combine. 
+         * @param vectorA One vector to combine. 
+         * @param vectorB The second vector to combine. 
          * @tparam T The type of data stored in the vectors. 
          * @return The combined values. 
          */
@@ -68,8 +68,8 @@ namespace pht {
         /**
          * Combines the two vectors into a new one. 
          * 
-         * @param[in] vector One vector to combine. 
-         * @param[in] values The second vector to combine. 
+         * @param vectorA One vector to combine. 
+         * @param vectorB The second vector to combine. 
          * @tparam T The type of data stored in the vectors. 
          * @return The combined values. 
          * @overload
@@ -308,7 +308,7 @@ namespace pht {
          * Maps all elements in vector1 into vector2 with the help of the given function. 
          * 
          * @param[in] vector The vector which should be mapped. 
-         * @param[out] vector The vector to map into. 
+         * @param[out] output The vector to map into. 
          * @param[in] mapper The mapping function which converts an element from T1 into T2. 
          * @tparam T1 The type of data stored in the vector. 
          * @tparam T2 The new type of the data after mapping. 
