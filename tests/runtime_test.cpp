@@ -7,9 +7,9 @@
 
 
 //#define PHT_TEST
-#ifdef NDEBUG
-#define PHT_LOGGER_QUIET
-#endif
+//#ifdef NDEBUG
+//#define PHT_LOGGER_QUIET
+//#endif
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
 #include "pht/xml_reader.h"
@@ -30,7 +30,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
+    std::vector<std::string> fileNames = {"DBLP.xml"};
             //{"DBLP.xml"};
             //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
     std::string resultFileName = "testResultsFactoryOptimizedPrecompCheckARR.csv";
@@ -52,9 +52,11 @@ protected:
     std::vector<pair<std::string , std::string >> leafSizeTimes;
     std::vector<pair<std::string , std::string >> leafRankTimes;
 
-    //TODO:
     std::vector<pair<std::string , std::string >> writeToFileTimes;
     std::vector<pair<std::string , std::string >> readFromFileTimes;
+
+    std::vector<pair<std::string , std::string >> normalFileSizes;
+    std::vector<pair<std::string , std::string >> huffmanFileSizes;
     pht::Timer timer;
 };
 
@@ -457,8 +459,8 @@ TEST_F(RuntimeTest, WriteToAndLoadFromFile) {
         PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
         PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
         PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
-        PHT_LOGGER_INFO("Runtime Test") << "Begin Create without Queries." << pht::Logger::endl();
-        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0,false);
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create." << pht::Logger::endl();
+        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0,true);
 
 
         PHT_LOGGER_INFO("Runtime Test") << "Begin writing to file." << pht::Logger::endl();
@@ -483,6 +485,75 @@ TEST_F(RuntimeTest, WriteToAndLoadFromFile) {
     }
     for(std::pair<std::string,std::string> &value : readFromFileTimes) {
         file << value.first << ", Factory::create ReadFromFile, " << value.second << "\n";
+    }
+    file.close();
+}
+
+TEST_F(RuntimeTest, HuffmanSizeTest) {
+    for(std::string &name : fileNames) {
+        PHT_LOGGER_INFO("Runtime Test") << "Begin: " << name << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Reading " << name << "\n" << pht::Logger::endl();
+        std::shared_ptr<pht::UnorderedTree<std::string>> tree = pht::XMLReader::readByName(name);
+        PHT_LOGGER_INFO("Runtime Test") << "Finished Reading File." << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Finished reading " << name << "\n" << pht::Logger::endl();
+        PHT_LOGGER_DEBUG("Test") << "Nodes: " << tree->getSize() << "\n" << pht::Logger::endl();
+        PHT_LOGGER_INFO("Runtime Test") << "Begin Create without Queries." << pht::Logger::endl();
+        pht::HypersuccinctTree hyperTree = *pht::HypersuccinctTreeFactory::create(tree, false, 0, 0,false);
+        tree = pht::XMLReader::readByName(name);
+        pht::HypersuccinctTree hyperTreeHuff = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0,false);
+
+
+        PHT_LOGGER_INFO("Runtime Test") << "Writing Normal Tree to File." << pht::Logger::endl();
+        timer.start();
+        pht::HypersuccinctTreeOutput::writeHuffmanToFile(hyperTree,"hyperTreeNormal.txt");
+        pht::HypersuccinctTreeOutput::writeHuffmanToFile(hyperTree,"hyperTreeNormalALL.txt",true);
+        timer.stop();
+        writeToFileTimes.emplace_back(name, timer.toString());
+
+        PHT_LOGGER_INFO("Runtime Test") << "Writing Huffman Tree to File." << pht::Logger::endl();
+        timer.start();
+        pht::HypersuccinctTreeOutput::writeHuffmanToFile(hyperTreeHuff,"hyperTreeHuff.txt");
+        pht::HypersuccinctTreeOutput::writeHuffmanToFile(hyperTreeHuff,"hyperTreeHuffALL.txt",true);
+        timer.stop();
+        readFromFileTimes.emplace_back(name, timer.toString());
+        tree.reset();
+
+        PHT_LOGGER_INFO("Runtime Test") << "Checking File Sizes" << pht::Logger::endl();
+        std::error_code ec;
+        std::uintmax_t size = std::filesystem::file_size("hyperTreeNormal.txt",ec);
+        if (ec) {
+            std::cout << " : " << ec.message() << '\n';
+        } else {
+            normalFileSizes.emplace_back(name,std::to_string(size));
+        }
+        size = std::filesystem::file_size("hyperTreeNormalALL.txt",ec);
+        if (ec) {
+            std::cout << " : " << ec.message() << '\n';
+        } else {
+            normalFileSizes.emplace_back(name,std::to_string(size));
+        }
+        size = std::filesystem::file_size("hyperTreeHuff.txt",ec);
+        if (ec) {
+            std::cout << " : " << ec.message() << '\n';
+        } else {
+            huffmanFileSizes.emplace_back(name,std::to_string(size));
+        }
+        size = std::filesystem::file_size("hyperTreeHuffALL.txt",ec);
+        if (ec) {
+            std::cout << " : " << ec.message() << '\n';
+        } else {
+            huffmanFileSizes.emplace_back(name,std::to_string(size));
+        }
+    }
+
+    PHT_LOGGER_INFO("Runtime Test") << "Begin File Output" << pht::Logger::endl();
+    std::ofstream file;
+    file.open(resultFileName + "HuffTable.csv",std::iostream::app);
+    for(std::pair<std::string,std::string> &value : normalFileSizes) {
+        file << value.first << ", Tree::Normal Size, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : huffmanFileSizes) {
+        file << value.first << ", Tree::Huffman Size, " << value.second << "\n";
     }
     file.close();
 }

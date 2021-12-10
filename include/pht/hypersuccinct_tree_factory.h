@@ -71,7 +71,6 @@ namespace pht {
 
             hypersuccinctTree->lookupTable.shrink_to_fit();
 
-            //TODO: convert std::bool to BitVector
             createBitvectorSupports(*hypersuccinctTree);
 
             return hypersuccinctTree;
@@ -80,11 +79,10 @@ namespace pht {
         /**
          * Creates a HypersuccinctTree from a given full Bitvector
          * WARNING: Function is very sensitive to badly formatted bitvectors (see write to File for formatting)
-         * TODO: Need error handling for bad bitvectors
          * @param fullBitvector the bitvector
          * @return Hypersuccinct Tree Class representing the encoded Tree
          */
-        static HypersuccinctTree createFromFile(Bitvector& fullBitvector) {
+        static HypersuccinctTree createFromBitvector(Bitvector& fullBitvector) {
             HypersuccinctTree hst;
             auto iter = fullBitvector.cbegin();
             auto end = fullBitvector.cend();
@@ -181,11 +179,11 @@ namespace pht {
                 std::vector<Bitvector> leaf_rank;
                 createBitvectorFromFile(iter, end, leaf_rank);
 
-                //TODO: Current Solution - Padding the Bitvector with one full Byte
+                //Current Solution - Padding the Bitvector with one full Byte
                 /**
                  * On TreeAlex:
                  * 1111111010110000100110001000000010000000100000001 correct bitvector
-                 * 1111111010110000100110001000000010000000100000000 createFromFile
+                 * 1111111010110000100110001000000010000000100000000 createFromBitvector
                  * 1111111010110000100110001000000010000000100000001 fileoutput
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
                  */
@@ -265,7 +263,6 @@ namespace pht {
         /**
          * Converts a Hypersuccinct Tree to Huffman encoding
          * Converts MicroTree Encoding from BP-form to huffman codes
-         * TODO: Could be private
          *
          * @param tree The Hypersuccinct Tree as HypersuccinctTree
          * @param huffmanTable  The huffman Table containing the ocurrences of all MicroTree structures
@@ -518,7 +515,6 @@ namespace pht {
                     miniTree.microTopFIDIndices.push_back({false});
                     miniTree.microLowFIDIndices.push_back({false});
 
-                    //TODO:
                     if (fmMiniTree->isRoot(microRoot)) {
                         miniTree.microParents.push_back({false});
                     } else {
@@ -644,7 +640,6 @@ namespace pht {
             std::vector<Bitvector> dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
             miniTree.dummys = dummys;
 
-            //TODO:
             enumerateMicroTrees(fmMicroTrees);
 
             //Simple Additions for Queries - MiniTree
@@ -719,7 +714,6 @@ namespace pht {
             PHT_LOGGER_DEBUG("Factory Create") << "Creating MiniTrees..." << pht::Logger::endl();
             hypersuccinctTree.miniTrees = std::vector<MiniTree>(fmMiniTrees.size());
 
-            //TODO: Fix Multithreading issues
             //These HAVE to be computed ONCE before the multithreading to avoid errors!
             const std::shared_ptr<pht::Node<T>> treeRoot = tree->getRoot();
             tree->getSubtreeSize(treeRoot);

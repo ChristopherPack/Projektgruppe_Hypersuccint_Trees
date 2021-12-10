@@ -63,7 +63,6 @@ namespace pht{
         /**
          * Finds all occurrences of a given pattern in a bitvector
          * Does not identify concatenated patterns (ie 10101 only matches once at the beginning for pattern 101)
-         * TODO: Generalize with Encoding if necessary
          *
          * @param iterator Begin of the bitvector to be matched
          * @param end End of the bitvector to be matched
