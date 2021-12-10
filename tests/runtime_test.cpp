@@ -7,9 +7,9 @@
 
 
 //#define PHT_TEST
-#ifdef NDEBUG
-#define PHT_LOGGER_QUIET
-#endif
+//#ifdef NDEBUG
+//#define PHT_LOGGER_QUIET
+//#endif
 #define MEASURE_TIME(func, output) timer.start(); func; timer.stop(); output.emplace_back(name,timer.toString());
 
 #include "pht/xml_reader.h"
@@ -30,7 +30,7 @@ protected:
      * Factory
      * WriteToFile / ReadFromFile
      */
-    std::vector<std::string> fileNames = {"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml","XMark2.xml","DBLP.xml"};
+    std::vector<std::string> fileNames = {"DBLP.xml"};
             //{"DBLP.xml"};
             //{"TreeNath.xml","TreeNath2.xml","TreeNath3.xml","TreeNath4.xml","TreeNath5.xml"};
     std::string resultFileName = "testResultsFactoryOptimizedPrecompCheckARR.csv";

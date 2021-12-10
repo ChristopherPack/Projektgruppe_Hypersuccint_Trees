@@ -79,7 +79,6 @@ namespace pht {
         /**
          * Creates a HypersuccinctTree from a given full Bitvector
          * WARNING: Function is very sensitive to badly formatted bitvectors (see write to File for formatting)
-         * TODO: Need error handling for bad bitvectors
          * @param fullBitvector the bitvector
          * @return Hypersuccinct Tree Class representing the encoded Tree
          */

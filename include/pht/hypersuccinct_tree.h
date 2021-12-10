@@ -376,16 +376,6 @@ namespace pht {
         uint32_t childRank(HstNode node);
 
         /**
-         * Finds the direct Parent of the given Node, ignoring dummies
-         * Important hepler function
-         * TODO: Should be private
-         *
-         * @param node The node as HSTNode
-         * @return The parent as HstNode
-         */
-        HstNode getParentForQuery(HstNode node);
-
-        /**
          * Finds the direct Parent of the given Node
          *
          * @param node The node as HSTNode
@@ -482,6 +472,15 @@ namespace pht {
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
         #pragma warning(default:4251)
+
+        /*
+         * Finds the direct Parent of the given Node, ignoring dummies
+         * Important helper function
+         *
+         * @param node The node as HSTNode
+         * @return The parent as HstNode
+         */
+        HstNode getParentForQuery(HstNode node);
 
         //uint64_t calculateMinitreeByteSize(const MiniTree& mt);
 
