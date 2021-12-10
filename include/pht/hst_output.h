@@ -39,14 +39,6 @@ namespace pht {
         static void printBitvector(const vector<vector<bool>>& bitvector);
 
         /**
-         * Splits the FIDs of hypersuccinct Trees into easily readable parts
-         * @param bitvector the FID bitvector
-         * @param separator the separator for splitting
-         * @return Readable version of FID Bitvector as string
-         */
-        static string splitFIDs(const vector<bool>& bitvector, const string& separator);
-
-        /**
          * Writes an entire hypersuccinct tree to a file
          * Add a 0 for all empty Bitvectors
          * @param tree the hypersuccinct tree to be written
@@ -64,13 +56,11 @@ namespace pht {
 
         /**
          * Reads an entire hypersuccinct tree from a file
-         * TODO: Has to conform to WriteToFile encoding
+         * Has to conform to WriteToFile encoding
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
-        //TODO: Has to conform to WriteToFile encoding
-        //TODO: Needs to figure out how to even manipulate a hst object from here (via Factory?)
-        static HypersuccinctTree readFromFile(string path);
+        static HypersuccinctTree readFromFile(const string& path);
 
     private:
         /**
@@ -87,9 +77,9 @@ namespace pht {
          * @param bitvector The Bitvector to write
          * @param target The Bitvector to write into
          */
-        static void createFileBitvector(Bitvector bitvector, Bitvector& target);
+        static void createFileBitvector(const Bitvector& bitvector, Bitvector& target);
 
-        static void createFileBitvector(std::vector<Bitvector> bitvector, Bitvector& target);
+        static void createFileBitvector(const std::vector<Bitvector>& bitvector, Bitvector& target);
 
         /**
          * Reads a space efficient Bitvector from a file
@@ -98,16 +88,6 @@ namespace pht {
          * @return the read bitvector
          */
         static Bitvector readBitvectorFromFile(std::ifstream &file);
-
-        /**
-         * Duplicates every instance of the given separator in a given Bitvector
-         * Helper function for writeToFile
-         * @param bitvector the given Bitvector
-         * @param separator the separator as string
-         * @return the modified Bitvector
-         */
-        //TODO: Currently unused
-        static Bitvector addDuplicateSeparator(const Bitvector& bitvector, const string& separator);
     };
 }
 

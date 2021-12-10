@@ -43,7 +43,7 @@ namespace pht {
          * Create a new CachedFunction from a previously slow function. 
          * @param func The function to cache results for. 
          */
-        CachedFunction(std::function<R(Args...)> func) : func(func) {}
+        explicit CachedFunction(std::function<R(Args...)> func_) : func(func_) {}
         
         /**
          * Reevaluates all cache entries. 
@@ -73,8 +73,9 @@ namespace pht {
             if(cache.find(std::tuple(args...)) == cache.end()) {
                 cache.insert_or_assign(std::tuple(args...), func(args...));
             }
-            return cache.at(std::tuple(args...));
+            R tmp = cache.at(std::tuple(args...));
             cLock.unlock();
+            return tmp;
         }
     };
 }

@@ -63,7 +63,6 @@ TEST(ListUtilsTest, Combined2Test) {
     EXPECT_THAT(pht::ListUtils::combined(a, {}), ::testing::ElementsAre());
     EXPECT_THAT(a, ::testing::ElementsAre());
 
-    //TODO
     std::vector<bool> aa = {true};
     EXPECT_THAT(pht::ListUtils::combined(aa, {false}), ::testing::ElementsAre(true,false));
     EXPECT_THAT(aa, ::testing::ElementsAre(true));

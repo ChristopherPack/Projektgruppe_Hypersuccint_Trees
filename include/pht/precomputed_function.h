@@ -43,7 +43,7 @@ namespace pht {
          * Create a new PrecomputedFunction with the help of another function which populates a map used as cache. 
          * @param func A function which takes a std::map<R,Args...> and populates it with the results of the cached function.  
          */
-        PrecomputedFunction(std::function<void(std::map<std::tuple<Args...>, R>&)> func) : func(func) {}
+        explicit PrecomputedFunction(std::function<void(std::map<std::tuple<Args...>, R>&)> func_) : func(func_) {}
         
         /**
          * Marks the content of the cache as dirty and triggers a repopulation of the cache on the next call. 
