@@ -42,6 +42,7 @@ protected:
     std::vector<pair<std::string , std::string >> degreeTimes;
     std::vector<pair<std::string , std::string >> leftmost_leafTimes;
     std::vector<pair<std::string , std::string >> rightmost_leafTimes;
+    std::vector<pair<std::string , std::string >> sizeTimes;
 
     std::vector<pair<std::string , std::string >> childRankTimes;
     std::vector<pair<std::string , std::string >> subTreeTimes;
@@ -74,10 +75,16 @@ TEST_F(RuntimeTest, FullTestRaw) {
 
         PHT_LOGGER_INFO("Runtime Test") << "Finished Creating HST" << pht::Logger::endl();
 
+        uint32_t size = hyperTree.subtreeSize({0,0,0});
+        sizeTimes.emplace_back(name, to_string(size));
+
         std::vector<pht::HstNode > testNodes = {{0,0,0}};
         uint32_t rootdegree;
         timer.start();
         rootdegree = hyperTree.degree({0,0,0});
+        timer.stop();
+        degreeTimes.emplace_back(name,timer.toString());
+
         if(rootdegree > 1001) {
             rootdegree = 1001;
         }
@@ -128,9 +135,7 @@ TEST_F(RuntimeTest, FullTestRaw) {
                 PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << pht::Logger::endl();
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
-                if(testNodes.size() < testSize) {
-                    testNodes.push_back(child);
-                }
+                testNodes.push_back(child);
             }
             i++;
         }
@@ -181,6 +186,9 @@ TEST_F(RuntimeTest, FullTestRaw) {
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimes) {
         file << value.first << ", Factory::create, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
     }
     for(std::pair<std::string,std::string> &value : childTimes) {
         file << value.first << ", child, " << value.second << "\n";
@@ -235,12 +243,20 @@ TEST_F(RuntimeTest, FullTestHuffman) {
         tree.reset();
         factoryTimesHuffman.emplace_back(name, timer.toString());
 
+        uint32_t size = hyperTree.subtreeSize({0,0,0});
+        sizeTimes.emplace_back(name, to_string(size));
+
         std::vector<pht::HstNode > testNodes = {{0,0,0}};
         uint32_t rootdegree;
         timer.start();
         rootdegree = hyperTree.degree({0,0,0});
         timer.stop();
         degreeTimes.emplace_back(name,timer.toString());
+
+        if(rootdegree > 1001) {
+            rootdegree = 1001;
+        }
+
         for(uint32_t i = 0; i<rootdegree; i++) {
             timer.start();
             pht::HstNode child = hyperTree.child({0,0,0},i);
@@ -265,9 +281,6 @@ TEST_F(RuntimeTest, FullTestHuffman) {
             if(i >= testNodes.size()) {
                 break;
             }
-            if(i == 28) {
-                uint32_t e = 1;
-            }
             uint32_t degree;
             timer.start();
             degree = hyperTree.degree(testNodes.at(i));
@@ -284,9 +297,7 @@ TEST_F(RuntimeTest, FullTestHuffman) {
                 PHT_LOGGER_DEBUG("Test") << "Child: " << child.mini << ", " << child.micro << ", " << child.node << ";" << std::endl << pht::Logger::endl();*/
                 timer.stop();
                 childTimes.emplace_back(name,timer.toString());
-                if(testNodes.size() < testSize) {
-                    testNodes.push_back(child);
-                }
+                testNodes.push_back(child);
             }
             i++;
         }
@@ -337,6 +348,9 @@ TEST_F(RuntimeTest, FullTestHuffman) {
     file.open(resultFileName,std::iostream::app);
     for(std::pair<std::string,std::string> &value : factoryTimesHuffman) {
         file << value.first << ", Factory::create Huffman, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
     }
     for(std::pair<std::string,std::string> &value : childTimes) {
         file << value.first << ", child, " << value.second << "\n";
@@ -392,6 +406,9 @@ TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
         tree.reset();
         factoryTimes.emplace_back(name, timer.toString());
 
+        uint32_t size = hyperTree.subtreeSize({0,0,0});
+        sizeTimes.emplace_back(name, to_string(size));
+
         PHT_LOGGER_INFO("Runtime Test") << "Begin Create Huffman." << pht::Logger::endl();
         tree = pht::XMLReader::readByName(name);
         timer.start();
@@ -408,8 +425,14 @@ TEST_F(RuntimeTest, FactoryOnlyWithQueries) {
     for(std::pair<std::string,std::string> &value : factoryTimes) {
         file << value.first << ", Factory::create, " << value.second << "\n";
     }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
+    }
     for(std::pair<std::string,std::string> &value : factoryTimesHuffman) {
         file << value.first << ", Factory::create Huffman, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
     }
     file.close();
 }
@@ -428,6 +451,9 @@ TEST_F(RuntimeTest, FactoryOnlyNoQueries) {
         timer.stop();
         factoryTimesNoQueries.emplace_back(name, timer.toString());
 
+        uint32_t size = hyperTree.subtreeSize({0,0,0});
+        sizeTimes.emplace_back(name, to_string(size));
+
         PHT_LOGGER_INFO("Runtime Test") << "Begin Create Huffman without Queries." << pht::Logger::endl();
         timer.start();
         hyperTree = *pht::HypersuccinctTreeFactory::create(tree, true, 0, 0,false);
@@ -443,8 +469,14 @@ TEST_F(RuntimeTest, FactoryOnlyNoQueries) {
     for(std::pair<std::string,std::string> &value : factoryTimesNoQueries) {
         file << value.first << ", Factory::create NoQueries, " << value.second << "\n";
     }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
+    }
     for(std::pair<std::string,std::string> &value : factoryTimesHuffmanNoQueries) {
         file << value.first << ", Factory::create Huffman+NoQueries, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
     }
     file.close();
 }
@@ -462,11 +494,17 @@ TEST_F(RuntimeTest, WriteToAndLoadFromFile) {
 
 
         PHT_LOGGER_INFO("Runtime Test") << "Begin writing to file." << pht::Logger::endl();
+
+        cout << "Starting Write..." << endl;
         timer.start();
         pht::HypersuccinctTreeOutput::writeToFile(hyperTree);
         timer.stop();
         writeToFileTimes.emplace_back(name, timer.toString());
 
+        uint32_t size = hyperTree.subtreeSize({0,0,0});
+        sizeTimes.emplace_back(name, to_string(size));
+
+        cout << "Starting Read..." << endl;
         PHT_LOGGER_INFO("Runtime Test") << "Begin reading from file." << pht::Logger::endl();
         timer.start();
         hyperTree = pht::HypersuccinctTreeOutput::readFromFile("tree.txt");
@@ -481,8 +519,14 @@ TEST_F(RuntimeTest, WriteToAndLoadFromFile) {
     for(std::pair<std::string,std::string> &value : writeToFileTimes) {
         file << value.first << ", Factory::create WriteToFile, " << value.second << "\n";
     }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
+    }
     for(std::pair<std::string,std::string> &value : readFromFileTimes) {
         file << value.first << ", Factory::create ReadFromFile, " << value.second << "\n";
+    }
+    for(std::pair<std::string,std::string> &value : sizeTimes) {
+        file << value.first << ", size, " << value.second << "\n";
     }
     file.close();
 }
