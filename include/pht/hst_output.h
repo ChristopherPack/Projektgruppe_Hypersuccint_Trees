@@ -50,12 +50,21 @@ namespace pht {
          * Writes an entire hypersuccinct tree to a file
          * Add a 0 for all empty Bitvectors
          * @param tree the hypersuccinct tree to be written
+         * @param filename the Filename
          */
-        //TODO: Needs to be adjusted for every change in HypersuccinctTree
-        static void writeToFile(HypersuccinctTree &tree);
+        static void writeToFile(HypersuccinctTree &tree, const std::string& filename = "tree.txt");
+
+        /**
+         * Writes vectors important for the huffman encoding to a file.
+         * @param tree the hypersuccinct tree to be written
+         * @param filename The filename as String
+         * @param allData bool if all relevant data should be written.
+         */
+        static void writeHuffmanToFile(HypersuccinctTree &tree, const std::string& filename = "tree.txt", bool allData = false);
 
         /**
          * Reads an entire hypersuccinct tree from a file
+         * TODO: Has to conform to WriteToFile encoding
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */

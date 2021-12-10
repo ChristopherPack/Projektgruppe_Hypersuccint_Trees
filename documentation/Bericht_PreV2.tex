@@ -255,7 +255,7 @@ The first issue originates from the handling of interconnections and the node nu
 Another issue is the identification of Minitree dummies within Microtrees. Minitree dummies are originally identified by their node number respective to the Minitree. However, due to the structure of Hypersuccinct nodes, it is necessary to translate the Minitree node numbers to Microtrees and Microtree node numbers.
 
 \subsection{Query structures and differences}
-Not all queries represented in the paper are implemented. This is in part due to the simplicity of this implementation, but also because the original paper is rather shortworded when describing the implementation of each query.
+Not all queries represented in the paper are implemented. This is in part due to the simplicity of this implementation, but also because the original paper is rather shortworded when describing the implementation of each query, or simply points towards other papers related to this topic, which were not part of this implementation.
 Due to this there are some minor or notable differences to the paper at hand.
 
 \subsubsection{Simple Queries}
@@ -279,7 +279,7 @@ These queries are described as using one bitvector per abstraction in the paper.
 On Dummies:\\
 These queries require to handle the dummy in query-specific ways. \textit{Depth} is the simplest query, only adding values from Minitree depth, Microtree depth and Node depth. These do already ignore dummies in their data, so this query does not require any dummy handling. \textit{Height} and \textit{subtreeSize} make use of the \textit{isDummyAncestor} helper queries to subtract the dummy from their calculations. \textit{Degree}, \textit{leftmostLeaf} and \textit{rightmostLeaf} check whether or not the current node is the dummy, and then move along its pointer. \textit{GetParent} simply checks if the result is a dummy, and then returns the parent of that dummy. This is still within $O(1)$, as there are at most two dummies (one Microdummy and one Minidummy) on top of one another.\\
 Despite not being implemented, we can still make some observations about 
-\textit{levelSuccessor} and \textit{levelPredecessor}. Both cannot use the FID to compute their results, as identifying a specific node in the FID is not possible in $O(1)$. We therefore believe that a bitvector pointing to either the FIDs position or directly to the successor/predecessor is necessary, therefore making both of these Simple Queries. For dummies both would use the same handling as getParent, as the value returned by the dummy is the correct one, whereas the dummies child would be effectively one level too low.
+\textit{levelSuccessor} and \textit{levelPredecessor}. Both cannot use the FID to compute their results, as identifying a specific node in the FID is not possible in $O(1)$. We therefore believe that a bitvector pointing to either the FIDs position or directly to the successor/predecessor is necessary, therefore making both of these Simple Queries. For dummies both would use the same handling as getParent, as the value returned by the dummy is the correct one, whereas the dummy's child would be effectively one level too low.
 
 \subsubsection{Rank Queries}
 Rank Queries are all queries that return some sort of rank from the tree. These queries are more compicated than Simple Queries since they require more than one bitvector per abstraction.
@@ -409,8 +409,8 @@ The structure of both queries is similar. First they calculate the result of onl
 Both implemented queries use \textit{getParentForQuery} as a helper query to identify the direct parent of the current node. These queries only check if the current node is a child of a dummy and if that is the case, the dummy is used instead, as the dummy is at the correct position to calculate the correct result.\\
 The special cases are not mentioned in the paper. The description of all Rank Queries are rather short and inconclusive.\\ 
 It is for example correct that we use the FID to compute the childRank. However, we interpret the paper to say that computing the childRank is possible by just using the FID, without any additional data. 
-This is not possible due to the identification of a node within the FID requiring $O(|Trees In FID|)$ time, which violates our time efficiency requirement. Our implementation instead uses the FID to identify the special cases that require additional information and then take that information from the additional bitvectors we implemented. Both implemented Rank Queries also need to take their direct ancestor into account, which is not mentioned for LeafRank.
-We believe our approach to be adequate, since both implemented queries fulfill the $O(1)$ time requirement without violating the space requirement. Additionally, both of our Rank Queries are very similar in their implementation offering easier understandability and openness, since adding nodeRank would most likely just require the exact same steps as taken in our approach to Rank Queries.
+This is not possible due to the identification of a node within the FID requiring $O(|Trees In FID|)$ time, which violates our time complexity requirement. Our implementation instead uses the FID to identify the special cases that require additional information and then take that information from the additional bitvectors we implemented. Both implemented Rank Queries also need to take their direct ancestor into account, which is not mentioned for LeafRank.
+We believe our approach to be adequate, since both implemented queries fulfill the $O(1)$ time requirement without violating the space requirement. Additionally, both of our Rank Queries are very similar in their implementation offering easier understandability and openness, since adding \textit{nodeRank} would most likely just require the exact same steps as taken in our approach to Rank Queries.
 
 \subsubsection{Unique Queries}
 There are queries that do not fit into a category. These are:
@@ -423,7 +423,7 @@ The process for identifying the Microtree is analogous to that, and at last we u
 Dummy-nodes are skipped, both if the starting node is a dummy, in which case child of the direct pointer of the dummy is used instead, or if the result node is a dummy, in which case the direct pointer of the dummy is returned instead.
 
 \subsubsection{Helper Queries}
-Instead of being identified by their algorithmic structure, these queries are identified by the fact, that they are used by other queries to compute their results.\\
+Instead of being identified by their algorithmic structure, these queries are identified by the fact that they are used by other queries to compute their results.\\
 These Helper Queries are:
 \begin{itemize}
 	\item[1)] \textit{isDummyAncestorWithinMiniTree}
@@ -431,8 +431,8 @@ These Helper Queries are:
 	\item[3)] \textit{getParentForQuery}
 \end{itemize}
 Their implementation is similar to the implementation of Simple Queries.\\
-\textit{GetParentForQuery} is a special version of \textit{getParent} that excludes handling for dummy nodes. This is necessary to identify special dummy cases in the queries that use this Helper Query.
-The \textit{isDummyAncestor} helper queries identify if a given node is an ancestor of a Minidummy or a Microdummy respectively. Both queries only work if their current node is actually in a Minitree or Microtree with a dummy. \textit{IsDummyAncestorWithinMiniTree} has a similar structure to the simple queries, first using specific bitvector data that contains if the Microtree root is an ancestor of the dummy, then if the specific node is the ancestor. \textit{IsDummyAncestorWithinMicroTree} is even simpler, only needing to determine the answer for specific nodes.
+\textit{GetParentForQuery} is a special version of \textit{getParent} that excludes handling for dummy nodes. This is necessary to identify special dummy cases in the queries that use this Helper Query (such as \textit{child}).
+The \textit{isDummyAncestor} helper queries identify if a given node is an ancestor of a Minidummy or a Microdummy respectively. Both queries only work if their current node is actually in a Minitree or Microtree with a dummy. \textit{IsDummyAncestorWithinMiniTree} has a similar structure to the simple queries, first using specific bitvector data that contains if the Microtree root is an ancestor of the dummy, then if the specific node is the ancestor. \textit{IsDummyAncestorWithinMicroTree} is even simpler, only needing to determine the answer for specific nodes. Both queries are necessary to evaluate an entire tree structure in $O(1)$, since they prevent the necessity to analyze every node on the structure individually, which would be $> O(1)$.
 
 \subsubsection{Other Queries / Not implemented queries}
 The following queries are not implemented and are not similar enough to already implemented queries to use those as a template.
@@ -452,13 +452,49 @@ There are a variety of other classes within the library that contribute to the H
 \subsubsection{Bitvector Utils}
 Bitvector Utils is a basic class that provides utility functions for Bitvectors. Its main function is to typecast Bitvectors to Integers and back, which is possible in O(1) due to the limited size of Integers. (i.e. uint 32 has a maximum of 32 bits.)
 \subsubsection{HST Output}
-The HyperSuccinctTree Output class provides functions for writing and reading a Hypersuccinct Tree class. Therefore this class handles writing Hypersuccinct Trees to Files or reading Hypersuccinct Trees from Files.
+The HyperSuccinctTree Output class provides functions for writing and reading a Hypersuccinct Tree class. Therefore this class handles writing Hypersuccinct Trees to Files or reading Hypersuccinct Trees from Files. It also supports writing the entire tree into the console.
 \subsubsection{Unordered Tree}
 Unordered Tree is our basic tree implementation, to which an xml tree is parsed. Unordered Trees are then used to create Hypersuccinct Trees.
+\subsubsection{Precomputed Function and Cached Function}
+These two classes are used to improve the performance of \textit{create} by either completely precomputing values for queries within the Unurdered Tree, or by caching already calculated values.
 \subsubsection{XML Reader}
 This class reads the actual xml file and creates an Unordered Tree from it.
 \subsubsection{Farzan Munro}
-The Farzan Munro class implements the algorithm as presented in \cite{farzanMunro}
+The Farzan Munro class implements the algorithm as presented in \cite{farzanMunro}. It therefore implements \textit{decomopose} and \textit{greedilyPack}. It also orders the created Tree afterwards to guarantee a consistent order within the hypersuccinct tree.
+
+\section{Complexity Benchmarks?}
+This section is mainly to show the difference between normal and Huffman encoding.
+\subsection{Huffman encoding}
+Our tree offers to types of encoding for Microtrees. The first option encodes trees according to \cite{farzanMunro}, and uses the Microtree's balanced parenthesis representation, while the other utilizes a huffman encoding for the Microtrees. For that, the Microtrees use their respective huffman codes in the representation, while their corresponding lookup table entries contain the balanced parenthesis representation for each code.\\
+The huffman encoding has no impact on query performance, as finding a corresponding lookup table entry for a huffman code is possible in $O(1)$. Encoding trees with huffman has a significant impact on the space necessary for the hypersuccinct tree. The balanced parenthesis representation needs $2n$ many bits for a tree of size $n$.\\
+%Huffman
+\begin{figure}[h]
+	\begin{tabular}{ |p{3cm}||p{2cm}|p{2cm}|p{4cm}|  }
+		 \hline
+		 Tree Name & Normal &Huffman &Huffman + Lookuptable\\
+		 \hline
+		 TreeNath.xml   & 52    & 23 &   24 \\
+		 TreeNath2.xml&   484  & 256   & 266 \\
+		 TreeNath3.xml&5196 &2695&  2706\\
+		 TreeNath4.xml&53369& 31709&  31732\\
+		 TreeNath5.xml&583289&345005&345029\\
+		 XMark2.xml&2004196&831572&831627\\
+		 DBLP.xml&3690039&593804&593842\\
+		 \hline
+	\end{tabular}
+\caption{Space for normal encoding and huffman encoding}
+\label{huff:table1}
+\end{figure}
+\subsection{Space Complexity concessions}
+While the encoding is efficient in size when saving a tree to a file, within the program, the amount of space required to run trees is a lot larger. This technically does not break the space requirement, simply adding a large constant factor to it, but this is still notable. We identify the following reasons for this discrepancy:\\
+\begin{itemize}
+	\item[1)] The implementation of \textit{Bitvector} in $C++$ saves its data as \textit{uint32\_t}, which is always 32 bits long. This is a massive waste of space, since most values are much smaller than 32 bits.
+	\item[2)] The use of \textit{vector$<$Bitvector$>$} causes overhead due to the pointer lists that \textit{vector} uses.
+	\item[3)] The \textit{succinct\_bv} library does not meet the perfect space complextity of $log(\begin{array}{c} n \\ r \end{array}) + O(\frac{n log log n}{log n})$, and instead has a complexity of $n + O(\frac{n log log n}{log n})$.
+\end{itemize}
+For \textit{1), 2)}, we believe it to be possible to save the entire hypersuccinct tree in a single bitvector. It should be possible to use pointers to access different parts of this bitvector in $O(1)$.\\
+For \textit{3)}, it is obviously necessary to either use a library that offers the improved complexity, or to improve the current library.
+
 
 \bibliographystyle{plain}
 \bibliography{references}

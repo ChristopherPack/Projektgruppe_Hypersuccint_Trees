@@ -102,11 +102,9 @@ namespace pht {
         std::vector<Bitvector> leafRank; ///Leaf Rank for every node within MicroTree + 1
         #pragma warning(default:4251)
 
-        //TODO: This constructor is specifically for HypersuccinctTreeFactory - could be removed
         //TODO Documentation
         LookupTableEntry(const Bitvector& index) : index(index) {}
         
-        //TODO: Extend constructor as more fields are added!
         //TODO Documentation
         LookupTableEntry(const Bitvector& index, const Bitvector& bp) : index(index), bp(bp) {}
 
@@ -343,16 +341,6 @@ namespace pht {
         uint32_t childRank(HstNode node);
 
         /**
-         * Finds the direct Parent of the given Node, ignoring dummies
-         * Important hepler function
-         *
-         * @param node The node as HSTNode
-         * @return The parent as HstNode
-         */
-        //TODO: Should be private
-        HstNode getParentForQuery(HstNode node);
-
-        /**
          * Finds the direct Parent of the given Node
          *
          * @param node The node as HSTNode
@@ -425,15 +413,6 @@ namespace pht {
          */
          uint32_t leafRank(HstNode node);
 
-        //TODO Unfinished
-        /**
-         *
-         * @param level
-         * @param node
-         * @return
-         */
-        HstNode levelAncestor(HstNode node, uint32_t level);
-
         /**
          * Returns the size of this Hypersuccinct Tree in bytes. 
          * @return uint64_t The size in bytes. 
@@ -462,6 +441,15 @@ namespace pht {
         //LookupTable
         std::vector<LookupTableEntry> lookupTable;
         #pragma warning(default:4251)
+
+        /*
+         * Finds the direct Parent of the given Node, ignoring dummies
+         * Important helper function
+         *
+         * @param node The node as HSTNode
+         * @return The parent as HstNode
+         */
+        HstNode getParentForQuery(HstNode node);
 
         //uint64_t calculateMinitreeByteSize(const MiniTree& mt);
 

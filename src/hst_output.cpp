@@ -215,12 +215,11 @@ string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const s
     }
 }
 
-void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
-    //TODO: implementing some sort of file explorer would be nice
-    //TODO: need to think about how to make the bitvector
+
+void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree,const std::string& filename) {
     //encode mit Elias Gamma
     std::ofstream file;
-    file.open("tree.txt", std::ofstream::binary);
+    file.open(filename, std::ofstream::binary);
     Bitvector fileBitvector;
     fileBitvector.push_back(tree.isHuffman());
     BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),BitvectorUtils::decodeNumber(tree.getSize(),BitvectorUtils::NumberEncoding::BINARY),BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
@@ -235,7 +234,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
     createFileBitvector(tree.getFIDLowTrees(), fileBitvector);
     createFileBitvector(tree.getMiniTypeVectors(), fileBitvector);
     createFileBitvector(tree.getMiniDummys(), fileBitvector);
-    for(MiniTree& miniTree : tree.getMiniTrees()) {
+    for(const MiniTree& miniTree : tree.getMiniTrees()) {
         createFileBitvector(miniTree.FIDs, fileBitvector);
         createFileBitvector(miniTree.typeVectors, fileBitvector);
         createFileBitvector(miniTree.dummys, fileBitvector);
@@ -281,7 +280,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
         createFileBitvector(miniTree.microRootLeafRanks, fileBitvector);
         createFileBitvector(miniTree.microExtendedLeafRanks, fileBitvector);
     }
-    for(LookupTableEntry& microTreeData : tree.getLookupTable()) {
+    for(const LookupTableEntry& microTreeData : tree.getLookupTable()) {
         createFileBitvector(microTreeData.index, fileBitvector);
         createFileBitvector(microTreeData.bp, fileBitvector);
         createFileBitvector(microTreeData.ancestorMatrix, fileBitvector);
@@ -309,13 +308,39 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree) {
     file.close();
 }
 
+void HypersuccinctTreeOutput::writeHuffmanToFile(HypersuccinctTree &tree, const std::string& filename, bool allData) {
+    std::ofstream file;
+    file.open(filename, std::ofstream::binary);
+    Bitvector fileBitvector;
+    for(const MiniTree& miniTree : tree.getMiniTrees()) {
+        createFileBitvector(miniTree.microTrees,fileBitvector);
+    }
+    if(allData) {
+        for(const LookupTableEntry& microTreeData : tree.getLookupTable()) {
+            createFileBitvector(microTreeData.index,fileBitvector);
+            createFileBitvector(microTreeData.bp, fileBitvector);
+        }
+    }
+    //Padding - see CreateFromFile
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    fileBitvector.push_back(true);
+    writeBitvectorToFile(file,fileBitvector);
+    file.close();
+}
+
 HypersuccinctTree HypersuccinctTreeOutput::readFromFile(string path) {
     std::ifstream file;
     file.open("tree.txt", std::ifstream::binary);
     Bitvector fileBitvector = readBitvectorFromFile(file);
     file.close();
     //funktion in Factory:
-    return HypersuccinctTreeFactory::createFromFile(fileBitvector);
+    return HypersuccinctTreeFactory::createFromBitvector(fileBitvector);
 }
 
 void HypersuccinctTreeOutput::createFileBitvector(Bitvector bitvector, Bitvector& target) {
@@ -386,14 +411,13 @@ Bitvector HypersuccinctTreeOutput::readBitvectorFromFile(std::ifstream &file) {
     return bitvector;
 }
 
-Bitvector HypersuccinctTreeOutput::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
+[[maybe_unused]] Bitvector HypersuccinctTreeOutput::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
     Bitvector temp = bitvector;
     Bitvector sep = BitvectorUtils::convertToBitvector(separator);
     uint32_t sepNum = BitvectorUtils::decodeNumber(sep, BitvectorUtils::NumberEncoding::BINARY);
     std::vector<std::pair<Bitvector::const_iterator, Bitvector::const_iterator>> patternMatches = BitvectorUtils::findMatches(temp.cbegin(),temp.cend(), separator);
 
     for(std::pair<Bitvector::const_iterator, Bitvector::const_iterator> match : patternMatches) {
-        //TODO: This is apparently optimal - other option is to advance to the const_iter
         auto iterMin = temp.erase(match.first,match.first);
         uint32_t add = BitvectorUtils::encodeNumber(std::inserter(temp, iterMin), sepNum, BitvectorUtils::NumberEncoding::BINARY);
         assert(match.first+add < match.second);

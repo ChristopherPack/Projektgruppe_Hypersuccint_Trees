@@ -708,7 +708,6 @@ namespace pht {
 
         //BUG Call cannot be simplified
         //True counts dummies (for Lookuptable); False ignores dummies (For Mini/Microtrees)
-        //TODO: Would it be better to unify the False and True Calcs?
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); }); //Cached version of enumerate. 
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalc(cache,root);}); //Cached version of getSubtreeSize. 
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSizeTrue = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeTrueCalc(cache,root);}); //Cached version of getSubtreeSizeTrue. 
