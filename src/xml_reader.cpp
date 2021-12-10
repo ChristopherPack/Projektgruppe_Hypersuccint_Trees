@@ -61,19 +61,12 @@ std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::read(const std:
     return xmlTree;
 }
 
-/**
- * Reads the specified file located in Projektgruppe_Hypersuccint_Trees/example_service
- *
- * @param name
- * @return unorderedTree from xml
- */
 std::shared_ptr<pht::UnorderedTree<std::string>> pht::XMLReader::readByName(const std::string &name) {
 
     char temp[256];
     _getcwd( temp, 256); //der Programmpfad ist jetzt in 'temp' gespeichert
     path myRoot(temp);
     path directory = myRoot;
-
     while ((directory.stem() != "Projektgruppe_Hypersuccint_Trees" && directory.stem() != "ProjektSuccinctTrees") && directory.root_path() != directory.parent_path()){
         directory = directory.parent_path();
     }

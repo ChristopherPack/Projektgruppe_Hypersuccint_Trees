@@ -1,6 +1,5 @@
 #include "pht/timer.h"
 
-#include <cassert>
 #include <sstream>
 
 void pht::Timer::start() {
@@ -22,11 +21,11 @@ std::string pht::Timer::toString() const {
 }
 
 std::ostream& operator<<(std::ostream& out, const pht::Timer& timer) {
-    std::chrono::duration<uint32_t, std::micro>         micros = timer.getDuration();
-    std::chrono::duration<uint32_t, std::milli>         millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(micros);
-    std::chrono::duration<uint32_t, std::ratio<1,1>>    secs   = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<1,1>>>(micros);
-    std::chrono::duration<uint32_t, std::ratio<60,1>>   mins   = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<60,1>>>(micros);
-    std::chrono::duration<uint32_t, std::ratio<3600,1>> hours  = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<3600,1>>>(micros);
+    std::chrono::duration<uint32_t, std::micro> micros = timer.getDuration();
+    auto millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(micros);
+    auto secs   = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<1,1>>>(micros);
+    auto mins   = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<60,1>>>(micros);
+    auto hours  = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::ratio<3600,1>>>(micros);
     std::string hoursFill((hours.count()%24)<10?1:0, '0');
     std::string minsFill ((mins.count()%60)<10?1:0, '0');
     std::string secsFill((secs.count()%60)<10?1:0, '0');

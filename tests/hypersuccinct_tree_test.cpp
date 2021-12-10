@@ -138,141 +138,141 @@ TEST_F(HypersuccinctTreeTest, getFIDforMiniTreeTest) {
 }
 
 TEST_F(HypersuccinctTreeTest, getTreesForFIDTest) {
-    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 0);
     EXPECT_EQ(res2, 1);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 1);
     EXPECT_EQ(res2, -1);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(2),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(2),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 2);
     EXPECT_EQ(res2, 3);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(3),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(3),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 3);
     EXPECT_EQ(res2, 5);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(4),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(4),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 4);
     EXPECT_EQ(res2, -1);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(5),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(5),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(5),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 5);
     EXPECT_EQ(res2, -1);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDTopTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(hyperNath.getFIDLowTrees().at(6),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDTopTrees().at(6),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(hyperNath.getFIDLowTrees().at(6),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 6);
     EXPECT_EQ(res2, -1);
 }
 
 TEST_F(HypersuccinctTreeTest, getTreesForMicroFIDTest) {
     pht::MiniTree miniTree = hyperNath.getMiniTree(4);
-    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDTopTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microFIDLowTrees.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res1 = pht::BitvectorUtils::decodeNumber(miniTree.microFIDTopTrees.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::BitvectorUtils::decodeNumber(miniTree.microFIDLowTrees.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 0);
     EXPECT_EQ(res2, 1);
 }
 
 TEST_F(HypersuccinctTreeTest, TreeToFIDIndexConversionTest) {
     pht::MiniTree miniTree = hyperNath.getMiniTree(0);
-    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 0);
     EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(1);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 1);
     EXPECT_EQ(res2, 0);
 
     miniTree = hyperNath.getMiniTree(2);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 2);
     EXPECT_EQ(res2, 0);
 
     miniTree = hyperNath.getMiniTree(3);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 3);
     EXPECT_EQ(res2, 2);
 
     miniTree = hyperNath.getMiniTree(4);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 4);
     EXPECT_EQ(res2, 2);
 
     miniTree = hyperNath.getMiniTree(5);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 5);
     EXPECT_EQ(res2, 3);
 
     miniTree = hyperNath.getMiniTree(6);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 6);
     EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(7);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.miniTopFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.miniLowFIDIndex,pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.miniTopFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.miniLowFIDIndex,pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 6);
     EXPECT_EQ(res2, -1);
 }
 
 TEST_F(HypersuccinctTreeTest, MicroTreeToFIDIndexConversionTest) {
     pht::MiniTree miniTree = hyperNath.getMiniTree(1);
-    uint32_t res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    uint32_t res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    uint32_t res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    uint32_t res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 0);
     EXPECT_EQ(res2, -1);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 1);
     EXPECT_EQ(res2, 0);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(2),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(2),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(2),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 2);
     EXPECT_EQ(res2, 0);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(3),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(3),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(3),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 3);
     EXPECT_EQ(res2, 2);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(4),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(4),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(4),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 4);
     EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(0);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 1);
     EXPECT_EQ(res2, 0);
 
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(0),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 0);
     EXPECT_EQ(res2, -1);
 
     miniTree = hyperNath.getMiniTree(4);
-    res1 = pht::Bitvector_Utils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
-    res2 = pht::Bitvector_Utils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::Bitvector_Utils::NumberEncoding::BINARY) - 1;
+    res1 = pht::BitvectorUtils::decodeNumber(miniTree.microTopFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
+    res2 = pht::BitvectorUtils::decodeNumber(miniTree.microLowFIDIndices.at(1),pht::BitvectorUtils::NumberEncoding::BINARY) - 1;
     EXPECT_EQ(res1, 1);
     EXPECT_EQ(res2, 0);
 }
@@ -357,7 +357,7 @@ TEST_F(HypersuccinctTreeTest, treeNathXFIDTest) {
 
     node = {0,0,0};
     resN = hyperNathX.child(node,1);
-    EXPECT_EQ(pht::HstNode(2,0,0), resN);
+    EXPECT_EQ(pht::HstNode(3,0,0), resN);
 
     node = {0,0,0};
     resN = hyperNathX.child(node,2);

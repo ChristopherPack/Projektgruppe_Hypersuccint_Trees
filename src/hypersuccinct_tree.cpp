@@ -60,18 +60,13 @@ LookupTableEntry HypersuccinctTree::getLookupTableEntry(Bitvector indexV) {
 }
 
 bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index) {
-    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.ancestorMatrix.size()));
+    auto sizeTable = static_cast<uint32_t>(sqrt(entry.ancestorMatrix.size()));
     return entry.ancestorMatrix.at(sizeTable * anc + node2Index);
-}
-
-bool HypersuccinctTree::lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index) {
-    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
-    return entry.childMatrix.at(sizeTable * child + node2Index);
 }
 
 uint64_t calculateMinitreeByteSize(const MiniTree& mt) {
     return
-        sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(mt.FIDs, 0, [](uint64_t acc, std::vector<bool> x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
+        sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(mt.FIDs, 0, [](uint64_t acc, const std::vector<bool>& x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
         sizeof(std::vector<succinct_bv::BitVector>)+ListUtils::fold<succinct_bv::BitVector,uint64_t>(mt.FIDsSupport, 0, [](uint64_t acc, succinct_bv::BitVector x){ return acc+x.n_bytes();})+
         sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(mt.typeVectors, 0, [](uint64_t acc, std::vector<bool> x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
         sizeof(std::vector<succinct_bv::BitVector>)+ListUtils::fold<succinct_bv::BitVector,uint64_t>(mt.typeVectorsSupport, 0, [](uint64_t acc, succinct_bv::BitVector x){ return acc+x.n_bytes();})+

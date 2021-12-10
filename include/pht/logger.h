@@ -9,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include "pht/timer.h"
 
@@ -33,19 +34,41 @@
 #endif
 
 namespace pht {
+    /**
+     * This class allows the printing of neatly formated, information-enriched log messages. 
+     * Example usage:
+     * PHT_LOGGER_INFO("Test") << "This is a test" << pht::Logger::endl();
+     */
     class __declspec(dllexport) Logger {
-            friend class LogStream;
+        friend class LogStream;
 
     public:
-        enum class __declspec(dllexport) LogLevel {
+        /**
+         * This enum defines the different LogLevels. More important log-levels will supress lower-level messages if used as filter. 
+         */
+        enum class /*__declspec(dllexport)*/ LogLevel {
             PHT_DEBUG = 0, PHT_INFO = 1, PHT_WARNING = 2, PHT_ERROR = 3, PHT_FATAL = 4
         };
 
     public:
+
+        /**
+         * This class allows the printing of messages as stream instead of function-arguments. 
+         * DO NOT save objects of this class. 
+         * DO NOT use/instantiate/... this class expect for their standard use in Logger. 
+         */
+        //TODO Change to better process of stream-printing messages. 
         class __declspec(dllexport) LogStream {
             friend class Logger;
 
         public:
+            /**
+             * Append a value to the current message. Must be terminated with pht::Logger::endl() to be printed. 
+             * This method will fail if this stream is not the most current, i.e. another logging call was made before this on was finished or this stream was already printed. 
+             * @tparam T A printable type. 
+             * @param value The value to print. 
+             * @return LogStream& This stream, for call-chaining. 
+             */
             template<class T> LogStream& operator<<(const T& value) {
                 if(Logger::getCurrentLogStream() != this) {
                     throw std::runtime_error("Invalid log stream");
@@ -54,6 +77,11 @@ namespace pht {
                 return *this;
             }
 
+            /**
+             * Template specialization to detect ending of messages.
+             * @param value The void* const to print. 
+             * @return LogStream& This stream, for call-chaining. DO NOT USE!
+             */
             template<> LogStream& operator<<(void* const& value) {
                 if(Logger::getCurrentLogStream() != this) {
                     throw std::runtime_error("Invalid log stream");
@@ -80,19 +108,54 @@ namespace pht {
             bool quiet;
             #pragma warning(default:4251)
 
-            LogStream(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet) : level(level), tag(tag), file(file), line(line), func(func), quiet(quiet) {}
+            LogStream(LogLevel level, std::string  tag, std::string  file, uint32_t line, std::string  func, bool quiet) : level(level), tag(std::move(tag)), file(std::move(file)), line(line), func(std::move(func)), quiet(quiet) {}
         };
 
     public:
+        /**
+         * Create a new log stream to print a message to.  
+         * DO NOT CALL THIS FUNCTION DIRECTLY!!!
+         * Use the PHT_LOGGER_... macros intead. 
+         * @param level The log level to use for this message/log-stream. 
+         * @param tag The tag (category) of this message/log-stream. 
+         * @param file The file from which this message/log-stream originates. 
+         * @param line The line in the file from which this message/log-stream originates.
+         * @param func The function from which this message/log-stream originates. 
+         * @param quiet Disable printing. 
+         * @return LogStream& A stream to print a message to. 
+         */
         static LogStream& log(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet = false);
 
+        /**
+         * Returns the current log-level used in filtering messages.
+         * @return LogLevel The current log-level. 
+         */
         static LogLevel getLogLevel();
+
+        /**
+         * Sets the log-level to filter messages.
+         * The default level is DEBUG. 
+         * @param level The new level. 
+         */
         static void setLogLevel(LogLevel level);
 
+        /**
+         * Allows disabling of the standard output. 
+         * @param enabled The new state of the standard output.
+         */
         static void setStdOutEnabled(bool enabled);
 
+        /**
+         * Used to end logging messages. 
+         * Must be appended to every message to print it. 
+         * @return void* A marker value to end a log-stream and print its value. 
+         */
         static void* endl();
 
+        /**
+         * The most current (and only valid) log-stream. 
+         * @return LogStream* The log-stream.
+         */
         static LogStream* getCurrentLogStream();
 
     private:

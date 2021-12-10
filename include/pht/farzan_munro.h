@@ -48,6 +48,7 @@ namespace pht {
             result = ListUtils::mapped<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
+        
         /**
          * Decomposes a tree and sorts it
          * This version contains mutex settings for multithreading.
@@ -57,6 +58,7 @@ namespace pht {
          *
          * @param[in] tree A pointer to the tree to decompose.
          * @param[in] idealSize The size of the new subtrees. Subtrees will never be larger than 2*idealSize and mostly bigger than idealSize.
+         * @param allMutex Mutex used during multithreading-phase. 
          * @tparam T The type of data stored in the nodes of the tree.
          * @return A list with pointers to the components of the decomposed tree.
          */
@@ -83,6 +85,7 @@ namespace pht {
             result = ListUtils::mapped<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
+
         /**
          * Decomposes a tree. 
          * 
@@ -111,9 +114,9 @@ namespace pht {
         }
 
     private:
-        inline static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> permanentComponents; ///The permanent components of the tree which is currently decomposed. 
+        inline static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> permanentComponents; //The permanent components of the tree which is currently decomposed.
 
-        /**
+        /*
          * Greedily packs the components and node v into new components with idealSize < getSize() < 2*idealSize. 
          * 
          * @param[in] tree A pointer to the original tree to decompose. 
@@ -123,7 +126,7 @@ namespace pht {
          * @tparam T The type of data stored in the nodes of the tree. 
          * @return A list with pointers to the new packed components. 
          */
-        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> greedilyPack(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> oldComponents, const uint32_t idealSize) {
+        static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> greedilyPack(const std::shared_ptr<pht::Node<T>> currentNode, std::vector<std::shared_ptr<pht::UnorderedTree<T>>> oldComponents, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> newComponents;
 
             do {
@@ -147,7 +150,7 @@ namespace pht {
             }
         }
 
-        /**
+        /*
          * Decomposes a tree. 
          * 
          * This method will decompose the given (sub-)tree into multiple new and smaller subtrees with a size 
@@ -162,7 +165,7 @@ namespace pht {
         static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> decompose(const std::shared_ptr<pht::UnorderedTree<T>> tree, const std::shared_ptr<pht::Node<T>> currentNode, const uint32_t idealSize) {
             std::vector<std::shared_ptr<pht::UnorderedTree<T>>> temporaryComponents;
             if(tree->isLeaf(currentNode)) {
-                return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
+                return greedilyPack(currentNode, temporaryComponents, idealSize);
             } else {
                 for(std::shared_ptr<pht::Node<T>> child : tree->getDirectDescendants(currentNode)) {
                     ListUtils::combine(temporaryComponents, decompose(tree, child, idealSize));
@@ -170,32 +173,9 @@ namespace pht {
             }
 
             std::vector<std::shared_ptr<pht::Node<T>>> heavyChildren = tree->getHeavyDirectDescendants(currentNode, idealSize);
-
-            /*std::cout << currentNode->getValue() << std::endl;
-            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : temporaryComponents) {
-                std::cout << tree1->toNewickString() << std::endl;
-            }
-            std::cout << "PERMANENT: " << std::endl;
-            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : permanentComponents) {
-                std::cout << tree1->toNewickString() << std::endl;
-            }
-            for(std::shared_ptr<pht::Node<T>> node : heavyChildren) {
-                std::cout << node->getValue() << std::endl;
-            }*/
-            /*PHT_LOGGER_DEBUG("Farzan") << currentNode->getValue() << std::endl << pht::Logger::endl();
-            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : temporaryComponents) {
-                PHT_LOGGER_DEBUG("Farzan") << tree1->toNewickString() << std::endl << pht::Logger::endl();
-            }
-            PHT_LOGGER_DEBUG("Farzan") << "PERMANENT: " << std::endl << pht::Logger::endl();
-            for(std::shared_ptr<pht::UnorderedTree<T>> tree1 : permanentComponents) {
-                PHT_LOGGER_DEBUG("Farzan") << tree1->toNewickString() << std::endl << pht::Logger::endl();
-            }
-            for(std::shared_ptr<pht::Node<T>> node : heavyChildren) {
-                PHT_LOGGER_DEBUG("Farzan") << node->getValue() << std::endl << pht::Logger::endl();
-            }*/
             
             if(heavyChildren.size() <= 1) {
-                return greedilyPack(tree, currentNode, temporaryComponents, idealSize);
+                return greedilyPack(currentNode, temporaryComponents, idealSize);
             } else {
                 std::vector<std::shared_ptr<pht::UnorderedTree<T>>> group;
                 do {
@@ -209,10 +189,7 @@ namespace pht {
                         temporaryComponents.erase(temporaryComponents.begin()); //Skip heavy component
                     }
                     if(!group.empty()) {
-                        std::vector<std::shared_ptr<pht::UnorderedTree<T>>> packedComponents = greedilyPack(tree,
-                                                                                                            currentNode,
-                                                                                                            group,
-                                                                                                            idealSize);
+                        std::vector<std::shared_ptr<pht::UnorderedTree<T>>> packedComponents = greedilyPack(currentNode, group, idealSize);
                         permanentComponents.insert(permanentComponents.end(), packedComponents.begin(),
                                                    packedComponents.end());
                     }
