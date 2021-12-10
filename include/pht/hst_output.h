@@ -14,29 +14,32 @@ using namespace std;
 extern "C" void __declspec(dllexport) hello();
 
 namespace pht {
+    /**
+     * This class provides various output-methods to debug/check contents of HypersuccinctTrees. 
+     */
     class __declspec(dllexport) HypersuccinctTreeOutput {
 
     public:
         /**
-         * prints a given hypersuccinct tree into the console
+         * Prints a given hypersuccinct tree into the console
          * @param tree the hypersuccinct tree to be printed
          */
         static void printTree(HypersuccinctTree &tree);
 
         /**
-         * prints a given bitvector into the console
+         * Prints a given bitvector into the console
          * @param bitvector the bitvector to be printed
          */
         static void printBitvector(const vector<bool>& bitvector);
 
         /**
-         * prints a given bitvector into the console
+         * Prints a given bitvector into the console
          * @param bitvector the bitvector to be printed
          */
         static void printBitvector(const vector<vector<bool>>& bitvector);
 
         /**
-         * splits the FIDs of hypersuccinct Trees into easily readable parts
+         * Splits the FIDs of hypersuccinct Trees into easily readable parts
          * @param bitvector the FID bitvector
          * @param separator the separator for splitting
          * @return Readable version of FID Bitvector as string
@@ -44,8 +47,7 @@ namespace pht {
         static string splitFIDs(const vector<bool>& bitvector, const string& separator);
 
         /**
-         * TODO: Needs to be adjusted for every change in HypersuccinctTree
-         * writes an entire hypersuccinct tree to a file
+         * Writes an entire hypersuccinct tree to a file
          * Add a 0 for all empty Bitvectors
          * @param tree the hypersuccinct tree to be written
          * @param filename the Filename
@@ -66,6 +68,8 @@ namespace pht {
          * @param path the path to the file as string
          * @return hypersuccinct tree
          */
+        //TODO: Has to conform to WriteToFile encoding
+        //TODO: Needs to figure out how to even manipulate a hst object from here (via Factory?)
         static HypersuccinctTree readFromFile(string path);
 
     private:
@@ -102,6 +106,7 @@ namespace pht {
          * @param separator the separator as string
          * @return the modified Bitvector
          */
+        //TODO: Currently unused
         static Bitvector addDuplicateSeparator(const Bitvector& bitvector, const string& separator);
     };
 }

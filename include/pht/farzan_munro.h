@@ -48,6 +48,7 @@ namespace pht {
             result = ListUtils::mapped<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
+        
         /**
          * Decomposes a tree and sorts it
          * This version contains mutex settings for multithreading.
@@ -57,6 +58,7 @@ namespace pht {
          *
          * @param[in] tree A pointer to the tree to decompose.
          * @param[in] idealSize The size of the new subtrees. Subtrees will never be larger than 2*idealSize and mostly bigger than idealSize.
+         * @param allMutex Mutex used during multithreading-phase. 
          * @tparam T The type of data stored in the nodes of the tree.
          * @return A list with pointers to the components of the decomposed tree.
          */
@@ -83,6 +85,7 @@ namespace pht {
             result = ListUtils::mapped<std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>>, std::shared_ptr<pht::UnorderedTree<T>>>(enumResult, [](std::pair<std::pair< uint32_t,uint32_t >,std::shared_ptr<pht::UnorderedTree<T>>> tree2){return tree2.second;});
             return result;
         }
+
         /**
          * Decomposes a tree. 
          * 
@@ -111,8 +114,10 @@ namespace pht {
         }
 
     private:
+        //TODO Remove documentation
         inline static std::vector<std::shared_ptr<pht::UnorderedTree<T>>> permanentComponents; ///The permanent components of the tree which is currently decomposed. 
 
+        //TODO Remove documentation
         /**
          * Greedily packs the components and node v into new components with idealSize < getSize() < 2*idealSize. 
          * 
@@ -147,6 +152,7 @@ namespace pht {
             }
         }
 
+        //TODO Remove documentation
         /**
          * Decomposes a tree. 
          * 

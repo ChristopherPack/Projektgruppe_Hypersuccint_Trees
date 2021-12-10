@@ -6,15 +6,15 @@
 
 using namespace pht;
 
-bool Bitvector_Utils::HuffmanComparator::operator()(const Bitvector &a, const Bitvector &b) const {
+bool BitvectorUtils::HuffmanComparator::operator()(const Bitvector &a, const Bitvector &b) const {
     return ((a.size() != b.size()) ? a.size() < b.size() : a < b);
 }
 
-uint32_t Bitvector_Utils::encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding) {
+uint32_t BitvectorUtils::encodeNumber(Bitvector& bitvector, uint32_t num, NumberEncoding encoding) {
     return encodeNumber(std::inserter(bitvector, bitvector.end()), num, encoding);
 }
 
-uint32_t Bitvector_Utils::encodeNumber(std::insert_iterator<Bitvector> iterator, uint32_t num, NumberEncoding encoding) {
+uint32_t BitvectorUtils::encodeNumber(std::insert_iterator<Bitvector> iterator, uint32_t num, NumberEncoding encoding) {
     switch (encoding) {
         case NumberEncoding::BINARY:
             return encodeBinary(iterator, num);
@@ -26,7 +26,7 @@ uint32_t Bitvector_Utils::encodeNumber(std::insert_iterator<Bitvector> iterator,
     }
 }
 
-Bitvector Bitvector_Utils::encodeNumberReturn(uint32_t num) {
+Bitvector BitvectorUtils::encodeNumberReturn(uint32_t num) {
     Bitvector res;
     uint32_t i = 0;
     if (num == 0) {
@@ -40,12 +40,12 @@ Bitvector Bitvector_Utils::encodeNumberReturn(uint32_t num) {
     return res;
 }
 
-uint32_t Bitvector_Utils::decodeNumber(const Bitvector& bitvector, NumberEncoding encoding) {
+uint32_t BitvectorUtils::decodeNumber(const Bitvector& bitvector, NumberEncoding encoding) {
     auto iter = bitvector.cbegin();
     return decodeNumber(iter, bitvector.cend(), encoding);
 }
 
-uint32_t Bitvector_Utils::decodeNumber(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, NumberEncoding encoding) {
+uint32_t BitvectorUtils::decodeNumber(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, NumberEncoding encoding) {
     assert(iterator <= end);
     switch (encoding) {
         case NumberEncoding::BINARY:
@@ -58,7 +58,7 @@ uint32_t Bitvector_Utils::decodeNumber(Bitvector::const_iterator& iterator, cons
     }
 }
 
-Bitvector Bitvector_Utils::getEntry(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information) {
+Bitvector BitvectorUtils::getEntry(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information) {
     assert(iterator <= end);
     switch (encoding) {
         case BitvectorEncoding::ELIAS_GAMMA:
@@ -79,7 +79,7 @@ Bitvector Bitvector_Utils::getEntry(Bitvector::const_iterator& iterator, uint32_
     }
 }
 
-uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information) {
+uint32_t BitvectorUtils::getEntryCount(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, BitvectorEncoding encoding, IndexingInformation information) {
     assert(iterator <= end);
     switch (encoding) {
         case BitvectorEncoding::ELIAS_GAMMA:
@@ -96,7 +96,7 @@ uint32_t Bitvector_Utils::getEntryCount(const Bitvector::const_iterator& iterato
     }
 }
 
-std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitvector_Utils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
+std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> BitvectorUtils::findMatches(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const std::string& patternString) {
     //TODO std::regex_match()???
     std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> res;
     Bitvector pattern = convertToBitvector(patternString);
@@ -119,7 +119,7 @@ std::vector<std::pair<Bitvector::const_iterator,Bitvector::const_iterator>> Bitv
     return res;
 }
 
-bool Bitvector_Utils::findBeginningMatch(const Bitvector::const_iterator &iterator, const Bitvector::const_iterator& end, const Bitvector& patternBitvector) {
+bool BitvectorUtils::findBeginningMatch(const Bitvector::const_iterator &iterator, const Bitvector::const_iterator& end, const Bitvector& patternBitvector) {
     auto iter = iterator;
     if(static_cast<size_t>(std::distance(iter, end)) < patternBitvector.size()) {
         return false;
@@ -133,7 +133,7 @@ bool Bitvector_Utils::findBeginningMatch(const Bitvector::const_iterator &iterat
     return true;
 }
 
-Bitvector Bitvector_Utils::convertToBitvector(const std::string& input) {
+Bitvector BitvectorUtils::convertToBitvector(const std::string& input) {
     Bitvector result;
     for(char i : input){
         result.push_back(i=='1');
@@ -141,7 +141,7 @@ Bitvector Bitvector_Utils::convertToBitvector(const std::string& input) {
     return result;
 }
 
-uint32_t Bitvector_Utils::decodeEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
+uint32_t BitvectorUtils::decodeEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
     if(iterator == end) {
         return 0;
     } else if(*iterator) {
@@ -170,7 +170,7 @@ uint32_t Bitvector_Utils::decodeEliasGamma(Bitvector::const_iterator& iterator, 
     return res;
 }
 
-uint32_t Bitvector_Utils::decodeBinary(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
+uint32_t BitvectorUtils::decodeBinary(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
     uint32_t res = 0;
     auto start = iterator;
     for(; iterator != end && (iterator-start < 32) ; iterator++) {
@@ -180,7 +180,7 @@ uint32_t Bitvector_Utils::decodeBinary(Bitvector::const_iterator& iterator, cons
     return res;
 }
 
-uint32_t Bitvector_Utils::encodeBinary(std::insert_iterator<Bitvector>& iterator, uint32_t num) {
+uint32_t BitvectorUtils::encodeBinary(std::insert_iterator<Bitvector>& iterator, uint32_t num) {
     uint32_t i = 0;
     if (num == 0) {
         iterator = false;
@@ -193,8 +193,8 @@ uint32_t Bitvector_Utils::encodeBinary(std::insert_iterator<Bitvector>& iterator
     return i;
 }
 
-uint32_t Bitvector_Utils::encodeEliasGamma(std::insert_iterator<Bitvector>& iterator, uint32_t num) {
-    //assert(num != 0); TODO
+uint32_t BitvectorUtils::encodeEliasGamma(std::insert_iterator<Bitvector>& iterator, uint32_t num) {
+    //assert(num != 0); //TODO
     uint32_t count = 0;
     int32_t logSize = static_cast<uint32_t>(floor((log2(num))));
     for(int i = 0; i < logSize; i++, count++) {
@@ -206,7 +206,7 @@ uint32_t Bitvector_Utils::encodeEliasGamma(std::insert_iterator<Bitvector>& iter
     return count;
 }
 
-Bitvector Bitvector_Utils::getEntryAtEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t multiplier) {
+Bitvector BitvectorUtils::getEntryAtEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t multiplier) {
     for(uint32_t i = 0; i < offset; i++) {
         uint32_t length = decodeEliasGamma(iterator, end)*multiplier;
         if(end-iterator < length) {
@@ -223,7 +223,7 @@ Bitvector Bitvector_Utils::getEntryAtEliasGamma(Bitvector::const_iterator& itera
     return Bitvector(temp, iterator);
 }
 
-Bitvector Bitvector_Utils::getEntryAtVectorIndex(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd) {
+Bitvector BitvectorUtils::getEntryAtVectorIndex(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd) {
     for(uint32_t i = 0; i < offset; i++) {
         Bitvector fid = getEntryAtEliasGamma(indexStart, 0, indexEnd, 1);
         uint32_t indexLength = countOccurences(fid.cbegin(), fid.cend());
@@ -242,7 +242,7 @@ Bitvector Bitvector_Utils::getEntryAtVectorIndex(Bitvector::const_iterator& iter
     return Bitvector(temp, iterator);
 }
 
-uint32_t Bitvector_Utils::countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros) {
+uint32_t BitvectorUtils::countOccurences(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, bool countZeros) {
     int occurences = 0;
     for(Bitvector::const_iterator indexIterator = iterator; indexIterator < end; indexIterator++) {
         if(*indexIterator != countZeros) {
@@ -252,7 +252,7 @@ uint32_t Bitvector_Utils::countOccurences(const Bitvector::const_iterator& itera
     return occurences;
 }
 
-Bitvector Bitvector_Utils::getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
+Bitvector BitvectorUtils::getEntryAtStatic(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
     if(end-iterator < size*offset) {
         throw std::runtime_error("Invalid Offset!");
     }
@@ -262,7 +262,7 @@ Bitvector Bitvector_Utils::getEntryAtStatic(Bitvector::const_iterator& iterator,
     return Bitvector(temp, iterator);
 }
 
-Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator, uint32_t offset, const Bitvector::const_iterator &end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
+Bitvector BitvectorUtils::getEntryAtHuffman(Bitvector::const_iterator &iterator, uint32_t offset, const Bitvector::const_iterator &end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
     for(uint32_t i = 0; i < offset; i++) {
         for(Bitvector code : huffmanCodes) {
             if(findBeginningMatch(iterator,end, code)) {
@@ -287,14 +287,14 @@ Bitvector Bitvector_Utils::getEntryAtHuffman(Bitvector::const_iterator &iterator
     return Bitvector(temp, iterator);
 }
 
-Bitvector Bitvector_Utils::getEntryAtPureEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end) {
+Bitvector BitvectorUtils::getEntryAtPureEliasGamma(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end) {
     for(uint32_t i = 0; i < offset; i++) {
         decodeEliasGamma(iterator, end);
     }
     return readEliasGamma(iterator, end);
 }
 
-Bitvector Bitvector_Utils::readEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
+Bitvector BitvectorUtils::readEliasGamma(Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end) {
     if(iterator == end) {
         return {false};
     } else if(*iterator) {
@@ -322,7 +322,7 @@ Bitvector Bitvector_Utils::readEliasGamma(Bitvector::const_iterator& iterator, c
     return res;
 }
 
-Bitvector Bitvector_Utils::getEntryAtStaticMatrixColumn(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
+Bitvector BitvectorUtils::getEntryAtStaticMatrixColumn(Bitvector::const_iterator& iterator, uint32_t offset, const Bitvector::const_iterator& end, uint32_t size) {
     if(iterator > end) {
         throw std::runtime_error("Invalid Offset!");
     }
@@ -336,7 +336,7 @@ Bitvector Bitvector_Utils::getEntryAtStaticMatrixColumn(Bitvector::const_iterato
     return res;
 }
 
-uint32_t Bitvector_Utils::getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier) {
+uint32_t BitvectorUtils::getEntryCountEliasGamma(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t multiplier) {
     uint32_t count = 0;
     auto it = iterator;
     while(it != end) {
@@ -347,7 +347,7 @@ uint32_t Bitvector_Utils::getEntryCountEliasGamma(const Bitvector::const_iterato
     return count;
 }
 
-uint32_t Bitvector_Utils::getEntryCountVectorIndex(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd) {
+uint32_t BitvectorUtils::getEntryCountVectorIndex(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, const Bitvector::const_iterator& indexStart, const Bitvector::const_iterator& indexEnd) {
     uint32_t count = 0;
     auto iter = iterator;
     auto it = indexStart;
@@ -360,12 +360,12 @@ uint32_t Bitvector_Utils::getEntryCountVectorIndex(const Bitvector::const_iterat
     return count;
 }
 
-uint32_t Bitvector_Utils::getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size) {
+uint32_t BitvectorUtils::getEntryCountStatic(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, uint32_t size) {
     assert((end-iterator)%size == 0);
     return static_cast<uint32_t>(std::distance(iterator, end))/size;
 }
 
-uint32_t Bitvector_Utils::getEntryCountHuffman(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
+uint32_t BitvectorUtils::getEntryCountHuffman(const Bitvector::const_iterator& iterator, const Bitvector::const_iterator& end, std::set<Bitvector, HuffmanComparator> huffmanCodes) {
     uint32_t count = 0;
     auto it = iterator;
     while(it != end) {

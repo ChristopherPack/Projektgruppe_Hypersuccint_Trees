@@ -9,10 +9,7 @@
 using namespace pht;
 using namespace std;
 
-/**
- * todo: include printing the Lookup Table
- * @param tree
- */
+//TODO include printing the Lookup Table
 void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
     PHT_LOGGER_INFO("HST_OUT") << "Hypersuccinct Tree:" << "\n" << pht::Logger::endl();
     PHT_LOGGER_INFO("HST_OUT") << "IsHuffman:   " << pht::Logger::endl();
@@ -197,7 +194,7 @@ string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const s
                     iterator++;
                 }
                 auto iter = num.cbegin();
-                eg = pht::Bitvector_Utils::decodeNumber(iter, num.cend(), Bitvector_Utils::NumberEncoding::BINARY);
+                eg = pht::BitvectorUtils::decodeNumber(iter, num.cend(), BitvectorUtils::NumberEncoding::BINARY);
             } else {
                 result.append(to_string(*iterator));
                 iterator++;
@@ -218,17 +215,18 @@ string HypersuccinctTreeOutput::splitFIDs(const vector<bool> &bitvector, const s
     }
 }
 
+
 void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree,const std::string& filename) {
     //encode mit Elias Gamma
     std::ofstream file;
     file.open(filename, std::ofstream::binary);
     Bitvector fileBitvector;
     fileBitvector.push_back(tree.isHuffman());
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMiniSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),Bitvector_Utils::decodeNumber(tree.getMicroSize(),Bitvector_Utils::NumberEncoding::BINARY),Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getMiniTrees().size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
-    Bitvector_Utils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getLookupTable().size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+    BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),BitvectorUtils::decodeNumber(tree.getSize(),BitvectorUtils::NumberEncoding::BINARY),BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+    BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),BitvectorUtils::decodeNumber(tree.getMiniSize(),BitvectorUtils::NumberEncoding::BINARY),BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+    BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()),BitvectorUtils::decodeNumber(tree.getMicroSize(),BitvectorUtils::NumberEncoding::BINARY),BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+    BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getMiniTrees().size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+    BitvectorUtils::encodeNumber(std::inserter(fileBitvector, fileBitvector.end()), static_cast<uint32_t>(tree.getLookupTable().size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
     Bitvector emptySet = {false};
 
     createFileBitvector(tree.getMiniFIDs(), fileBitvector);
@@ -350,8 +348,8 @@ void HypersuccinctTreeOutput::createFileBitvector(Bitvector bitvector, Bitvector
         target.push_back(true);
         target.push_back(false);
     } else {
-        Bitvector_Utils::encodeNumber(std::inserter(target, target.end()),
-                                      static_cast<uint32_t>(bitvector.size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        BitvectorUtils::encodeNumber(std::inserter(target, target.end()),
+                                      static_cast<uint32_t>(bitvector.size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
         ListUtils::combine(target, bitvector);
     }
 }
@@ -365,7 +363,7 @@ void HypersuccinctTreeOutput::createFileBitvector(std::vector<Bitvector> bitvect
         for(Bitvector& part : bitvector) {
             createFileBitvector(part,partFileBit);
         }
-        Bitvector_Utils::encodeNumber(std::inserter(target,target.end()), static_cast<uint32_t>(bitvector.size()), Bitvector_Utils::NumberEncoding::ELIAS_GAMMA);
+        BitvectorUtils::encodeNumber(std::inserter(target,target.end()), static_cast<uint32_t>(bitvector.size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
         ListUtils::combine(target,partFileBit);
     }
 }
@@ -379,7 +377,7 @@ void HypersuccinctTreeOutput::writeBitvectorToFile(std::ofstream &file, Bitvecto
             tmp.push_back(bitvector.at(i*8+j));
         }
         auto iter = tmp.cbegin();
-        uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+        uint32_t num = pht::BitvectorUtils::decodeNumber(iter, tmp.cend(),BitvectorUtils::NumberEncoding::BINARY);
         file.write(reinterpret_cast<char*>(&num), 1);
         bytes++;
     }
@@ -391,7 +389,7 @@ void HypersuccinctTreeOutput::writeBitvectorToFile(std::ofstream &file, Bitvecto
         tmp.push_back(0);
     }
     auto iter = tmp.cbegin();
-    uint32_t num = pht::Bitvector_Utils::decodeNumber(iter, tmp.cend(),Bitvector_Utils::NumberEncoding::BINARY);
+    uint32_t num = pht::BitvectorUtils::decodeNumber(iter, tmp.cend(),BitvectorUtils::NumberEncoding::BINARY);
     file.write(reinterpret_cast<char*>(&num), 1);
 }
 
@@ -400,7 +398,7 @@ Bitvector HypersuccinctTreeOutput::readBitvectorFromFile(std::ifstream &file) {
     std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
     for(unsigned char cNum : buffer) {
         Bitvector temp;
-        Bitvector_Utils::encodeNumber(std::inserter(temp, temp.end()), cNum, Bitvector_Utils::NumberEncoding::BINARY);
+        BitvectorUtils::encodeNumber(std::inserter(temp, temp.end()), cNum, BitvectorUtils::NumberEncoding::BINARY);
         if(temp.size() < 8) {
             std::insert_iterator<Bitvector> iterator = std::inserter(temp, temp.begin());
             while(temp.size()<8) {
@@ -415,13 +413,13 @@ Bitvector HypersuccinctTreeOutput::readBitvectorFromFile(std::ifstream &file) {
 
 [[maybe_unused]] Bitvector HypersuccinctTreeOutput::addDuplicateSeparator(const Bitvector& bitvector, const string& separator) {
     Bitvector temp = bitvector;
-    Bitvector sep = Bitvector_Utils::convertToBitvector(separator);
-    uint32_t sepNum = Bitvector_Utils::decodeNumber(sep, Bitvector_Utils::NumberEncoding::BINARY);
-    std::vector<std::pair<Bitvector::const_iterator, Bitvector::const_iterator>> patternMatches = Bitvector_Utils::findMatches(temp.cbegin(),temp.cend(), separator);
+    Bitvector sep = BitvectorUtils::convertToBitvector(separator);
+    uint32_t sepNum = BitvectorUtils::decodeNumber(sep, BitvectorUtils::NumberEncoding::BINARY);
+    std::vector<std::pair<Bitvector::const_iterator, Bitvector::const_iterator>> patternMatches = BitvectorUtils::findMatches(temp.cbegin(),temp.cend(), separator);
 
     for(std::pair<Bitvector::const_iterator, Bitvector::const_iterator> match : patternMatches) {
         auto iterMin = temp.erase(match.first,match.first);
-        uint32_t add = Bitvector_Utils::encodeNumber(std::inserter(temp, iterMin), sepNum, Bitvector_Utils::NumberEncoding::BINARY);
+        uint32_t add = BitvectorUtils::encodeNumber(std::inserter(temp, iterMin), sepNum, BitvectorUtils::NumberEncoding::BINARY);
         assert(match.first+add < match.second);
     }
 
