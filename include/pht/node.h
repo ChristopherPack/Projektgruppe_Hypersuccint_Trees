@@ -28,19 +28,18 @@ namespace pht {
          * 
          * @param[in] value The value to store in the node. 
          */
-        Node(const T value) : value(value) {
+        explicit Node(const T value) : value(value) {
         }
 
-        ~Node() {
-        }
+        ~Node() = default;
 
         /**
          * Changes the value to the new value. 
          * 
          * @param[in] value The new value. 
          */
-        void setValue(const T value) {
-            this->value = value;
+        void setValue(const T value_) {
+            this->value = value_;
         }
 
         /**
@@ -104,8 +103,8 @@ namespace pht {
     private:
         T value;
         bool miniDummy = false;
-        uint32_t miniTree;
-        uint32_t microTree;
+        uint32_t miniTree = -1;
+        uint32_t microTree = -1;
     };
 }
 

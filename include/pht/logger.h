@@ -10,6 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include "pht/timer.h"
 
@@ -40,7 +41,7 @@ namespace pht {
         /**
          * This enum defines the different LogLevels. More important log-levels will supress lower-level messages if used as filter. 
          */
-        enum class __declspec(dllexport) LogLevel {
+        enum class /*__declspec(dllexport)*/ LogLevel {
             PHT_DEBUG = 0, PHT_INFO = 1, PHT_WARNING = 2, PHT_ERROR = 3, PHT_FATAL = 4
         };
 
@@ -131,7 +132,7 @@ namespace pht {
             bool exists;
             #pragma warning(default:4251)
 
-            LogStream(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet, bool exists) : level(level), tag(tag), file(file), line(line), func(func), quiet(quiet), exists(exists) {}
+            LogStream(LogLevel level, std::string  tag, std::string  file, uint32_t line, std::string  func, bool quiet, bool exists) : level(level), tag(std::move(tag)), file(std::move(file)), line(line), func(std::move(func)), quiet(quiet), exists(exists) {}
         };
 
     public:

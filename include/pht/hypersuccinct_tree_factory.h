@@ -74,7 +74,6 @@ namespace pht {
 
             hypersuccinctTree->lookupTable.shrink_to_fit();
 
-            //TODO: convert std::bool to BitVector
             createBitvectorSupports(*hypersuccinctTree);
 
             return hypersuccinctTree;
@@ -86,8 +85,7 @@ namespace pht {
          * @param fullBitvector the bitvector
          * @return Hypersuccinct Tree Class representing the encoded Tree
          */
-        //TODO: Need error handling for bad bitvectors
-        static HypersuccinctTree createFromFile(Bitvector& fullBitvector) {
+        static HypersuccinctTree createFromBitvector(Bitvector& fullBitvector) {
             HypersuccinctTree hst;
             auto iter = fullBitvector.cbegin();
             auto end = fullBitvector.cend();
@@ -184,11 +182,11 @@ namespace pht {
                 std::vector<Bitvector> leaf_rank;
                 createBitvectorFromFile(iter, end, leaf_rank);
 
-                //TODO: Current Solution - Padding the Bitvector with one full Byte
+                //Current Solution - Padding the Bitvector with one full Byte
                 /**
                  * On TreeAlex:
                  * 1111111010110000100110001000000010000000100000001 correct bitvector
-                 * 1111111010110000100110001000000010000000100000000 createFromFile
+                 * 1111111010110000100110001000000010000000100000000 createFromBitvector
                  * 1111111010110000100110001000000010000000100000001 fileoutput
                  * 1111111010110000100110001000000010000000100000000000000 fileinput???
                  */
@@ -209,6 +207,7 @@ namespace pht {
             createBitvectorSupports(hst);
             return hst;
         }
+    private:
 
         /**
          * Reads a Bitvector from a larger Bitvector and writes it into given target
@@ -272,7 +271,6 @@ namespace pht {
          * @param tree The Hypersuccinct Tree as HypersuccinctTree
          * @param huffmanTable  The huffman Table containing the ocurrences of all MicroTree structures
          */
-        //TODO: Could be private
         static void convertToHuffman(HypersuccinctTree& tree, std::map<std::vector<bool>,std::vector<bool>> huffmanTable) {
             for(LookupTableEntry& x : tree.lookupTable) {
                 x.bp = x.index;
@@ -281,7 +279,7 @@ namespace pht {
             for(MiniTree& x : tree.miniTrees) {
                 std::vector<std::vector<bool>> oldEncodedMicros = x.microTrees;
                 x.microTrees.clear();
-                uint32_t entryCount = static_cast<uint32_t>(oldEncodedMicros.size());
+                auto entryCount = static_cast<uint32_t>(oldEncodedMicros.size());
                 for(uint32_t i = 0; i < entryCount; i++) {
                     std::vector<bool> bp = oldEncodedMicros.at(i);
                     x.microTrees.push_back(huffmanTable.at(bp));
@@ -342,7 +340,6 @@ namespace pht {
             return {FIDs, typeVectors};
         }
 
-        //TODO Documentation
         static void encodeAllSizesInHST(HypersuccinctTree &hypersuccinctTree, uint32_t sizeTree, uint32_t sizeMini, uint32_t sizeMicro){
             BitvectorUtils::encodeNumber(std::inserter(hypersuccinctTree.size, hypersuccinctTree.size.begin()), sizeTree, BitvectorUtils::NumberEncoding::BINARY);
             BitvectorUtils::encodeNumber(std::inserter(hypersuccinctTree.miniSize, hypersuccinctTree.miniSize.begin()), sizeMini,BitvectorUtils::NumberEncoding::BINARY);
@@ -398,13 +395,12 @@ namespace pht {
             return dummys;
         }
 
-        //TODO Documentation 
         /**
          * Fills the given Lookup Table entry with data from the given MicroTree
          * @tparam T Class implemented in UnorderedTree
          * @param lookupTableEntry The lookupTable Entry to fill
          * @param fmMicroTree The Micro Tree to get data from
-         * @param allMutex
+         * @param allMutex Mutex variables for multithreading
          */
         template<class T> static void fillLookupTableEntry(LookupTableEntry& lookupTableEntry, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree,std::vector<std::mutex>& allMutex){
             std::unique_lock<std::mutex> lockLog(allMutex.at(2));
@@ -444,10 +440,10 @@ namespace pht {
                 uint32_t leaveNum = fmMicroTree->getLeafSize(node1);
                 lookupTableEntry.leaves.push_back(BitvectorUtils::encodeNumberReturn(leaveNum));
               
-                uint32_t leftmost_leafNum =  static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeafCache(node1))));
+                auto leftmost_leafNum =  static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getLeftmostLeafCache(node1))));
                 lookupTableEntry.leftmost_leaf.push_back(BitvectorUtils::encodeNumberReturn(leftmost_leafNum));
 
-                uint32_t rightmost_leafNum = static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeafCache(node1))));
+                auto rightmost_leafNum = static_cast<uint32_t>(std::distance(nodes.begin(), std::find(nodes.begin(),nodes.end(),fmMicroTree->getRightmostLeafCache(node1))));
               
                 lookupTableEntry.rightmost_leaf.push_back(BitvectorUtils::encodeNumberReturn(rightmost_leafNum));
 
@@ -468,7 +464,6 @@ namespace pht {
             lockLog2.unlock();
         }
 
-        //TODO Documentation 
         /**
          * Uses the MicroTrees for a given Mini Tree and fills the HypersuccinctTree and MiniTree with data.
          * @tparam T Class implemented in UnorderedTree
@@ -477,9 +472,9 @@ namespace pht {
          * @param fmMiniTree The Mini Tree to get data from
          * @param fmMicroTrees The Micro Trees to get data from
          * @param bpsAndOccurrences Counting Table of BP forms for Huffman encoding
-         * @param tree
-         * @param sizeMicro
-         * @param doQueries 
+         * @param tree The unordered Tree to create from
+         * @param sizeMicro Size of the MicroTrees
+         * @param doQueries Flag if generate query data
          * @param allMutex Mutex locks
          */
         template<class T> static void createMicroTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences,uint32_t sizeMicro, bool doQueries,std::vector<std::mutex>& allMutex){
@@ -528,7 +523,6 @@ namespace pht {
                     miniTree.microTopFIDIndices.push_back({false});
                     miniTree.microLowFIDIndices.push_back({false});
 
-                    //TODO:
                     if (fmMiniTree->isRoot(microRoot)) {
                         miniTree.microParents.push_back({false});
                     } else {
@@ -634,14 +628,13 @@ namespace pht {
             lockLog2.unlock();
         }
 
-        //TODO Documentation 
         /**
          * Uses the given Mini Tree to fill the HypersuccinctTree  with data
          * @tparam T Class implemented in UnorderedTree
          * @param hypersuccinctTree The Hypersuccinct Tree to fill
          * @param tree The original Tree to get data from
-         * @param fmMiniTree
-         * @param doQueries
+         * @param fmMiniTree the current Minitree to create from
+         * @param doQueries Flag if generate Query data
          * @param sizeMicro Average Size of MicroTrees (according to Farzan Munro) for MicroTree generation
          * @param bpsAndOccurrences Count Table of BP forms for Huffman encoding
          * @param allMutex Mutex locks
@@ -656,7 +649,6 @@ namespace pht {
             std::vector<Bitvector> dummys = createDummyInterconnections(fmMiniTree, fmMicroTrees, sizeMicro);
             miniTree.dummys = dummys;
 
-            //TODO:
             enumerateMicroTrees(fmMicroTrees);
 
             //Simple Additions for Queries - MiniTree
@@ -717,7 +709,6 @@ namespace pht {
             lockLog.unlock();
         }
 
-        //TODO Documentation 
         /**
          * Uses the given Mini Trees to fill the HypersuccinctTree  with data
          * @tparam T Class implemented in UnorderedTree
@@ -725,7 +716,7 @@ namespace pht {
          * @param tree The original Tree to get data from
          * @param fmMiniTrees The Mini Trees to get data from
          * @param sizeMicro Average Size of MicroTrees (according to Farzan Munro) for MicroTree generation
-         * @param doQueries
+         * @param doQueries Flag if generate Query data
          * @param bpsAndOccurrences Count Table of BP forms for Huffman encoding
          */
         template<class T> static void createMiniTrees(HypersuccinctTree& hypersuccinctTree, const std::shared_ptr<UnorderedTree<T>>& tree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMiniTrees, uint32_t sizeMicro, std::map<std::vector<bool>,uint32_t>& bpsAndOccurrences, bool doQueries){
@@ -733,7 +724,6 @@ namespace pht {
             PHT_LOGGER_DEBUG("Factory Create") << "Creating MiniTrees..." << pht::Logger::endl();
             hypersuccinctTree.miniTrees = std::vector<MiniTree>(fmMiniTrees.size());
 
-            //TODO: Fix Multithreading issues
             //These HAVE to be computed ONCE before the multithreading to avoid errors!
             const std::shared_ptr<pht::Node<T>> treeRoot = tree->getRoot();
             tree->getSubtreeSize(treeRoot);
@@ -823,7 +813,7 @@ namespace pht {
         template<class T> static void handleMiniDummyInMicroTree(MiniTree& miniTree, std::shared_ptr<UnorderedTree<T>>& fmMiniTree, const std::shared_ptr<UnorderedTree<T>>& fmMicroTree, std::vector<std::shared_ptr<UnorderedTree<T>>>& fmMicroTrees){
             if(fmMicroTree->contains(fmMiniTree->getDummy())) {
                 auto iter = std::find(fmMicroTrees.begin(),fmMicroTrees.end(), fmMicroTree);
-                uint32_t dist = static_cast<uint32_t>(std::distance(fmMicroTrees.begin(), iter));
+                auto dist = static_cast<uint32_t>(std::distance(fmMicroTrees.begin(), iter));
                 BitvectorUtils::encodeNumber(miniTree.miniDummyTree,dist,BitvectorUtils::NumberEncoding::BINARY);
                 uint32_t enumV = fmMicroTree->enumerate(fmMiniTree->getDummy());
                 BitvectorUtils::encodeNumber(miniTree.miniDummyIndex,enumV,BitvectorUtils::NumberEncoding::BINARY);

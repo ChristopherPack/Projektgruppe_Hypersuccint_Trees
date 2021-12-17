@@ -34,18 +34,17 @@ namespace pht {
      * @tparam T The type of data stored in the nodes. 
      */
     template<class T> class UnorderedTree {
-        friend class Visualize;
 
     public:
         /**
          * Construct a new empty UnorderedTree object. 
          */
-        UnorderedTree() {}
+        UnorderedTree() = default;
 
         /**
          * Destruct a UnorderedTree object. 
          */
-        ~UnorderedTree() {}
+        ~UnorderedTree() = default;
         
         /**
          * Adds a node to the tree. 
@@ -90,7 +89,6 @@ namespace pht {
          * @param[in] ancestor Optional. A pointer to the ancestor of the new node, or nullptr to add a root.
          *     Can only be nullptr if the tree is empty. Adding a node to an empty tree will ignore this parameter.
          */
-        //TODO: Rewrite tree for consistent ORDER
         void insert(const std::shared_ptr<pht::Node<T>> node, uint32_t index, const std::shared_ptr<pht::Node<T>> ancestor = nullptr) {
             ASSERT(node, "Invalid node");
             ASSERT(ancestor || !root, "Invalid ancestor");
@@ -120,7 +118,6 @@ namespace pht {
          * @param[in] child A pointer to the child to insert the new node as parent. 
          * @param[in] ancestor A pointer to the ancestor of the new node, must be the parent of child. 
          */
-        //TODO: Rewrite tree for consistent ORDER
         void insertBetween(const std::shared_ptr<pht::Node<T>> node, const std::shared_ptr<pht::Node<T>> child, const std::shared_ptr<pht::Node<T>> ancestor) {
             ASSERT(node, "Invalid node");
             ASSERT(ancestor, "Invalid ancestor");
@@ -385,7 +382,7 @@ namespace pht {
          * 
          * @return The count of nodes in this tree.
          */
-        uint32_t getSize() const {
+        [[nodiscard]] uint32_t getSize() const {
             if(root == nullptr)
                 return 0;
             return static_cast<uint32_t>(nodes.size());
@@ -396,7 +393,7 @@ namespace pht {
          * 
          * @return True if this tree does not contain any nodes.
          */
-        bool isEmpty() const {
+        [[nodiscard]] bool isEmpty() const {
             return root == nullptr;
         }
 
@@ -405,7 +402,7 @@ namespace pht {
          * 
          * @return The count of edges in the longest path in this tree. -1 if empty. 
          */
-        virtual uint32_t getHeight() const {
+        [[nodiscard]] virtual uint32_t getHeight() const {
             if(root == nullptr)
                 return -1;
             return getHeight(root);
@@ -522,15 +519,13 @@ namespace pht {
             return getRightmostLeaf(descendants.at(node).back());
         }
 
-        //TODO Remove Documentation
-        //TODO: This one really needs caching
-        /*
+        /**
          * Returns the leaf size (Amount of Leaves) of the given node
          *
          * @param node A pointer to the node. Cannot be nullptr. Has to be in the tree.
          * @return The leaf size of the node
          */
-        /*uint32_t getLeafSize(const std::shared_ptr<pht::Node<T>> node) const {
+        uint32_t getLeafSize_(const std::shared_ptr<pht::Node<T>> node) const {
             ASSERT(node, "Invalid node");
             ASSERT(std::find(nodes.begin(), nodes.end(), node) != nodes.end(), "Node not found");
 
@@ -542,7 +537,7 @@ namespace pht {
                 res += getLeafSize(desc);
             }
             return res;
-        }*/
+        }
 
         /**
          * Returns the leaf Rank (Amount of leaves before) of the given node
@@ -638,7 +633,7 @@ namespace pht {
          * 
          * @return The string representation of this tree. 
          */
-        std::string toString() const {
+        [[nodiscard]] std::string toString() const {
             if(root == nullptr) {
                 return "";
             }
@@ -652,7 +647,7 @@ namespace pht {
          * 
          * @return The newick representation of this tree. 
          */
-        std::string toNewickString() const {
+        [[nodiscard]] std::string toNewickString() const {
             if(root == nullptr) {
                 return "";
             }
@@ -689,26 +684,22 @@ namespace pht {
             return size;
         }
 
-        //TODO Documentation
         bool hasDummy() {
             return dummy != nullptr;
         }
 
-        //TODO Documentation
         std::shared_ptr<pht::Node<T>> getDummy() {
             return dummy;
         }
 
-        //TODO Documentation
-        void setDummy(std::shared_ptr<pht::Node<T>> dummy) {
-            ASSERT(dummy, "Invalid dummy");
-            ASSERT(std::find(nodes.begin(), nodes.end(), dummy) != nodes.end(), "Dummy not found");
-            this->dummy = dummy;
+        void setDummy(std::shared_ptr<pht::Node<T>> dummy_) {
+            ASSERT(dummy_, "Invalid dummy");
+            ASSERT(std::find(nodes.begin(), nodes.end(), dummy_) != nodes.end(), "Dummy not found");
+            this->dummy = dummy_;
         }
 
         //BUG Call cannot be simplified
         //True counts dummies (for Lookuptable); False ignores dummies (For Mini/Microtrees)
-        //TODO: Would it be better to unify the False and True Calcs?
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> enumerate = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){ enumerateCalculator(cache); }); //Cached version of enumerate. 
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSize = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeCalc(cache,root);}); //Cached version of getSubtreeSize. 
         pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>> getSubtreeSizeTrue = pht::PrecomputedFunction<uint32_t, const std::shared_ptr<pht::Node<T>>>([this](std::map<std::tuple<const std::shared_ptr<pht::Node<T>>>, uint32_t>& cache){getSubtreeSizeTrueCalc(cache,root);}); //Cached version of getSubtreeSizeTrue. 

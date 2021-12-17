@@ -7,7 +7,7 @@
 #include <ostream>
 
 
-extern "C" {
+//extern "C" {
     namespace pht {
         class Timer;
     }
@@ -42,13 +42,13 @@ extern "C" {
              * Returns the duration between start() and stop(). 
              * @return std::chrono::duration<uint32_t, std::micro> The duration in microseconds. 
              */
-            std::chrono::duration<uint32_t, std::micro> getDuration() const;
+            [[nodiscard]] std::chrono::duration<uint32_t, std::micro> getDuration() const;
 
             /**
              * Converts the duration of this Timer to a human-readable format. 
              * @return std::string The duration as "hours:minuts:seconds.millis_micros". 
              */
-            std::string toString() const;
+            [[nodiscard]] std::string toString() const;
 
             ///Befriend the print-operator. 
             friend std::ostream &::operator<<(std::ostream &out, const Timer &timer);
@@ -61,5 +61,5 @@ extern "C" {
         };
     }
 
-}
+//}
 #endif//PROJECTGROUP_HYPERSUCCINCT_TREES_TIMER_H_

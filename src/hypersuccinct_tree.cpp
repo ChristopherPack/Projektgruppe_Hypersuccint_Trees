@@ -60,13 +60,8 @@ LookupTableEntry HypersuccinctTree::getLookupTableEntry(Bitvector indexV) {
 }
 
 bool HypersuccinctTree::lookupTableAncestorMatrixComparison(const LookupTableEntry& entry, uint32_t anc, uint32_t node2Index) {
-    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.ancestorMatrix.size()));
+    auto sizeTable = static_cast<uint32_t>(sqrt(entry.ancestorMatrix.size()));
     return entry.ancestorMatrix.at(sizeTable * anc + node2Index);
-}
-
-bool HypersuccinctTree::lookupTableChildMatrixComparison(const LookupTableEntry& entry, uint32_t child, uint32_t node2Index) {
-    uint32_t sizeTable = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
-    return entry.childMatrix.at(sizeTable * child + node2Index);
 }
 
 uint64_t calculateMinitreeByteSize(const MiniTree& mt) {
