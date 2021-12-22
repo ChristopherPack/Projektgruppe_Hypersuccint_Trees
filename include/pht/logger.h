@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include <iostream>
 #include <memory>
 #include <regex>
 #include <sstream>
@@ -12,12 +13,6 @@
 #include <utility>
 
 #include "pht/timer.h"
-
-#ifdef DLL_EXPORTS
-#define DLL_API __declspec(dllexport)
-#else
-#define DLL_API __declspec(dllimport)
-#endif
 
 #ifdef PHT_LOGGER_QUIET
 #define PHT_LOGGER_DEBUG(tag)   pht::Logger::log(pht::Logger::LogLevel::PHT_DEBUG,   tag, __FILE__, __LINE__, __func__,true)
@@ -63,6 +58,45 @@ namespace pht {
 
         public:
             /**
+             * Prohibit copying of LogStreams. 
+             * @param copy The stream to copy. 
+             */
+            LogStream(const LogStream& copy) = delete;
+            /**
+             * Prohibit copying of LogStreams. 
+             * @param copy The stream to copy. 
+             */
+            LogStream& operator=(const LogStream& copy) = delete;
+            /**
+             * Allow only moving of LogStreams. 
+             * @param move The stream to move. 
+             */
+            LogStream(LogStream&& move) {
+                std::exchange(move.exists, false);
+            }
+            /**
+             * Allow only moving of LogStreams. 
+             * @param move The stream to move. 
+             */
+            LogStream& operator=(LogStream&& move) {
+                std::exchange(move.exists, false);
+                return *this;
+            }
+
+            /**
+             * Flush stream and log message if the stream gets deleted. 
+             * @param move The stream to move. 
+             */
+            ~LogStream() {
+                if(exists) {
+                    if(!quiet) {
+                        Logger::_log(level, tag, content.str(), file, line, func);
+                    }
+                    content.clear();
+                }
+            }
+
+            /**
              * Append a value to the current message. Must be terminated with pht::Logger::endl() to be printed. 
              * This method will fail if this stream is not the most current, i.e. another logging call was made before this on was finished or this stream was already printed. 
              * @tparam T A printable type. 
@@ -70,28 +104,17 @@ namespace pht {
              * @return LogStream& This stream, for call-chaining. 
              */
             template<class T> LogStream& operator<<(const T& value) {
-                if(Logger::getCurrentLogStream() != this) {
-                    throw std::runtime_error("Invalid log stream");
-                }
                 content << value;
                 return *this;
             }
 
             /**
-             * Template specialization to detect ending of messages.
-             * @param value The void* const to print. 
-             * @return LogStream& This stream, for call-chaining. DO NOT USE!
+             * Template specialization for backward-compatibility, DO NOT USE.
+             * @param value The value to capture. 
+             * @return LogStream& This stream, for call-chaining. 
              */
-            template<> LogStream& operator<<(void* const& value) {
-                if(Logger::getCurrentLogStream() != this) {
-                    throw std::runtime_error("Invalid log stream");
-                }
-                if(value == Logger::endl()) {
-                    if(!quiet) {
-                        Logger::_log(level, tag, content.str(), file, line, func);
-                    }
-                    content.clear();
-                } else {
+            template<> [[deprecated]] LogStream& operator<<(void* const& value) {
+                if(value != Logger::endl()) {
                     content << value;
                 }
                 return *this;
@@ -106,9 +129,10 @@ namespace pht {
             uint32_t line;
             const std::string func;
             bool quiet;
+            bool exists;
             #pragma warning(default:4251)
 
-            LogStream(LogLevel level, std::string  tag, std::string  file, uint32_t line, std::string  func, bool quiet) : level(level), tag(std::move(tag)), file(std::move(file)), line(line), func(std::move(func)), quiet(quiet) {}
+            LogStream(LogLevel level, std::string  tag, std::string  file, uint32_t line, std::string  func, bool quiet, bool exists) : level(level), tag(std::move(tag)), file(std::move(file)), line(line), func(std::move(func)), quiet(quiet), exists(exists) {}
         };
 
     public:
@@ -124,7 +148,7 @@ namespace pht {
          * @param quiet Disable printing. 
          * @return LogStream& A stream to print a message to. 
          */
-        static LogStream& log(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet = false);
+        static LogStream log(LogLevel level, const std::string& tag, const std::string& file, uint32_t line, const std::string& func, bool quiet = false);
 
         /**
          * Returns the current log-level used in filtering messages.
@@ -148,25 +172,27 @@ namespace pht {
         /**
          * Used to end logging messages. 
          * Must be appended to every message to print it. 
+         * DEPRECATED, DO NOT USE ANYMORE, it is not necessary!
          * @return void* A marker value to end a log-stream and print its value. 
          */
-        static void* endl();
-
-        /**
-         * The most current (and only valid) log-stream. 
-         * @return LogStream* The log-stream.
-         */
-        static LogStream* getCurrentLogStream();
+        [[deprecated]] static void* endl();
 
     private:
-        #pragma warning(disable:4251)
-        static LogLevel logLevel;
-        static Timer timer;
-        static std::regex unifyLinebreakRegex;
-        static std::ostream stdOutWrapper;
-        static std::streambuf* stdoutBuf;
-        static std::unique_ptr<LogStream> currentLogStream;
-        #pragma warning(default:4251)
+        class __declspec(dllexport) LoggerStatics {
+            friend class Logger;
+        private:
+            #pragma warning(disable:4251)
+            LogLevel logLevel;
+            Timer timer;
+            std::regex unifyLinebreakRegex;
+            std::unique_ptr<std::ostream> stdOutWrapper;
+            std::streambuf* stdoutBuf;
+            #pragma warning(default:4251)
+
+            LoggerStatics();
+        };
+
+        static LoggerStatics& getStatics();
 
         static void _log(LogLevel level, const std::string& tag, const std::string& message, const std::string& file, uint32_t line, const std::string& func);
     };

@@ -7,20 +7,21 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 file_names = [
-    "../../build/results/testResults1.csv",
-    "../../build/results/testResults2.csv",
-    "../../build/results/testResults3.csv",
-    "../../build/results/testResults4.csv",
-    "../../build/results/testResults5.csv",
-    "../../build/results/testResults6.csv",
-    "../../build/results/testResults7.csv",
-    "../../build/results/testResults8.csv",
-    "../../build/results/testResults9.csv",
-    "../../build/results/testResults10.csv",
-    "../../build/results/dblp1.csv",
-    "../../build/results/dblp3.csv",
-    "../../build/results/dblp4.csv",
-    "../../build/results/dblp5.csv"
+    "../results/testResults1.csv",
+    "../results/testResults2.csv",
+    "../results/testResults3.csv",
+    "../results/testResults4.csv",
+    "../results/testResults5.csv",
+    "../results/testResults6.csv",
+    "../results/testResults7.csv",
+    "../results/testResults8.csv",
+    "../results/testResults9.csv",
+    "../results/testResults10.csv",
+    "../results/dblp1.csv",
+    "../results/dblp3.csv",
+    "../results/dblp4.csv",
+    "../results/dblp5.csv",
+    "../results/dblpWR10.csv"
 ]
 interfile_comparison_labels = [
     "Factory::create", 
@@ -88,6 +89,10 @@ def clean_float_str(string):
         return str(int(match.group(1))+1)+(match.group(2) if match.group(2) != None else "")
     return string
 
+def float_to_latex(value):
+    parts = "{:.2e}".format(value).split("e")
+    return parts[0]+("" if int(parts[1]) == 0 else "^{"+str(int(parts[1]))+"}")
+
 
 
 #Read data
@@ -116,35 +121,34 @@ for file, methods in data.items():
             raise Exception("Invalid method: \""+method+"\"")
 
 #Render data
+x_all = np.array(list(set([tree_sizes[file] for _, times in interfile_comparison_data.items() for file, _ in times])))
+y_all = np.array([time for _, times in interfile_comparison_data.items() for _, time in times])
+figure = plt.figure(figsize=(20,11))
+axes = figure.add_subplot(1,1,1)
+axes.set_title(method)
+axes.set_xscale("log")
+axes.set_xlabel("Nodes")
+axes.set_yscale("log")
+axes.set_ylabel("s")
+axes.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: clean_float_str(str(x/(10**y_unit_info_pwr)))))
+axes.grid(True, which="both")
+xmin, xmax, xstep = get_step(x_all.min(), x_all.max(), True)
+ymin, ymax, ystep = get_step(y_all.min(), y_all.max(), True)
+y_unit_info_pwr = get_unit_info(np.power(10.0, ymax))[1]
+axes.set(xlim=(np.power(10.0, xmin), np.power(10.0, xmax)), xticks=np.power(10.0, np.arange(xmin, xmax+xstep, xstep)), ylim=(np.power(10.0, ymin), np.power(10.0, ymax)), yticks=np.power(10.0, np.arange(ymin, ymax+ystep, ystep)))
 for method, times in interfile_comparison_data.items():
     x = np.array([tree_sizes[file] for file, _ in times])
     y = np.array([time for _, time in times])
-
-    xmin, xmax, xstep = get_step(x.min(), x.max(), True)
-    ymin, ymax, ystep = get_step(y.min(), y.max(), True)
-    y_unit_info_pwr = get_unit_info(np.power(10.0, ymax))[1]
-
-    #function = lambda _x,_a,_b,_c: _a*_x**2+_b*_x+_c#lambda _x,_a,_b,_c: _a*_x**2+_b*_x+_c
-    function = lambda _x,_a,_b,_c: _a*_b**_x+_c
+    function = lambda _x,_a,_b: _a*_x+_b #lambda _x,_a,_b,_c: _a*_x**2+_b*_x+_c#lambda _x,_a,_b,_c: _a*_x**2+_b*_x+_c #TODO
     params = scipy.optimize.curve_fit(function, x, y, maxfev=5000)
-    
-    figure = plt.figure(figsize=(20,11))
-    func_text = matplotlib.text.Text(text=f"${clean_float_str('{:10.3f}'.format(params[0][0]))}*{clean_float_str('{:10.3f}'.format(params[0][1]))}^x{'+' if params[0][2] > 0.0 else ''}{clean_float_str('{:10.3f}'.format(params[0][2]))}$", usetex=True)
-    figure.suptitle(func_text)
-    axes = figure.add_subplot(1,1,1)
-    axes.set_title(method)
-    axes.set_xscale("log")
-    axes.set_xlabel("Nodes")
-    axes.set_yscale("log")
-    axes.set_ylabel("s")
-    axes.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: clean_float_str(str(x/(10**y_unit_info_pwr)))))
-    axes.grid(True, which="both")
-    axes.set(xlim=(np.power(10.0, xmin), np.power(10.0, xmax)), xticks=np.power(10.0, np.arange(xmin, xmax+xstep, xstep)), ylim=(np.power(10.0, ymin), np.power(10.0, ymax)), yticks=np.power(10.0, np.arange(ymin, ymax+ystep, ystep)))
+    plt.rcParams.update({"text.usetex": True})
+    func_str = f"${float_to_latex(params[0][0])} x {'+' if params[0][1] > 0.0 else ''} {float_to_latex(params[0][1])}$"
     axes.scatter(x, y)
-    axes.plot(np.power(10.0, np.linspace(xmin, xmax+xstep, 1000)), function(np.power(10.0, np.linspace(xmin, xmax+xstep, 1000)), *params[0]))
-    clean = re.sub(r"[!\"§$%&/()=?`²³{[\]}\\´*\':;+#-.,~\|<>@€]", "", method)
-    plt.savefig(f"{clean}.png")
-    plt.close(figure)
+    axes.plot(np.power(10.0, np.linspace(xmin, xmax+xstep, 1000)), function(np.power(10.0, np.linspace(xmin, xmax+xstep, 1000)), *params[0]), label=method+" ("+func_str+")")
+    plt.rcParams.update({"text.usetex": False})
+axes.legend()
+plt.savefig("file_compare.png")
+plt.close(figure)
 
 #Render data
 for file, time_data in intrafile_comparison_data.items():
