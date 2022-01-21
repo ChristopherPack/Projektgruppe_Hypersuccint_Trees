@@ -953,7 +953,6 @@ namespace pht {
                 pool.push_task(assignBitVector,std::ref(miniTree.typeVectorsSupport),std::cref(miniTree.typeVectors));
             }
             for(LookupTableEntry &entry : hst.lookupTable) {
-                pool.push_task(assignBitvector,std::ref(entry.ancestorMatrixSupport),std::cref(entry.ancestorMatrix));
                 pool.push_task(assignBitvector,std::ref(entry.childMatrixSupport),std::cref(entry.childMatrix));
             }
             pool.wait_for_tasks();

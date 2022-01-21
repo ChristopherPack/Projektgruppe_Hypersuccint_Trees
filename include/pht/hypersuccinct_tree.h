@@ -87,7 +87,6 @@ namespace pht {
         Bitvector index; ///Index of the LookupTableEntry
         Bitvector bp; ///BP of the Entry. Empty if index is BP
         Bitvector ancestorMatrix;//Ancestor Matrix
-        succinct_bv::BitVector ancestorMatrixSupport; ///Rank + Select for ancestor matrix
         Bitvector childMatrix; ///Child Matrix
         succinct_bv::BitVector childMatrixSupport; ///Rank + Select for child matrix
         std::vector<Bitvector> parentPointers; ///ParentPointers + 1
@@ -153,7 +152,7 @@ namespace pht {
          * @return MiniTree as MiniTree
          */
         MiniTree& getMiniTree(uint32_t index ) {
-            return miniTrees.at(index);
+            return miniTrees[index];
         }
 
         /**
