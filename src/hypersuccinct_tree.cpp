@@ -114,7 +114,6 @@ uint64_t calculateLookupTableEntryByteSize(const LookupTableEntry& lte) {
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.index.size())/8.0))+
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.bp.size())/8.0))+
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.ancestorMatrix.size())/8.0))+
-        lte.ancestorMatrixSupport.n_bytes()+
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.childMatrix.size())/8.0))+
         lte.childMatrixSupport.n_bytes()+
         sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(lte.parentPointers, 0, [](uint64_t acc, const std::vector<bool>& x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+

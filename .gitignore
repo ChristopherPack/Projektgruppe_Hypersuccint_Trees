@@ -12,7 +12,8 @@ venv/
 
 /build/
 /.vscode/
-/resources/
+/resources/XMark2.xml
+/resources/DBLP.xml
 
 /python/build/
 /python/*.pyd

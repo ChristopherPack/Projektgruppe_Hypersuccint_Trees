@@ -2,7 +2,9 @@
 \usepackage{graphicx}
 \usepackage{forest}
 \usepackage{tikz}
+\usepackage{float}
 \usepackage{subcaption}
+\usepackage{hyperref}
 \usetikzlibrary{fit}
 \graphicspath{ {./images/} }
 \begin{document}
@@ -11,19 +13,25 @@
 \date{\today}
 \maketitle
 
-%Write more in abstract
+%ADJUST FIGURE REFERENCES IN TEXT
+%ADJUST FIGURE REFERENCES IN TEXT
+%ADJUST FIGURE REFERENCES IN TEXT
+%ADJUST FIGURE PLACEMENTS WHEN TEXT IS DONE
+%ADJUST FIGURE PLACEMENTS WHEN TEXT IS DONE
+%ADJUST FIGURE PLACEMENTS WHEN TEXT IS DONE
+
 \begin{abstract}
-This document describes an implementation of Hypersuccinct Tree encodings in C++, following the procedure described in \cite{farzanMunro} and \cite{universalSuccinct}.
+This document describes a practical implementation of hypersuccinct tree encodings in C++. The theory is based on the procedures described in \cite{farzanMunro} and \cite{universalSuccinct}. A special focus lies on a space-efficient real-world-encoding and support of constant-time queries. We show that both of these constraints can be fulfilled in a practically usable implementation and provide a C++-library, Python-interface and GUI to showcase our results. We also summarize our findings regarding a short theoretical and practical analysis of the time- and space-requirements of an example service which reads, parses and writes XML-Files.
 
 \end{abstract}
 
 \tableofcontents
 
 \section{Introduction}
-%Write more
-Search for good (space and time efficient) encodings.\\
-A proof of concept of an implementation.\\
-Library meant to be open (extendable) and easy to use.
+Data storage is and has always been a challenge for multiple reasons, with the two probably most frequently occurring problems being access time and size. The challenges these problems pose only increase with more complex access mechanisms and datastructures.\\
+One possible solution is the more efficient usage of the given space by the introduction of hypersuccinct data structures. Succinct data structures store data in some kind of compressed format, at or around the information-theoretical lower limit, while still allowing the execution of queries in an acceptable timeframe.\\
+While much work has already been done on the theorecial site of things, the implementation of more complex succinct datastructures is not as well established. In this paper we present our practical implementation of hypersuccinct trees in C++ as an example of a complex hypersuccinct datastructure. The implementation should be space-efficient and still allow the execution of constant-time queries.\\
+The theoretical basis for our implementation can be found in \cite{farzanMunro} and \cite{universalSuccinct}. While mainly a Proof-of-Concept, our library should also allow for easy extension and be usable as a solid basis-implementation of a hypersuccinct tree.
 
 \section{The tree covering Algorithm}
 To achieve the succinct encoding of the tree we follow the algorithm described by Farzan-Munro \cite{farzanMunro}. This algorithm has several steps. At first, the decompose-algorithm is used to divide the tree into several smaller subtrees of roughly equal size. These are called mini-trees. These mini-trees follow certain rules. Their nodes are disjoint, except they may have a common root node. Edges between mini-trees that do not share a common root node always end in the root node of the child tree and start from the root node of the parent tree, except for at most one edge in a mini-tree, that may start from any node in that tree and connect to the root of the child tree. We call this last special type of connection “dummy-interconnection”.\\
@@ -34,7 +42,7 @@ For each Mini-tree we store it's index in the FIDs and the data about its's Micr
 \subsection{Functions and Queries of the Hypersuccinct Tree}
 To have a succinct data structure we have to be able to execute efficient query operations on our data. The auxiliary information stored for each Mini-tree is fundamental for that. In fact, the information we store allows us to execute many commonly needed query operations within $O(1)$ time. That means a lot of complex calculations are done upon creating the data and the results are then stored efficiently to be quickly available when asked for. \\
 
-\begin{figure}
+\begin{figure}[H]
 \begin{tabular}{ |p{3.5cm}p{8cm}|} 
  \hline
  child($v$, $i$) & The $i$-th child of node $v$. \\
@@ -65,13 +73,11 @@ The library offers basic functionality around the hypersuccinct tree encoding su
 
 \subsection{External Libraries}
 We use four external libraries in our project.
-%Need Link to IrrXML
-The first one, called Irrxml, serves an implementation to read efficiently from an xml file. We use this library to generate a basic tree structure from xml files which is then used for our encoding.\\
-We make use of a small library which provides an implementation of space efficient Fully Indexable Dictionaries \cite{universalSuccinct}, called succinct\_bv, which is implemented as described in \cite{succinctBV}.
+The first one, called Irrxml \cite{irrXMLLink}, serves an implementation to read efficiently from an xml file. We use this library to generate a basic tree structure from xml files which is then used for our encoding.\\
+We make use of a small library which provides an implementation of space efficient Fully Indexable Dictionaries \cite{universalSuccinct}, called succinct\_bv \cite{succinctBVLink}, which is implemented as described in \cite{succinctBV}.
 This library is very lightweight and has been modified personally by us to suit our needs.\\
-%Need link for succinct_bv, Threading, and googletest
-To increase the performance of our encoding process (see \textit{section 4.2}), we utilize a multithreading library. This library is called thread-pool, and was created by \cite{threading}, to provide an efficient multithreading library.\\
-Lastly, we utilise the googletest library for unit tests.
+To increase the performance of our encoding process (see \textit{section 4.2}), we utilize a multithreading library called thread-pool \cite{threading}, to provide an efficient multithreading library.\\
+Lastly, we utilise the googletest library \cite{googletestLink} for unit tests.
 
 \section{Implementation in Depth}
 We present our implementation in detail, and highlight issues we encountered during our implementation process and how we solved them.
@@ -323,9 +329,7 @@ In this section we discuss some specific design decisions and shortcomings, and 
 \label{huff:table1}
 \end{figure}
 Our tree offers two types of encoding for Microtrees. The first option encodes trees according to \cite{farzanMunro}, and uses the Microtree's balanced parenthesis representation, while the other utilizes a huffman encoding for the Microtrees. For that, the Microtrees use their respective huffman codes in the representation, while their corresponding lookup table entries contain the balanced parenthesis representation for each code.\\
-The huffman encoding has no impact on query performance, as finding a corresponding lookup table entry for a huffman code is possible in $O(1)$. Encoding trees with huffman has a significant impact on the space necessary for the hypersuccinct tree. The balanced parenthesis representation needs $2n$ many bits for a tree of size $n$.\\
-%Huffman theory bit
-Huffman code ist optimal für diskrete gedächtnislose Quellen. Anzahl der Microtrees ist eine diskrete gedächtnislose Quelle. Einsparung schon allein ziemlich gut, da bp enconding 2n ist, und huffman code schon für nur 1n optimal wäre. %Need complexity?? of huffman code.
+The huffman encoding has no impact on query performance, as finding a corresponding lookup table entry for a huffman code is possible in $O(1)$. Encoding trees with huffman has a significant impact on the space necessary for the Microtree encoding since the balanced parenthesis representation needs $2n$ many bits for a tree of size $n$, while huffman codes are more efficient (See Section 6.4).
 
 \subsection{Factory Complexity}
 The encoding process in \textit{create} is obviously not possible in $O(1)$, due to the Farzan-Munro algorithm itself being more complex, and the current implementation amounts to roughly $O(n^{3})$. Despite that we put significant effort into increasing the performance of the encoding process. The \textit{create} was evaluated in four separate options, whether or not to use huffman encoding, and whether or not to generate query data.\\
@@ -349,97 +353,129 @@ We in addition to that we also analyzed the runtime of \textit{writeToFile} and 
 \end{figure}
 %Insert New image
 \begin{figure}[h]
-\includegraphics[scale=0.3]{file_comp_cut}
-\caption{Complexity of \textit{create}}
+\includegraphics[scale=0.3]{file_compare_cut}
+\caption{Runtime of \textit{create}}
 \label{complexFac:image1}
 \end{figure}
 
 \subsection{Query complexity tests}
 For query runtime tests we used \textit{DBLP}, which is a large, flat tree, and \textit{treeNath1-5}, which are trees of growing size and depth. The records we got from these tests show that queries on Hypersuccint Trees of vastly different size are still in the same magnitude of execution time. The longer execution times of larger trees compared to smaller trees can be accounted longer access times related to caching and hardware behaviour. The code itself maintains it's $O(1)$ execute time magnitude.\\
-\begin{figure}[h]
-\includegraphics[scale=0.3]{treeNath3.xml}
-\includegraphics[scale=0.3]{DBLP_Queries}
-\caption{Complexity of implemented queries}
-\label{complexQue:image1}
-\end{figure}
-%\includegraphics[width=\textwidth]{treeNath5.xml}\\
-%I think there is no good way to unify the different images from different trees.
 The queries provided by the hypersuccinct tree are implemented in $O(1)$, as specified in
 \cite{farzanMunro}. As shown in \textit{Fig. 9} all queries except \textit{child} have an average runtime of well below $100 \mu s$. When it comes to \textit{child} when comparing between our different trees, the average runtime of \textit{child} increases with an increased amount of nodes. However, when analyzing our code, we were not able to find a section that would violate the $O(1)$ complexity requirement, not in our query implementation nor in the \textit{succinct\_bv} library. With some testing we determined that the increase in runtime stems from the basic function \textit{getMinitree}, which returns the Minitree for a given index, which is important for our evalutation, as hypersuccinct nodes save their Minitree as an integer (see Section 4.1).
-%SPECULATION
 Since this function simply calls the \textit{[]} operator of \textit{std::vector}, which per the C++ definition is $O(1)$. We argue that at some point a maximum runtime is reached and that this increase therefore does not violate our complexity requirement.
+\begin{figure}[H]
+\includegraphics[scale=0.3]{treeNath3_Queries}
+\includegraphics[scale=0.3]{DBLP_Queries}
+\caption{Runtime of implemented queries}
+\label{complexQue:image1}
+\end{figure}
 
 \subsection{Space complexity}
-%Make Subsubsections
-%More math
-%Make Equations more beautiful (in the text)
-%Also include what each query contributes to complexity
-The hypersuccinct tree class saves first some simple data, such as a flag for huffman encoding, its size, and the calculated sizes of its Minitrees and Microtrees, as calculated according to \cite{farzanMunro}. These values all have a maximum length and therefore are $O(1)$. Next, we have a variety of Bitvectors regarding indices for FIDs and Minitrees which save values for each Minitree or each FID, therefore amounting to $O(|Minitrees|)$ and $O(|FIDs|)$. We save the data of the FID and its Typevector in $O(|FIDs|)$, while the Dummys of Minitrees are $\epsilon O(|Minitrees|)$. The FIDs and Typevectors also implement \textit{Rank} and \textit{Select} queries, which is $= |FIDs| \times (|FIDs| + O(\frac{|FIDs| log log |FIDs|}{log |FIDs|}))$, as described in \cite{succinctBV}.
-\subsubsection{Minitree Complexity}
-The Minitree vector obviously has $|Minitrees|$ many elements, as the Lookuptable has $|Lookuptable entries|$ many entries.\\
-The Minitrees themselves save data for their Microtrees and the queries. All query data used for the Minitree itself is just a single value and therefore $O(1)$, while all data for Microtrees if $O(|Microtrees|)$. The FID, Typevector and Dummys for Microtrees have the same complexity as their counterparts for Minitrees, $O(|Micro FIDs|)$ and $O(|Microtrees|)$, and the implementation for \textit{Rank} and \textit{Select} are $= |MicroFIDs| \times (|MicroFIDs| + O(\frac{|MicroFIDs| log log |MicroFIDs|}{log |MicroFIDs|}))$. The bitvector that denotes the Microtrees themselves can be encoded in two ways, either using a balanced parentheses encoding that takes $|microtrees| \times |microsize| \times 2$ space, or a huffman encoding that takes $|microtrees| \times$ %??? Huffman???
-both of which are $\epsilon O(|Microtrees|)$.
-Therefore in total, the Minitrees have a complexity of $O(|Microtrees|)$.
-\subsubsection{Lookuptable complexity}
-For a lookuptable entry of a tree of size $m$, its complexity is:
-\begin{itemize}
-	\item[-] $O(2m)$ for \textit{index} and \textit{bp}
-	\item[-] $O(m^{2})$ for both \textit{ancestorMatrix} and \textit{childMatrix}
-	\item[-] $O(m^{2}) \times (m^{2} + O(\frac{m^{2} log log m^{2}}{log m^{2}}))$ for \textit{Rank} and \textit{Select} support for both matrices.
-	\item[-] $O(m)$ for all other query data.
-\end{itemize}
-This amounts to the total complexity of Lookuptables to be $O(m^{2}) \times (m^{2} + O(\frac{m^{2} log log m^{2}}{log m^{2}}))$.
-\subsubsection{Total space complexity}
-Coming together for the entire tree, all Minitree data in the base tree is $\epsilon O(|Minitrees|)$ and the Minitrees are $ \leq |Minitrees| \times O(|Microtrees|)$. 
-The amount of lookuptable entries is $\leq$ \textit{(number of unlabeled ordered trees with (} $microsize \times 2$ \textit{) nodes)}, OEIS000108, Catalan Numbers. Therefore the total complexity of the lookuptable is $\leq C(microsize \times 2) \times O((microsize \times 2)^{2}) \times ((microsize \times 2)^{2} + O(\frac{(microsize \times 2)^{2} log log (microsize \times 2)^{2}}{log (microsize \times 2)^{2}}))$.\\
-Due to the calculation via the farzanMunro algorithm, it follows that:
-$$size > |Minitrees|$$
-$$size > |Microtrees|$$
-$$size > m$$
-Therefore:
-$$|Minitrees| \times O(|Microtrees|) \leq O(n^{2})$$
-$$C(microsize \times 2) \times O((microsize \times 2)^{2}) \times ((microsize \times 2)^{2} +$$ $$O(\frac{(microsize \times 2)^{2} log log (microsize \times 2)^{2}}{log (microsize \times 2)^{2}})) \leq C(size) \times O(size^{2}) \times (size^{2} + O(\frac{size^{2} log log (size^{2})}{log (size^{2})}))$$
-%Just proving < n^2 or so will prob not suffice.
+In this section we discuss the space complexity of our hypersuccinct tree implementation. For that matter let $n$ be the size of the entire tree, $m_{fm}$ be the calculated Minitree size of $\lceil lg^{2} n \rceil$, and $\mu_{fm}$ be the calculated Microtree size of $\lceil \frac{lg n}{8} \rceil$. Let this tree have $l$ many Minitrees, and let $m_{j}$ be the actual size of the j-th Minitree.
 
+\subsubsection{Minitree Complexity}
+Let $m$ be the size of a Minitree $M$ with $k$ many Microtrees $P$ and let $\mu_{i}$ be the size of its i-th Microtree $P_{i}$. Then we can describe the complexity of $M$ in the following way:\\
+
+The amount of Microtrees $k$ is strictly dependent on $m$ and $\mu_{fm}$. As higher Microtree sizes reduce the number of Microtrees, the highest amount of Microtrees is reached when $\mu_{i} = 1$ $\forall i < k$, in which case $k = m$. It follows that $k \leq m$ \textit{(1)}.
+
+The Microtrees are encoded in a vector, and there are two ways to encode them. If huffman encoding is enabled, the huffman code corresponding to the correct Lookuptable entry is used here, which has a complexity of $\leq O(m)$, as shown in \cite{universalSuccinct} %This is not shown directly. Terefore this might not suffice as an argument.
+If huffman encoding is disabled, the Microtrees are encoded in balanced parenthesis form, which takes $2\mu_{i}$ many bits for Microtree $i$.\\
+This leads to a total of $\displaystyle\sum_{i=0}^{k-1} 2 \times \mu_{i}$. \textit{(2)}\\
+Given that due to their construction the Microtrees can share roots, the worst possible outcome would be that all trees share the same root, in which case \textit{(2)} $= 2(m + k)$. The maximum amount of Microtrees possible (that can still share roots) is reached when the size of all Microtrees is $= 2$, in which case \textit{(2)} $= 4m = 4k$. Therefore, \textit{(2)} $\leq 4m \in O(m)$.
+
+Microtree dummys and the Microtree-to-FID index conversion vector, as well as any query vector related to Microtrees all have $k$ many entries, and both of them encode integers which is possible in $O(1)$. From \textit{(1)} if follows that all these vectors have a complexity of $\leq O(m)$. Any query data related to the Minitree itself is a single encoded integer, and therefore $O(1)$.
+
+The Microtree FIDs, Typevectors, and FID-to-Microtree index conversion vector have one entry for each FID, and there is only one FID for each unique Microtree root. Therefore let there be $f$ many Microtree FIDs. Then, $f \leq k$, where $f = k$ if $k = m$, because then every tree consists of a single node and that node is a unique root.
+While the index conversion vector saves integers in $O(1)$ and therefore has a complexity of $O(m)$, the FIDs and Typevectors however save data depending on the amount of children of a Microtree root.\\
+This therefore amounts to $\displaystyle\sum_{i=0}^{k-1} \textit{degree(root($P_{i}$))}$ \textit{(3)}.\\
+Since the the Minitree is of size $m$, it follows that $\sum_{i=0}^{k-1} \textit{degree(root($P_{i}$))} = m-1$, since the degree of all leaves is $0$ and, starting from the Minitree root, there are only $m-1$ many children in total.
+Therefore it follows that \textit{(3)} $\leq \sum_{i=0}^{k-1} m = k \times m$, and due to \textit{(1)} it follows that \textit{(3)} $\leq m^{2}$, which has a complexity of $O(m^{2})$.
+
+The Microtree FIDs and Typevectors also implement \textit{Rank} and \textit{Select} using the procedure in \cite{succinctBV} and \cite{succinctBVLink}. Let $\xi_{u}$ be the size of the u-th FID.
+The complexity for this FID is described as $\xi_{u} + O(\frac{\xi_{u} log log \xi_{u}}{log \xi_{u}})$.\\
+Since there are at most $k$ many FIDs, this amounts to 
+$$\displaystyle\sum_{i=0}^{k-1} \textit{degree(root($P_{i}$))} + O(\frac{(\textit{degree(root($P_{i}$)))} log log (\textit{degree(root($P_{i}$)))}}{log (\textit{degree(root($P_{i}$)))}})$$\\
+$$\leq O(m^{2}) + O(\frac{(\textit{degree(root($P_{i}$)))} log log (\textit{degree(root($P_{i}$)))}}{log (\textit{degree(root($P_{i}$)))}})$$\\
+$$\leq O(m^{2}) + O(\frac{m log log m}{log m})$$
+
+\subsubsection{Lookuptable complexity}
+Let the lookuptable entry $LP_{h}$ have size $\mu_{h}$. Then its complexity can be described as follows:\\
+
+The first two bitvectors encode the structure of the tree.
+If huffman encoding is enabled, then the index vector saves the huffman code of this entry $C_{h}$, which has a complexity of $\leq O(m)$, as shown in \cite{universalSuccinct} %This is not shown directly. Terefore this might not suffice as an argument.
+In both cases, the balanced parenthesis form of the entry is saved, which has a complexity of $O(\mu_{h})$.
+
+The lookuptable entry saves query data for each node within its structure, which has a complexity of $O(\mu_{h})$.
+The lookuptable then saves two specific matrices for query data, both of which have a complexity of $O((\mu_{h})^{2})$.
+One of these two also requires \textit{Rank} and \textit{Select} queries, their implementation has a complexity of 
+$$(\mu_{h})^{2} + O(\frac{(\mu_{h})^{2} log log (\mu_{h})^{2}}{log (\mu_{h}})^{2})$$\\
+$$\in O((\mu_{h})^{2}) + O(\frac{(\mu_{h})^{2} log log (\mu_{h})^{2}}{log (\mu_{h}})^{2})$$
+
+\subsubsection{Total space complexity}
+Coming together for the entire tree, let $n$ be the size of the entire tree, $m_{fm}$ be the calculated Minitree size, and $\mu_{fm}$ be the calculated Microtree size. Let this tree have $l$ many Minitrees, and let $m_{j}$ be the actual size of the j-th Minitree, then for a hypersuccinct tree $N$ of size $n$, the complexity can be described in the following way:\\
+
+The tree saves a flag for huffman encoding, its own size $n$, and the Minitree size $m_{fm}$ and the Microtree size $\mu_{fm}$.\\
+
+Just as within the Minitrees, the amount of Minitrees $l$ is per construction directly correlated to the tree size $n$. If $\forall j < l:$ $m_{j} = 1$, and in that case $l = n$, and therefore $l \leq n$ \textit{(1)}\\
+
+The tree then saves vectors for the Minitree FIDs, Typevectors, Dummys and index conversions between the FIDs and Minitrees, and their complexity is analoguos to their Microtree counterparts. Therefore the Minitree FIDs and Typevectors have a complexity of $O(n^2)$, the dummys and index conversions all have a complexity of $O(n)$.
+Support for \textit{Rank} and \textit{Select} for FIDs and Typevectors have a complexity of $O(n^{2}) + O(\frac{n log log n}{log n})$.\\
+
+When it comes to the Minitrees, there are obviously $l$ many Minitrees, and each Minitree $j$ has a complexity of $O(m_{j}^{2}) + O(\frac{m_{j} log log m_{j}}{log m_{j}})$.
+Therefore the entire structure has a size of $\displaystyle \sum_{b=0}^{l} (O(m_{b}^{2}) + O(\frac{m_{b} log log m_{b}}{log m_{b}}))$.\\
+Analogously to Microtrees, all Minitrees can share roots, or have a dummy (in which case the tree below has a unique root), therefore  $\sum_{b=0}^{l-1} m_{b} \leq 2n$,
+therefore 
+$$\displaystyle \sum_{b=0}^{l} (O(m_{b}^{2}) + O(\frac{m_{b} log log m_{b}}{log m_{b}}))$$\\ 
+$$\leq \displaystyle O(2n^{2}) + O(\frac{2n log log 2n}{log 2n})$$\\ 
+$$= O(n^{2}) + O(\frac{n log log n}{log n})$$
+
+When it comes to the Lookuptable, the amount of entries is less or equal to the amount of unlabeled ordered trees of size $2 \times \mu_{fm}$ or less, which is the sum of the Catalan Numbers $\sum_{v=1}^{2\mu_{fm}} Ca(v) = \sum_{v=1}^{2\mu_{fm}} \sum_{c=0}^{v} a(c)a(v-1-c)$, as shown in \cite{catalanN}. A lookuptable entry $h$ then has a size of $\mu_{h}$, and a complexity of $O((\mu_{h})^{2}) + O(\frac{(\mu_{h})^{2} log log (\mu_{h})^{2}}{log (\mu_{h})^{2}})$. Since the lookuptable only saves unique entries with a unique structure, the worst possible case in terms of space can only be when each tree structure is only used exactly once. In that case each entry $h$ directly maps to a Microtree $\mu$, and the sum of all Microtrees sizes in a Minitree is $\leq 2m$. Then, since the sum of all Minitree sizes is $\leq 2n$, the sum of all Microtrees in the entire tree is $\leq 4n$, and this is also true for the sum of all lookuptable entry sizes.
+Therefore the total complexity of all entries is
+$$\sum_{v=1}^{2\mu_{fm}} (Ca(v) \times (O(v^{2}) + O(\frac{v^{2} log log v^{2}}{log v^{2}})))$$
+$$\leq O((4n)^{2}) + O(\frac{(4n)^{2} log log (4n)^{2}}{log (4n)^{2}})$$
+$$ = O(n^{2}) + O(\frac{n^{2} log log n^{2}}{log n^{2}})$$
+
+%In the worst case, these should all be =, and therefore this should be the FINAL CORRECT Complexity
+%This complexity seems too high...
 
 
 \subsubsection{Space Complexity concessions}
 While the encoding is efficient in size when saving a tree to a file, within the program, the amount of space required to run trees is a lot larger. This technically does not break the space complexity, simply adding a large constant factor to it, but this is still notable. We identify the following reasons for this discrepancy:\\
 \begin{itemize}
 	\item[1)] The implementation of \textit{Bitvector} in $C++$ saves its data as \textit{uint32\_t}, which is always 32 bits long. This is a massive waste of space, since most values are much smaller than 32 bits.
-	\item[2)] The \textit{succinct\_bv} library does not meet the perfect space complexity from \cite{succinctBV} of $log(\begin{array}{c} n \\ r \end{array}) + O(\frac{n log log n}{log n})$, and instead has a complexity of $n + O(\frac{n log log n}{log n})$.
+	\item[2)] The \textit{succinct\_bv} library does not meet the perfect space complexity from \cite{succinctBV} of $log(\begin{array}{c} n \\ r \end{array}) + O(\frac{n log log n}{log n})$, and instead has a complexity of $n + O(\frac{n log log n}{log n})$ for a bitvector of size $n$.
 \end{itemize}
 For \textit{1)}, we believe it to be possible to save the entire hypersuccinct tree in a single bitvector. It should be possible to use pointers to access different parts of this bitvector in $O(1)$ using a variable cell array, as described in \cite{universalSuccinct}.\\
 For \textit{2)}, it is obviously necessary to either use a library that offers the improved complexity, or to improve the current library.
 
-\section{Conclusion?}
+\section{Conclusion}
+In this work we demonstrated that an implementation of a hypersuccinct tree is not only possible, but also usable in real-world scenarios. Both a theoretical analysis and a practical evaluation of a test service have shown that the space-efficiency of our implementation is sufficiently high, and follows the instructions presented in \cite{farzanMunro}. We were also able to implement queries in a constant time.\\
+Also noteworthy is the effect of the application of the Huffman encoding for microtree-representation, which further improves the space-complexity by a significant amount.\\
+Further work could be done by implementing some missing complex and underspecified queries. Additional optimization potential regarding the memory-footprint of our library also exists (e.g. merging bitvectors together).\\
+Nonetheless, our example applications show that our implementation is more than sufficient to process common Use-Cases, such as loading a tree from an existing file, parsing another tree format to a hypersuccinct tree, visualizing the tree and queries and saving the results back to a file.
 
-%Add Data
-%We def. need references to the trees we used.
-%But is this the right way?
 \section{Data}
-All trees can be found in the resources folder of our project on GitHub.
+All trees can be found in the resources folder of our project on Github, on \href{https://github.com/ChristopherPack/Projektgruppe\_Hypersuccint\_Trees}{https://github.com/ChristopherPack/Projektgruppe\_Hypersuccint\_Trees}, or on \href{http://xmlcompbench.sourceforge.net/Dataset.html}{http://xmlcompbench.sourceforge.net/Dataset.html}.
 \subsection{Used xml tree files}
-\begin{figure}[h]
-	\begin{tabular}{ |p{3cm}||p{2,5cm}| }
+\begin{figure}[H]
+	\begin{tabular}{ |p{3cm}||p{2,5cm}||p{2,5cm}| }
 		 \hline
-		 Tree Name & Size\\
+		 Tree Name & Size & Depth\\
 		 \hline
-		 TreeNath.xml   &77 \\
-		 TreeNath2.xml&  837 \\
-		 TreeNath3.xml&9197\\
-		 TreeNath4.xml&101157\\
-		 TreeNath5.xml&1112717\\
-		 XMark2.xml&3603803\\
-		 DBLP.xml&7146530\\
+		 TreeNath.xml   &77 & 8\\
+		 TreeNath2.xml&  837 & 31\\
+		 TreeNath3.xml&9197 & 119\\
+		 TreeNath4.xml&101157 & 228\\
+		 TreeNath5.xml&1112717 & 351\\
+		 XMark2.xml&3603803 & 12\\
+		 DBLP.xml&7146530 & 6\\
 		 \hline
 	\end{tabular}
 \caption{sizes of our xml trees}
 \label{data:table1}
 \end{figure}
-%Make sure NOTHING is below bibliography
 
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}
