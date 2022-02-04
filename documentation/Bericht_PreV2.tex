@@ -34,10 +34,10 @@ While much work has already been done on the theorecial site of things, the impl
 The theoretical basis for our implementation can be found in \cite{farzanMunro} and \cite{universalSuccinct}. While mainly a Proof-of-Concept, our library should also allow for easy extension and be usable as a solid basis-implementation of a hypersuccinct tree.
 
 \section{The tree covering Algorithm}
-To achieve the succinct encoding of the tree we follow the algorithm described by Farzan-Munro \cite{farzanMunro}. This algorithm has several steps. At first, the decompose-algorithm is used to divide the tree into several smaller subtrees of roughly equal size. These are called mini-trees. These mini-trees follow certain rules. Their nodes are disjoint, except they may have a common root node. Edges between mini-trees that do not share a common root node always end in the root node of the child tree and start from the root node of the parent tree, except for at most one edge in a mini-tree, that may start from any node in that tree and connect to the root of the child tree. We call this last special type of connection “dummy-interconnection”.\\
-This allows to represent the interconnections of these subtrees with so called Fully Index-able Dictionaries (FIDs). Only the dummy-interconnections need their own handling. For these, we create a new dummy node on the interconnecting edge and store its pointer explicitly. Since there can at most be one such interconnection for each tree, the amount of created dummy nodes is bound by $O(log (n))$.\\
+To achieve the succinct encoding of the tree we follow the algorithm described by Farzan and Munro \cite{farzanMunro}. This algorithm has several steps. At first, the decomposition algorithm is used to divide the tree into several smaller subtrees of roughly equal size. These trees, called mini-trees, are then with the same algorithm further decomposed into even smaller subtrees, called micro-trees. The decomposed trees follow certain rules. Their nodes are disjoint, except they may have a common root node. Edges between them that do not share a common root node always end in the root node of the child tree and start from the root node of the parent tree, except for at most one edge in a subtree, that may start from any node in that tree and connect to the root of the child tree. We call this last special type of connection “dummy-interconnection”.\\
+This allows to represent the interconnections of these subtrees with so called Fully Indexable Dictionaries (FIDs). Only the dummy-interconnections need their own handling. For these, we create a new dummy node on the interconnecting edge and store its pointer explicitly. Since there can at most be one such interconnection for each tree, the amount of created dummy nodes for a tree with $n$ nodes is bound by $O(\log (n))$.\\
 For the other types of interconnection, we distinguish between two types. Trees with type 1 interconnections share a common root node, while trees with type 2 interconnections are connected via an edge between their root nodes. With the FIDs and an additional vector we can represent both these interconnections. We create a FID for each root node. In the FID we store information about the child nodes of the root. This information allows us to identify which child nodes belong to a common tree. We use the additional vector, the Typevector (TV), to distinguish between interconnections of type 1 and type 2, by storing that information in 1 bit for each tree.\\
-For each Mini-tree we store it's index in the FIDs and the data about its's Micro-trees together with some auxiliary information which will be described later. The size of this data of all Mini-trees is in $o(n)$ bits.
+For each mini-tree we store its index in the FIDs and the data about its micro-trees together with some auxiliary information which will be described later. The size of this data of all mini-trees is in $o(n)$ bits.
 
 \subsection{Functions and Queries of the Hypersuccinct Tree}
 To have a succinct data structure we have to be able to execute efficient query operations on our data. The auxiliary information stored for each Mini-tree is fundamental for that. In fact, the information we store allows us to execute many commonly needed query operations within $O(1)$ time. That means a lot of complex calculations are done upon creating the data and the results are then stored efficiently to be quickly available when asked for. \\
@@ -312,17 +312,41 @@ In order to test if our code fulfills the aforementioned boundaries of time we i
 In this section we discuss some specific design decisions and shortcomings, and how they affect the performance of our hypersuccinct encoding.
 \subsection{Huffman encoding}
 \begin{figure}[h]
-	\begin{tabular}{ |p{3cm}||p{2cm}|p{2cm}|p{4cm}|  }
+	\begin{tabular}{ |p{4.5cm}||p{2cm}|p{2cm}|p{4cm}|  }
 		 \hline
 		 Tree Name & Normal &Huffman &Huffman + Lookuptable\\
 		 \hline
-		 TreeNath.xml   & 52    & 23 &   24 \\
-		 TreeNath2.xml&   484  & 256   & 266 \\
-		 TreeNath3.xml&5196 &2695&  2706\\
-		 TreeNath4.xml&53369& 31709&  31732\\
-		 TreeNath5.xml&583289&345005&345029\\
-		 XMark2.xml&2004196&831572&831627\\
-		 DBLP.xml&3690039&593804&593842\\
+		 TreeNath.xml 		&52    		&23 		&24 		\\
+		 TreeNath2.xml		&484  		&256   	&266 		\\
+		 TreeNath3.xml		&5196 	&2695		&2706		\\
+		 TreeNath4.xml		&53369	&31709	&31732	\\
+		 TreeNath5.xml		&583289	&345005	&345029	\\
+		 DBLP.xml			&3690039	&593804	&593842	\\
+		 EnWikiNew.xml		&208736	&62920	&62931	\\
+		 EnWikiQuote.xml		&135452	&42033	&42044	\\
+		 EnWikiVersity.xml		&254354	&72622	&72633	\\
+		 EnWikiTionary.xml		&4257416	&1136761	&1136772	\\
+		 EXI-Array.xml		&110700	&23611	&23629	\\
+		 EXI-factbook.xml		&34671	&8764		&8769		\\
+		 EXI-GeogCoord.xml	&13		&7		&8		\\
+		 EXI-Invoice.xml		&9093		&3063		&3068		\\
+		 EXI-Telecomp.xml		&101223	&50656	&50680	\\
+		 EXI-weblog.xml		&58101	&12446	&12451	\\
+		 Lineitem.xml			&638109	&119099	&119104	\\
+		 Mondial.xml			&13523	&3838		&3843		\\
+		 Nasa.xml			&238346	&101229	&101273	\\
+		 Random-R1.xml		&128122	&74701	&74791	\\
+		 Random-R3.xml		&871406	&198523	&198593	\\
+		 Shakespeare.xml		&98521	&26097	&260123	\\
+		 SwissProt.xml		&1745940	&404339	&404364	\\
+		 Treebank.xml		&1274173	&752081	&752166	\\
+		 USHouse.xml		&3628		&1151		&1161		\\
+		 XBench-DCSD-Normal.xml	&1132157	&455538	&455556	\\
+		 XBench-DCSD-Small.xml	&113979	&46120	&46137	\\
+		 XBench-TCSD-Normal.xml	&1543295	&563397	&563422	\\
+		 XBench-TCSD-Small.xml	&159204	&58507	&58532	\\
+		 XMark1.xml			&95623	&42484	&42521	\\
+		 XMark2.xml			&2004196	&831572	&831627	\\
 		 \hline
 	\end{tabular}
 \caption{Space for normal encoding and huffman encoding}
