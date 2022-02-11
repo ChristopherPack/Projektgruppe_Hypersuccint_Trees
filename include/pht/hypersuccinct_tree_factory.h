@@ -161,7 +161,7 @@ namespace pht {
                 createBitvectorFromFile(iter, end, bp);
                 Bitvector ancMatrix;
                 createBitvectorFromFile(iter, end, ancMatrix);
-                Bitvector childMatrix;
+                std::vector<std::vector<Bitvector>> childMatrix;
                 createBitvectorFromFile(iter, end, childMatrix);
                 std::vector<Bitvector> parents;
                 createBitvectorFromFile(iter, end, parents);
@@ -408,12 +408,18 @@ namespace pht {
             lockLog.unlock();
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
             //Generates LookupTable Entries
-            for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
-
+            for(uint32_t i = 0; i < fmMicroTree->getNodes().size(); i++) {
+                std::shared_ptr<Node<T>> node1 = fmMicroTree->getNodes().at(i);
                 std::vector<std::shared_ptr<pht::Node<T>>> directDesc = fmMicroTree->getDirectDescendants(node1);
-                for(std::shared_ptr<Node<T>> node2 : fmMicroTree->getNodes()) {
+
+                for(uint32_t j = 0; j < fmMicroTree->getNodes().size(); j++) {
+                    std::shared_ptr<Node<T>> node2 = fmMicroTree->getNodes().at(j);
                     lookupTableEntry.ancestorMatrix.push_back(fmMicroTree->isAncestor(node2, node1));
-                    lookupTableEntry.childMatrix.push_back(ListUtils::containsAny(directDesc, {node2}));
+
+                    if(ListUtils::containsAny(directDesc,{node2})){
+                        lookupTableEntry.childMatrix.at(i).push_back(BitvectorUtils::encodeNumberReturn(j));
+                        lookupTableEntry.childRanks.
+                    }
                 }
 
 
@@ -952,9 +958,9 @@ namespace pht {
                 pool.push_task(assignBitVector,std::ref(miniTree.FIDsSupport),std::cref(miniTree.FIDs));
                 pool.push_task(assignBitVector,std::ref(miniTree.typeVectorsSupport),std::cref(miniTree.typeVectors));
             }
-            for(LookupTableEntry &entry : hst.lookupTable) {
+            /*for(LookupTableEntry &entry : hst.lookupTable) {
                 pool.push_task(assignBitvector,std::ref(entry.childMatrixSupport),std::cref(entry.childMatrix));
-            }
+            }*/
             pool.wait_for_tasks();
         }
 
