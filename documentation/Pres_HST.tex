@@ -2,7 +2,7 @@
 
 \mode<presentation>
 {
-  \usetheme{Warsaw}
+  \usetheme{Darmstadt}
   \setbeamercovered{transparent}
 }
 
@@ -68,6 +68,7 @@
 \subsection[Hypersuccinct Tree Code]{Hypersuccinct Tree Code}
 
 \begin{frame}{The tree covering Algorithm} %Muss genauer sein!!!!
+	\cite{farzanMunro} provide the decomposition algorithm, that splits a given tree into subtrees with the following properties:
 \begin{itemize}
 	\item
 		Given a splitting size $m$, all resulting trees are at most of size $2m$.
@@ -98,6 +99,8 @@
 		Then decompose each Minitree into Microtrees with the size $\lceil \frac{lg n}{8} \rceil$.
 	\item
 		Generate the FIDs and Dummys for their interconnections.
+	\item
+		For each unique Microtree structure, create a lookuptable that saves relevant data for their individual nodes.
 	\end{itemize}
 \end{frame}
 %introduce Lookuptable
@@ -106,7 +109,7 @@
 	As mentioned in \cite{farzanMunro}, additional data needs to be saved in order to execute queries without needing to decode hypersuccinct trees.
 	\begin{itemize}
 	\item
-		Additional query data is saved for each level of abstraction (Minitrees, Microtrees, individual nodes).
+		Additional query data is saved for each level of abstraction (Minitrees, Microtrees, lookuptable).
 	\item
 		To execute some queries, navigation on the FID and the Typevector is required.
 		\begin{itemize}
@@ -264,7 +267,7 @@
 	\item
 		We need specific bitvectors that denote the rank of the first child of a tree for data to resolve these cases.
 	\item
-		We do not need two bitvectors in the lookup table. If \textit{Case 4} only has one Microtree in the higher Minitree, the respective lookuptable will already present the correct result for \textit{m0n2}.
+		We do not need two bitvectors in the lookup table, since it saves data for every node.
 	\end{itemize}
 \end{frame}
 
