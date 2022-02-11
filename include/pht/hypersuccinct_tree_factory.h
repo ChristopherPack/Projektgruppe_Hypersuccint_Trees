@@ -161,8 +161,10 @@ namespace pht {
                 createBitvectorFromFile(iter, end, bp);
                 Bitvector ancMatrix;
                 createBitvectorFromFile(iter, end, ancMatrix);
-                Bitvector childMatrix;
+                std::vector<std::vector<Bitvector>> childMatrix;
                 createBitvectorFromFile(iter, end, childMatrix);
+                std::vector<Bitvector> childRanks;
+                createBitvectorFromFile(iter, end, childRanks);
                 std::vector<Bitvector> parents;
                 createBitvectorFromFile(iter, end, parents);
                 std::vector<Bitvector> degree;
@@ -193,6 +195,7 @@ namespace pht {
                 LookupTableEntry microTreeData(index, bp);
                 microTreeData.ancestorMatrix = ancMatrix;
                 microTreeData.childMatrix = childMatrix;
+                microTreeData.childRanks = childRanks;
                 microTreeData.parentPointers = parents;
                 microTreeData.degree = degree;
                 microTreeData.subTrees = subTrees;
@@ -236,6 +239,23 @@ namespace pht {
             uint32_t tempSize = BitvectorUtils::decodeNumber(iter, end, BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
             for(uint32_t i=0; i<tempSize; i++) {
                 Bitvector part;
+                createBitvectorFromFile(iter, end, part);
+                target.push_back(part);
+            }
+            target.shrink_to_fit();
+        }
+
+        /**
+         * Reads a Bitvector from a larger Bitvector and writes it into given target
+         * Decoding of Larger Bitvector according to FileOutput (See HypersuccinctTreeOutput)
+         * @param iter Current Position in large Bitvector
+         * @param end End of large Bitvector
+         * @param target Bitvector to write into
+         */
+        static void createBitvectorFromFile(Bitvector::const_iterator& iter, Bitvector::const_iterator& end, std::vector<std::vector<Bitvector>>& target){
+            uint32_t tempSize = BitvectorUtils::decodeNumber(iter, end, BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+            for(uint32_t i=0; i<tempSize; i++) {
+                std::vector<Bitvector> part;
                 createBitvectorFromFile(iter, end, part);
                 target.push_back(part);
             }
@@ -407,13 +427,21 @@ namespace pht {
             PHT_LOGGER_DEBUG("Factory Create") << "Creating LookupTableEntries..." << pht::Logger::endl();
             lockLog.unlock();
             std::vector<std::shared_ptr<Node<T>>> nodes = fmMicroTree->getNodes();
+            lookupTableEntry.childRanks.emplace_back();
             //Generates LookupTable Entries
-            for(std::shared_ptr<Node<T>> node1 : fmMicroTree->getNodes()) {
-
+            for(uint32_t i = 0; i < fmMicroTree->getNodes().size(); i++) {
+                std::shared_ptr<Node<T>> node1 = fmMicroTree->getNodes().at(i);
                 std::vector<std::shared_ptr<pht::Node<T>>> directDesc = fmMicroTree->getDirectDescendants(node1);
-                for(std::shared_ptr<Node<T>> node2 : fmMicroTree->getNodes()) {
+                uint32_t childRank = 1;
+                lookupTableEntry.childMatrix.emplace_back();
+                for(uint32_t j = 0; j < fmMicroTree->getNodes().size(); j++) {
+                    std::shared_ptr<Node<T>> node2 = fmMicroTree->getNodes().at(j);
                     lookupTableEntry.ancestorMatrix.push_back(fmMicroTree->isAncestor(node2, node1));
-                    lookupTableEntry.childMatrix.push_back(ListUtils::containsAny(directDesc, {node2}));
+                    if(ListUtils::containsAny(directDesc,{node2})){
+                        lookupTableEntry.childMatrix.at(i).push_back(BitvectorUtils::encodeNumberReturn(j));
+                        lookupTableEntry.childRanks.push_back(BitvectorUtils::encodeNumberReturn(childRank));
+                        childRank++;
+                    }
                 }
 
 
@@ -952,9 +980,9 @@ namespace pht {
                 pool.push_task(assignBitVector,std::ref(miniTree.FIDsSupport),std::cref(miniTree.FIDs));
                 pool.push_task(assignBitVector,std::ref(miniTree.typeVectorsSupport),std::cref(miniTree.typeVectors));
             }
-            for(LookupTableEntry &entry : hst.lookupTable) {
+            /*for(LookupTableEntry &entry : hst.lookupTable) {
                 pool.push_task(assignBitvector,std::ref(entry.childMatrixSupport),std::cref(entry.childMatrix));
-            }
+            }*/
             pool.wait_for_tasks();
         }
 

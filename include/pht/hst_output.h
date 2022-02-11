@@ -39,6 +39,12 @@ namespace pht {
         static void printBitvector(const vector<vector<bool>>& bitvector);
 
         /**
+         * Prints a given bitvector into the console
+         * @param bitvector the bitvector to be printed
+         */
+        static void printBitvector(const vector<vector<vector<bool>>> &bitvector);
+
+        /**
          * Writes an entire hypersuccinct tree to a file
          * Add a 0 for all empty Bitvectors
          * @param tree the hypersuccinct tree to be written
@@ -79,7 +85,21 @@ namespace pht {
          */
         static void createFileBitvector(const Bitvector& bitvector, Bitvector& target);
 
+        /**
+         * Writes Content of a small Bitvector into a larger Bitvector
+         * Encodes small Bitvector with Elias Gamma
+         * @param bitvector The Bitvector to write
+         * @param target The Bitvector to write into
+         */
         static void createFileBitvector(const std::vector<Bitvector>& bitvector, Bitvector& target);
+
+        /**
+         * Writes Content of a small Bitvector into a larger Bitvector
+         * Encodes small Bitvector with Elias Gamma
+         * @param bitvector The Bitvector to write
+         * @param target The Bitvector to write into
+         */
+        static void createFileBitvector(const vector<std::vector<Bitvector>> &bitvector, Bitvector &target);
 
         /**
          * Reads a space efficient Bitvector from a file
