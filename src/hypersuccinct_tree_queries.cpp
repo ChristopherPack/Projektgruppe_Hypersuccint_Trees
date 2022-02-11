@@ -163,10 +163,10 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 
     if(checkNode) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(getMiniTree(miniRes),microRes));
-        if(index > entry.childMatrix.at(parent.node).size()) {
+        if(nodeIndexHelp >= entry.childMatrix.at(parent.node).size()) {
             return {};
         }
-        nodeRes = BitvectorUtils::decodeNumber(entry.childMatrix.at(parent.node).at(index), BitvectorUtils::NumberEncoding::BINARY);
+        nodeRes = BitvectorUtils::decodeNumber(entry.childMatrix.at(parent.node).at(nodeIndexHelp), BitvectorUtils::NumberEncoding::BINARY);
         if(nodeRes == parent.node) {
             throw std::runtime_error("HypersuccinctTree: Child Determination Error");
         }
@@ -215,7 +215,7 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
         if(parent.node > 0) {
             return BitvectorUtils::decodeNumber(entry.childRanks.at(node.node), BitvectorUtils::NumberEncoding::BINARY) - 1;
         } else {
-            res += - 1; //TODO was  fullRank - startRank - 1 before
+            res += BitvectorUtils::decodeNumber(entry.childRanks.at(node.node), BitvectorUtils::NumberEncoding::BINARY) - 1;
         }
     }
 

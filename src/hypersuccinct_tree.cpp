@@ -115,6 +115,7 @@ uint64_t calculateLookupTableEntryByteSize(const LookupTableEntry& lte) {
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.bp.size())/8.0))+
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.ancestorMatrix.size())/8.0))+
         sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.childMatrix.size())/8.0))+
+        sizeof(std::vector<bool>)+static_cast<uint64_t>(static_cast<double>(ceil(lte.childRanks.size())/8.0))+
         sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(lte.parentPointers, 0, [](uint64_t acc, const std::vector<bool>& x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
         sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(lte.degree, 0, [](uint64_t acc, const std::vector<bool>& x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
         sizeof(std::vector<Bitvector>)+ListUtils::fold<std::vector<bool>,uint64_t>(lte.subTrees, 0, [](uint64_t acc, const std::vector<bool>& x){ return acc+sizeof(std::vector<bool>)+static_cast<uint64_t>(ceil(static_cast<double>(x.size())/8.0));})+
