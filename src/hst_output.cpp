@@ -127,6 +127,8 @@ void HypersuccinctTreeOutput::printTree(HypersuccinctTree &tree) {
         printBitvector(tree.getLookupTableEntry(index).ancestorMatrix);
         PHT_LOGGER_INFO("HST_OUT") << "ChildMap:   " << pht::Logger::endl();
         printBitvector(tree.getLookupTableEntry(index).childMatrix);
+        PHT_LOGGER_INFO("HST_OUT") << "ChildRanks:   " << pht::Logger::endl();
+        printBitvector(tree.getLookupTableEntry(index).childRanks);
         PHT_LOGGER_INFO("HST_OUT") << "Parent Pointers:   " << pht::Logger::endl();
         printBitvector(tree.getLookupTableEntry(index).parentPointers);
         PHT_LOGGER_INFO("HST_OUT") << "Degrees:   " << pht::Logger::endl();
@@ -163,6 +165,20 @@ void HypersuccinctTreeOutput::printBitvector(const vector<vector<bool>> &bitvect
             ss << bit;
         }
         ss << "  ";
+    }
+    PHT_LOGGER_INFO("HST_OUT") << ss.str() << "\n" << pht::Logger::endl();
+}
+
+void HypersuccinctTreeOutput::printBitvector(const vector<vector<vector<bool>>> &bitvector) {
+    std::stringstream ss;
+    for(const std::vector<vector<bool>> &first: bitvector) {
+        for (const std::vector<bool> &part: first) {
+            for (bool bit: part) {
+                ss << bit;
+            }
+            ss << "  ";
+        }
+        ss << ";  ";
     }
     PHT_LOGGER_INFO("HST_OUT") << ss.str() << "\n" << pht::Logger::endl();
 }
@@ -237,6 +253,7 @@ void HypersuccinctTreeOutput::writeToFile(HypersuccinctTree &tree,const std::str
         createFileBitvector(microTreeData.bp, fileBitvector);
         createFileBitvector(microTreeData.ancestorMatrix, fileBitvector);
         createFileBitvector(microTreeData.childMatrix, fileBitvector);
+        createFileBitvector(microTreeData.childRanks, fileBitvector);
         createFileBitvector(microTreeData.parentPointers, fileBitvector);
         createFileBitvector(microTreeData.degree, fileBitvector);
         createFileBitvector(microTreeData.subTrees, fileBitvector);
@@ -313,6 +330,20 @@ void HypersuccinctTreeOutput::createFileBitvector(const std::vector<Bitvector>& 
     } else {
         Bitvector partFileBit;
         for(const Bitvector& part : bitvector) {
+            createFileBitvector(part,partFileBit);
+        }
+        BitvectorUtils::encodeNumber(std::inserter(target,target.end()), static_cast<uint32_t>(bitvector.size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);
+        ListUtils::combine(target,partFileBit);
+    }
+}
+
+void HypersuccinctTreeOutput::createFileBitvector(const std::vector<std::vector<Bitvector>>& bitvector, Bitvector &target) {
+    if(bitvector.empty()) {
+        target.push_back(true);
+        target.push_back(false);
+    } else {
+        Bitvector partFileBit;
+        for(const std::vector<Bitvector>& part : bitvector) {
             createFileBitvector(part,partFileBit);
         }
         BitvectorUtils::encodeNumber(std::inserter(target,target.end()), static_cast<uint32_t>(bitvector.size()), BitvectorUtils::NumberEncoding::ELIAS_GAMMA);

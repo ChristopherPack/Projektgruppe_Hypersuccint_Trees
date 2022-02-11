@@ -87,8 +87,8 @@ namespace pht {
         Bitvector index; ///Index of the LookupTableEntry
         Bitvector bp; ///BP of the Entry. Empty if index is BP
         Bitvector ancestorMatrix;//Ancestor Matrix
-        Bitvector childMatrix; ///Child Matrix
-        succinct_bv::BitVector childMatrixSupport; ///Rank + Select for child matrix
+        std::vector<std::vector<Bitvector>> childMatrix; ///Child Matrix
+        std::vector<Bitvector> childRanks; ///Child Ranks
         std::vector<Bitvector> parentPointers; ///ParentPointers + 1
         std::vector<Bitvector> degree; ///degree for every node + 1
         std::vector<Bitvector> subTrees; ///subTree for every node within MicroTree (at least 1)

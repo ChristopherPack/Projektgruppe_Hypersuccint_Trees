@@ -163,13 +163,10 @@ HstNode HypersuccinctTree::child(HstNode parent, uint32_t index) {
 
     if(checkNode) {
         LookupTableEntry entry = getLookupTableEntry(getMicroTree(getMiniTree(miniRes),microRes));
-        auto matSize = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
-        auto startRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node));
-        auto startRankSelect = static_cast<uint32_t>(entry.childMatrixSupport.Select(startRank + nodeIndexHelp));
-        nodeRes = startRankSelect % matSize;
-        if(startRankSelect > (matSize * (parent.node + 1))) {
+        if(nodeIndexHelp >= entry.childMatrix.at(parent.node).size()) {
             return {};
         }
+        nodeRes = BitvectorUtils::decodeNumber(entry.childMatrix.at(parent.node).at(nodeIndexHelp), BitvectorUtils::NumberEncoding::BINARY);
         if(nodeRes == parent.node) {
             throw std::runtime_error("HypersuccinctTree: Child Determination Error");
         }
@@ -213,15 +210,12 @@ uint32_t HypersuccinctTree::childRank(HstNode node) {
     }
 
     if(node.node > 0) {
-            LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent, parent.micro));
-            auto matSize = static_cast<uint32_t>(sqrt(entry.childMatrix.size()));
-            auto startRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node));
-            auto fullRank = static_cast<uint32_t>(entry.childMatrixSupport.Rank(matSize * parent.node + node.node));
+        LookupTableEntry entry = getLookupTableEntry(getMicroTree(miniTreeParent, parent.micro));
 
         if(parent.node > 0) {
-            return fullRank - startRank - 1;
+            return BitvectorUtils::decodeNumber(entry.childRanks.at(node.node), BitvectorUtils::NumberEncoding::BINARY) - 1;
         } else {
-            res += fullRank - startRank - 1;
+            res += BitvectorUtils::decodeNumber(entry.childRanks.at(node.node), BitvectorUtils::NumberEncoding::BINARY) - 1;
         }
     }
 
