@@ -40,7 +40,7 @@ def drawNode(content, x, y, startNode, resultNode):
 
 def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, mode):
     childCount = tree.degree(hstnode[0], hstnode[1], hstnode[2])
-    identifiers = []
+    identifiers = [hstnode]
 
     if mode == "background":
         if depth == 1:
@@ -62,6 +62,7 @@ def drawSubtree(hstnode, x, width, y, depth, startNode, resultNode, mode):
         if startNode != None:
             if resultNode != None:
                 drawNode(node_data, x, y, startNode in identifiers, resultNode in identifiers)
+
             else:
                 drawNode(node_data, x, y, startNode in identifiers, False)
         elif resultNode != None:
