@@ -158,6 +158,19 @@
 	\end{itemize}
 \end{frame}
 
+\begin{frame}{Minitrees and lookuptable entries}
+	\begin{itemize}
+	\item
+		Are part of the Hypersuccinct Tree class.
+	\item
+		Minitrees and lookuptable entries are structs that hold bitvectors.
+	\item
+		Minitrees hold all information for their Microtrees, all their query data and all their Microtree query data.
+	\item
+		Lookuptable entries hold information of their structure and a key for identification, as well as query data.
+	\end{itemize}
+\end{frame}
+
 \begin{frame}{FIDs and specific issues}
 	\begin{figure}[h]
 	\begin{tabular}{ |p{2.4cm}||p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|  }
@@ -197,19 +210,6 @@
 			\item
 				This is possible since each FID points to its first low tree, which points to its own FID, and other low FIDs have incremental indices by construction.
 		\end{itemize}
-	\end{itemize}
-\end{frame}
-
-\begin{frame}{Minitrees and lookuptable entries}
-	\begin{itemize}
-	\item
-		Are part of the Hypersuccinct Tree class.
-	\item
-		Minitrees and lookuptable entries are structs that hold bitvectors.
-	\item
-		Minitrees hold all information for their Microtrees, all their query data and all their Microtree query data.
-	\item
-		Lookuptable entries hold information of their structure and a key for identification, as well as query data.
 	\end{itemize}
 \end{frame}
 
@@ -299,6 +299,15 @@
 	\item[1)] \textit{isDummyAncestorWithinMiniTree}
 	\item[2)] \textit{isDummyAncestorWithinMicroTree}
 	\item[3)] \textit{getParentForQuery}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Space complexity}
+	Our implementation takes $4n + o(n)$ bits to encode a tree of size $n$:
+	\begin{itemize}
+	\item[1)] The Microtree encoding takes $2n + o(n)$ bits, and huffman encoding reduces this further \cite{universalSuccinct}.
+	\item[2)] The FIDs takes $2n + o(n)$ bits in total.
+	\item[3)] All query data, all lookuptable entries, and all Typevectors and Dummys only take $o(n)$ bits each.
 	\end{itemize}
 \end{frame}
 
