@@ -75,10 +75,16 @@
 	\item
 		The resulting subtrees at most share a single node, their root.
 	\item
-		Most subtrees' roots lie either directly below other subtree roots or share roots with other subtrees, and a dictionary of the root's children can be used to identify tree connections.
-	\item
-		Subtrees that do not lie directly at or below other roots require a special node, a Dummy, to represent their connection to its higher tree.
-	\end{itemize}
+		This results in three types of connections between subtrees:
+		\begin{itemize}
+			\item
+				Subtrees share their roots.
+			\item
+				Subtree roots are directly below other subtree roots.
+			\item
+				Rarely, a subtree lies below a non-root node. In this case, we use a dummy node to represent this connection.
+		\end{itemize}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{The tree covering Algorithm}
@@ -89,16 +95,16 @@
 \end{frame}
 
 \begin{frame}{The tree covering Algorithm}
-	To fully decompose a tree for hypersuccinct encoding, \cite{farzanMunro} offers the following procedure:
+	To fully decompose a tree of size $n$ for hypersuccinct encoding, \cite{farzanMunro} offers the following procedure:
 	\begin{itemize}
 	\item
 		First decompose the entire tree into Minitrees with the size $\lceil lg^{2} n \rceil$.
 	\item
-		Generate the FIDs and Dummys for their interconnections.
+		Generate FIDs and Dummys for their interconnections.
 	\item
 		Then decompose each Minitree into Microtrees with the size $\lceil \frac{lg n}{8} \rceil$.
 	\item
-		Generate the FIDs and Dummys for their interconnections.
+		Generate FIDs and Dummys for their interconnections.
 	\item
 		For each unique Microtree structure, create a lookuptable that saves relevant data for their individual nodes.
 	\end{itemize}
@@ -114,7 +120,11 @@
 		To execute some queries, navigation on the FID and the Typevector is required.
 		\begin{itemize}
 			\item
-				As the definition of "Fully Indexable Dictionary" states, it is necessary to implement \textit{Rank} and \textit{Select} queries.
+				The FID and Typevector represent the interconnections between trees, there is one FID for each unique root.
+			\item
+				The FID holds all children of its root and marks the first child of new trees.
+			\item
+				The Typevector marks what type of connection the trees in its FID are.
 			\item
 				A possible efficient implementation is described in \cite{succinctBV}, which is implemented in an external library \cite{succinctBVLink}.
 		\end{itemize}
@@ -129,9 +139,9 @@
 %Bild of Struktur oder so
 	\begin{itemize}
 	\item
-		Hypersuccinct nodes are tripels that represent their Minitree, Microtree, and Node within the Microtree.
+		Hypersuccinct nodes are tripels that represent their Minitree, Microtree and Node within the Microtree.
 	\item
-		The Hypersuccinct\_Tree class implements the encoding and offers the query functions.
+		The Hypersuccinct Tree class implements the encoding and offers the query functions.
 	\item
 		The Hypersuccinct Factory handles creating a hypersuccinct tree from possible sources.
 	\end{itemize}
@@ -140,11 +150,24 @@
 \begin{frame}{The Hypersuccinct Factory}
 	\begin{itemize}
 	\item
-		The hypersuccinct factory encodes trees efficiently, making use of multiple threads with a multithreading library \cite{threading}.
+		Encodes trees efficiently, making use of multiple threads with a multithreading library \cite{threading}.
 	\item
 		Creates data for query execution.
 	\item
-		The hypersuccinct factory also creates hypersuccinct trees from an encoded file. Since an already encoded file is read, there is no processing for generating any data.
+		Can create hypersuccinct trees from an encoded file.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Minitrees and lookuptable entries}
+	\begin{itemize}
+	\item
+		Are part of the Hypersuccinct Tree class.
+	\item
+		Minitrees and lookuptable entries are structs that hold bitvectors.
+	\item
+		Minitrees hold all information for their Microtrees, all their query data and all their Microtree query data.
+	\item
+		Lookuptable entries hold information of their structure and a key for identification, as well as query data.
 	\end{itemize}
 \end{frame}
 
@@ -187,17 +210,6 @@
 			\item
 				This is possible since each FID points to its first low tree, which points to its own FID, and other low FIDs have incremental indices by construction.
 		\end{itemize}
-	\end{itemize}
-\end{frame}
-
-\begin{frame}{Minitrees and Lookuptable entries}
-	\begin{itemize}
-	\item
-		Minitrees and Lookuptable entries are structs that hold bitvectors.
-	\item
-		Minitrees hold all information for their Microtrees, all their query data and all their Microtree query data.
-	\item
-		Lookuptable entries hold information of their structure and a key for identification, as well as query data.
 	\end{itemize}
 \end{frame}
 
@@ -267,7 +279,7 @@
 	\item
 		We need specific bitvectors that denote the rank of the first child of a tree for data to resolve these cases.
 	\item
-		We do not need two bitvectors in the lookup table, since it saves data for every node.
+		We do not need two bitvectors in the lookuptable, since it saves data for every node.
 	\end{itemize}
 \end{frame}
 
@@ -287,6 +299,15 @@
 	\item[1)] \textit{isDummyAncestorWithinMiniTree}
 	\item[2)] \textit{isDummyAncestorWithinMicroTree}
 	\item[3)] \textit{getParentForQuery}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Space complexity}
+	Our implementation takes $4n + o(n)$ bits to encode a tree of size $n$:
+	\begin{itemize}
+	\item[1)] The Microtree encoding takes $2n + o(n)$ bits, and huffman encoding reduces this further \cite{universalSuccinct}.
+	\item[2)] The FIDs takes $2n + o(n)$ bits in total.
+	\item[3)] All query data, all lookuptable entries, and all Typevectors and Dummys only take $o(n)$ bits each.
 	\end{itemize}
 \end{frame}
 
@@ -357,7 +378,7 @@
 	\end{figure}
 	\begin{itemize}
 	\item
-		Space reduction is fairly obvious.
+		Effective space reduction.
 	\item
 		XMark2 is larger than DBLP with huffman due to having more evenly distributed tree structures.
 	\end{itemize}
