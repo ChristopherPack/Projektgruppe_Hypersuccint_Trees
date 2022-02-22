@@ -99,7 +99,7 @@ def drawTree(startNode=None, resultNode=None):
 
 def loadTree():
     global tree
-    tree = pht_hst.PyHST(pathValue.get(), False, 12, 4)
+    tree = pht_hst.PyHST(pathValue.get(), False)
     drawTree()
 
 def executeQuery():
